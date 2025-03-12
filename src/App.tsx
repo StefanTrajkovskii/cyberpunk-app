@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import MissionDetailModal from './components/MissionDetailModal';
 import NavHeader from './components/NavHeader';
 import CyberFooter from './components/CyberFooter';
 import SplashScreen from './components/SplashScreen';
+import DataViz from './components/DataViz';
 
 // Types for our mission data
 interface Mission {
@@ -62,6 +63,75 @@ const SAMPLE_MISSIONS: Mission[] = [
   }
 ];
 
+// Define glitch animation keyframes
+const glitchEffect = keyframes`
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+`;
+
+const glitchText = keyframes`
+  0% {
+    text-shadow: -2px 0 #ff3e88, 2px 0 #00f6ff;
+    opacity: 1;
+  }
+  10% {
+    text-shadow: 2px 0 #ff3e88, -2px 0 #00f6ff;
+    opacity: 0.9;
+  }
+  20% {
+    text-shadow: -3px 0 #ff3e88, 3px 0 #00f6ff;
+    opacity: 1;
+  }
+  30% {
+    text-shadow: 3px 0 #ff3e88, -3px 0 #00f6ff;
+    opacity: 0.9;
+  }
+  40% {
+    text-shadow: -1px 0 #ff3e88, 1px 0 #00f6ff;
+    opacity: 1;
+  }
+  50% {
+    text-shadow: 1px 0 #ff3e88, -1px 0 #00f6ff;
+    opacity: 0.9;
+  }
+  60% {
+    text-shadow: -2px 0 #ff3e88, 2px 0 #00f6ff;
+    opacity: 1;
+  }
+  70% {
+    text-shadow: 2px 0 #ff3e88, -2px 0 #00f6ff;
+    opacity: 0.9;
+  }
+  80% {
+    text-shadow: -3px 0 #ff3e88, 3px 0 #00f6ff;
+    opacity: 1;
+  }
+  90% {
+    text-shadow: 3px 0 #ff3e88, -3px 0 #00f6ff;
+    opacity: 0.9;
+  }
+  100% {
+    text-shadow: -1px 0 #ff3e88, 1px 0 #00f6ff;
+    opacity: 1;
+  }
+`;
+
 // Styled components
 const AppContainer = styled.div`
   background-color: #0a0a12;
@@ -106,25 +176,46 @@ const MissionGrid = styled.div`
 `;
 
 const MissionCard = styled(motion.div)`
-  background: rgba(18, 18, 33, 0.8);
-  border: 1px solid #ff3e88;
-  border-radius: 5px;
+  background-color: rgba(7, 15, 25, 0.85);
+  border: 1px solid rgba(0, 246, 255, 0.3);
   padding: 1.5rem;
+  border-radius: 0.25rem;
   position: relative;
   overflow: hidden;
   cursor: pointer;
-  backdrop-filter: blur(5px);
-  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
   
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
-    width: 5px;
+    width: 100%;
     height: 100%;
-    background: #ff3e88;
-    box-shadow: 0 0 10px rgba(255, 62, 136, 0.7);
+    background: linear-gradient(
+      45deg,
+      rgba(0, 246, 255, 0.05) 0%,
+      rgba(255, 62, 136, 0.05) 100%
+    );
+    pointer-events: none;
+  }
+  
+  &:hover {
+    .mission-title {
+      animation: ${glitchText} 0.2s linear 1;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 246, 255, 0.05);
+      animation: ${glitchEffect} 0.2s linear 1;
+      pointer-events: none;
+    }
   }
 `;
 
@@ -365,14 +456,17 @@ function App() {
                   }}
                 >
                   SYSTEM:
-                </GlitchText> Welcome, edgerunner. <StatusHighlight>{missions.length}</StatusHighlight> active missions found.
+                </GlitchText> Welcome, netrunner. <StatusHighlight>{missions.length}</StatusHighlight> gigs available on the board.
               </StatusText>
               <StatusText>
-                Last updated: <StatusHighlight>{dateTime}</StatusHighlight>
+                Last scan: <StatusHighlight>{dateTime}</StatusHighlight>
               </StatusText>
             </StatusBar>
             
-            <SectionTitle>Available Missions</SectionTitle>
+            {/* Data Visualization Component */}
+            <DataViz title="NIGHT CITY NETWORK ACTIVITY" />
+            
+            <SectionTitle>Active Gigs</SectionTitle>
             
             <FilterBar>
               <FilterButton 
@@ -381,7 +475,7 @@ function App() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                All Missions
+                All Gigs
               </FilterButton>
               <FilterButton 
                 active={filter === 'easy'} 
@@ -427,7 +521,7 @@ function App() {
                     exit={{ opacity: 0, y: -20 }}
                   >
                     <RewardTag>{mission.reward}</RewardTag>
-                    <MissionTitle>{mission.title}</MissionTitle>
+                    <MissionTitle className="mission-title">{mission.title}</MissionTitle>
                     <DifficultyBadge level={mission.difficulty}>
                       {mission.difficulty}
                     </DifficultyBadge>

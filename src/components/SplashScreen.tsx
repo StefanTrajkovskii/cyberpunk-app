@@ -427,7 +427,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <GlitchingText>
-          HELLO <span>PSYCHO</span>
+          HELLO <span>NETRUNNER</span>
         </GlitchingText>
       </motion.div>
       
