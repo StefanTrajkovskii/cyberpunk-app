@@ -1,13 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+:root {
+  --neon-blue: #00f6ff;
+  --neon-pink: #ff3e88;
+  --neon-yellow: #faff00;
+  --dark-bg: #0a0a12;
+  --panel-bg: rgba(18, 18, 33, 0.8);
+  --text-color: #e4f3ff;
+  --text-secondary: #b8c0c2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  padding: 0;
+  font-family: 'Rajdhani', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--dark-bg);
+  color: var(--text-color);
+  line-height: 1.5;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: 'Share Tech Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+  background-color: rgba(0, 246, 255, 0.1);
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: var(--neon-blue);
+}
+
+/* Cyberpunk glow effect for text */
+.neon-text {
+  text-shadow:
+    0 0 5px rgba(0, 246, 255, 0.7),
+    0 0 10px rgba(0, 246, 255, 0.5),
+    0 0 15px rgba(0, 246, 255, 0.3);
+}
+
+.neon-text-pink {
+  text-shadow:
+    0 0 5px rgba(255, 62, 136, 0.7),
+    0 0 10px rgba(255, 62, 136, 0.5),
+    0 0 15px rgba(255, 62, 136, 0.3);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-pink);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-blue);
+}
+
+/* Cyberpunk border effect */
+.cyber-border {
+  position: relative;
+  border: 1px solid var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 246, 255, 0.5);
+  overflow: hidden;
+}
+
+.cyber-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    var(--neon-blue), 
+    transparent, 
+    var(--neon-pink), 
+    transparent, 
+    var(--neon-yellow));
+  z-index: -1;
+  filter: blur(10px);
+  animation: glitch 10s linear infinite;
+}
+
+@keyframes glitch {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: 100% 25%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  75% {
+    background-position: 25% 75%;
+  }
+  100% {
+    background-position: 0 0;
+  }
 }
