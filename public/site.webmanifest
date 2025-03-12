@@ -1,25 +1,25 @@
 {
-  "short_name": "Cyberpunk App",
   "name": "Night City Mission Board",
+  "short_name": "Cyberpunk App",
   "icons": [
     {
-      "src": "cyberpunk-favicon.png",
+      "src": "/cyberpunk-favicon.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/png"
     },
     {
-      "src": "cyberpunk-favicon.png",
+      "src": "/cyberpunk-favicon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "cyberpunk-favicon.png",
+      "src": "/cyberpunk-favicon.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
-  "display": "standalone",
   "theme_color": "#ff3e88",
-  "background_color": "#0a0a12"
-}
+  "background_color": "#0a0a12",
+  "display": "standalone",
+  "start_url": "/"
+} 
