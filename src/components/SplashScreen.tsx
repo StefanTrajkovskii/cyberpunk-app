@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import BootSequence from './BootSequence';
 
 interface SplashScreenProps {
@@ -282,7 +282,6 @@ const ACCESS_GRANTED_SOUND_URL = '/sounds/access_granted.mp3';
 const BUTTON_HOVER_SOUND_URL = '/sounds/button_hover.mp3';
 
 const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
-  const [cursorBlink, setCursorBlink] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [bootComplete, setBootComplete] = useState(false);
   
@@ -344,7 +343,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
     }
   };
   
-  const handleEnter = () => {
+  const handleEnter = useCallback(() => {
     console.log('handleEnter called, transitioning to main app');
     if (soundEnabled && accessGrantedSoundRef.current) {
       try {
@@ -354,7 +353,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
       }
     }
     onEnter();
-  };
+  }, [soundEnabled, onEnter]);
   
   const playHoverSound = () => {
     if (soundEnabled && buttonHoverSoundRef.current) {
@@ -389,16 +388,10 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
     
     document.addEventListener('keydown', handleKeyDown);
     
-    // Toggle cursor blink
-    const blinkInterval = setInterval(() => {
-      setCursorBlink(prev => !prev);
-    }, 500);
-    
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
-      clearInterval(blinkInterval);
     };
-  }, [bootComplete, onEnter]);
+  }, [bootComplete, onEnter, handleEnter]);
   
   // If not boot complete, show boot sequence
   if (!bootComplete) {
@@ -437,7 +430,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
         transition={{ duration: 0.8, delay: 0.8 }}
       >
         <PromptContainer>
-          <EnterPrompt>// ACCESS REQUIRED</EnterPrompt>
+          <EnterPrompt>{`// ACCESS REQUIRED`}</EnterPrompt>
           <motion.div
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ 
