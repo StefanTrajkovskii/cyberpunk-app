@@ -7,12 +7,13 @@ interface Mission {
   id: string;
   title: string;
   description: string;
-  reward: string;
+  reward: number;
   difficulty: 'easy' | 'medium' | 'hard';
   fixer: string;
   location: string;
   deadline: string;
   completed: boolean;
+  progress: number;
 }
 
 interface MissionDetailModalProps {
@@ -160,6 +161,12 @@ const RewardAmount = styled.div`
   text-shadow:
     0 0 5px rgba(0, 246, 255, 0.7),
     0 0 10px rgba(0, 246, 255, 0.5);
+    
+  &::before {
+    content: '¥';
+    margin-right: 0.3rem;
+    opacity: 0.7;
+  }
 `;
 
 const AcceptButton = styled(motion.button)`
@@ -326,7 +333,7 @@ const MissionDetailModal: React.FC<MissionDetailModalProps> = ({ mission, onClos
             
             <RewardSection>
               <DetailLabel>Payment Upon Completion</DetailLabel>
-              <RewardAmount>{mission.reward}</RewardAmount>
+              <RewardAmount>{mission.reward.toLocaleString()}</RewardAmount>
             </RewardSection>
             
             {mission.completed ? (

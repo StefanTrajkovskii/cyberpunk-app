@@ -1,78 +1,550 @@
-import React, { useState, useEffect, FormEvent } from 'react';
-import styled, { css } from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled, { css, keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import MissionDetailModal from './components/MissionDetailModal';
 import NavHeader from './components/NavHeader';
 import CyberFooter from './components/CyberFooter';
 import SplashScreen from './components/SplashScreen';
-import DailyTasks from './components/DailyTasks'; 
-
-
+import DailyTasks from './components/DailyTasks';
 
 // Types for our mission data
 interface Mission {
   id: string;
   title: string;
   description: string;
-  reward: string;
   difficulty: 'easy' | 'medium' | 'hard';
   fixer: string;
   location: string;
   deadline: string;
+  reward: number;
   completed: boolean;
+  progress: number;
 }
 
-// Sample mission data
-const SAMPLE_MISSIONS: Mission[] = [
-  {
-    id: '001',
-    title: 'Netrunner Extraction',
-    description: 'Extract a rogue netrunner from Arasaka Tower before they fry his neural implants.',
-    reward: '¥5,000',
-    difficulty: 'hard',
-    fixer: 'Wakako Okada',
-    location: 'Night City, Downtown',
-    deadline: '48 hours',
-    completed: false
-  },
-  {
-    id: '002',
-    title: 'Data Courier Run',
-    description: 'Transport a high-value data shard across town without getting flatlined.',
-    reward: '¥2,500',
-    difficulty: 'medium',
-    fixer: 'Dexter DeShawn',
-    location: 'Watson District',
-    deadline: '24 hours',
-    completed: false
-  },
-  {
-    id: '003',
-    title: 'Tech Retrieval',
-    description: 'Acquire prototype augmentation tech from a Militech convoy.',
-    reward: '¥3,500',
-    difficulty: 'medium',
-    fixer: 'Regina Jones',
-    location: 'Pacifica',
-    deadline: '72 hours',
-    completed: false
-  },
-  {
-    id: '004',
-    title: 'Recon Op',
-    description: 'Scout Maelstrom gang territory and report back on their numbers and equipment.',
-    reward: '¥1,200',
-    difficulty: 'easy',
-    fixer: 'Sebastian "Padre" Ibarra',
-    location: 'Northside',
-    deadline: '12 hours',
-    completed: false
+// Add task type
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  baseReward: number;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  type: 'HACK' | 'COMBAT' | 'STEALTH' | 'TECH';
+  completed: boolean;
+  difficulty: number;
+  consecutiveCompletions: number;
+}
+
+// Add animations
+const glitch = keyframes`
+  0% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(0);
   }
-];
+  1% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(-2px, 1px);
+  }
+  2% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(2px, -1px);
+  }
+  3% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(0);
+  }
+  100% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(0);
+  }
+`;
 
+const pulse = keyframes`
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+`;
 
+const scanlines = keyframes`
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 15px;
+  }
+`;
 
-// Styled components
+const holographicShimmer = keyframes`
+  0% {
+    opacity: 0.3;
+    transform: translateY(-10px) rotate(0deg);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(5px) rotate(0.5deg);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translateY(-10px) rotate(0deg);
+  }
+`;
+
+const dataCorruption = keyframes`
+  0% {
+    clip-path: inset(0 0 0 0);
+  }
+  5% {
+    clip-path: inset(33% 0 66% 0);
+  }
+  10% {
+    clip-path: inset(66% 0 33% 0);
+  }
+  15% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+`;
+
+const matrixRain = keyframes`
+  0% {
+    background-position: 0% -100%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+`;
+
+const circuitAnimation = keyframes`
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+`;
+
+// Helper functions
+const getRiskColor = (risk: string) => {
+  switch (risk) {
+    case 'LOW': return '#00ff9d';
+    case 'MEDIUM': return '#ffff00';
+    case 'HIGH': return '#ff3e3e';
+    case 'CRITICAL': return '#ff0000';
+    default: return '#ffffff';
+  }
+};
+
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case 'HACK': return '#00ff9d';
+    case 'COMBAT': return '#ff3e3e';
+    case 'STEALTH': return '#9d00ff';
+    case 'TECH': return '#00a2ff';
+    default: return '#ffffff';
+  }
+};
+
+// Add styled components
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  background: rgba(0, 0, 0, 0.8);
+  
+  @media (max-width: 768px) {
+    padding: 1rem 0.5rem;
+    width: 100%;
+  }
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15) 0px,
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    animation: ${scanlines} 0.5s linear infinite;
+    z-index: 2;
+  }
+`;
+
+const TaskGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+`;
+
+const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid ${({ type }) => getTypeColor(type)};
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 0 20px rgba(${({ type }) => {
+    switch (type) {
+      case 'HACK': return '0, 255, 157';
+      case 'COMBAT': return '255, 62, 62';
+      case 'STEALTH': return '157, 0, 255';
+      case 'TECH': return '0, 162, 255';
+      default: return '255, 255, 255';
+    }
+  }}, 0.2);
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  &::before {
+    background: 
+      linear-gradient(
+        90deg,
+        transparent 50%,
+        rgba(${({ type }) => {
+          switch (type) {
+            case 'HACK': return '0, 255, 157';
+            case 'COMBAT': return '255, 62, 62';
+            case 'STEALTH': return '157, 0, 255';
+            case 'TECH': return '0, 162, 255';
+            default: return '255, 255, 255';
+          }
+        }}, 0.1) 100%
+      ),
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='none' stroke='%23FFF' stroke-width='0.25'/%3E%3Cpath d='M10 0v100M20 0v100M30 0v100M40 0v100M50 0v100M60 0v100M70 0v100M80 0v100M90 0v100M0 10h100M0 20h100M0 30h100M0 40h100M0 50h100M0 60h100M0 70h100M0 80h100M0 90h100' fill='none' stroke='%23FFF' stroke-width='0.125'/%3E%3C/svg%3E");
+    opacity: 0.1;
+    animation: ${circuitAnimation} 20s linear infinite;
+  }
+
+  &::after {
+    background: linear-gradient(
+      0deg,
+      transparent 0%,
+      rgba(${({ type }) => {
+        switch (type) {
+          case 'HACK': return '0, 255, 157';
+          case 'COMBAT': return '255, 62, 62';
+          case 'STEALTH': return '157, 0, 255';
+          case 'TECH': return '0, 162, 255';
+          default: return '255, 255, 255';
+        }
+      }}, 0.1) 50%,
+      transparent 100%
+    );
+    animation: ${matrixRain} 2s linear infinite;
+  }
+
+  ${({ riskLevel }) => riskLevel === 'CRITICAL' && css`
+    animation: ${dataCorruption} 5s infinite;
+  `}
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+      0 5px 30px rgba(${({ type }) => {
+        switch (type) {
+          case 'HACK': return '0, 255, 157';
+          case 'COMBAT': return '255, 62, 62';
+          case 'STEALTH': return '157, 0, 255';
+          case 'TECH': return '0, 162, 255';
+          default: return '255, 255, 255';
+        }
+      }}, 0.3),
+      inset 0 0 20px rgba(${({ type }) => {
+        switch (type) {
+          case 'HACK': return '0, 255, 157';
+          case 'COMBAT': return '255, 62, 62';
+          case 'STEALTH': return '157, 0, 255';
+          case 'TECH': return '0, 162, 255';
+          default: return '255, 255, 255';
+        }
+      }}, 0.2);
+  }
+`;
+
+const TaskHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+`;
+
+const TaskTitle = styled.h3<{ type: string }>`
+  color: ${({ type }) => getTypeColor(type)};
+  font-size: 1.3rem;
+  margin: 0;
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  position: relative;
+  padding-left: 20px;
+  text-shadow: 0 0 10px currentColor;
+  letter-spacing: 2px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    background: currentColor;
+    transform: translateY(-50%);
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  &::after {
+    content: '[EXECUTING]';
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: 0.3s;
+  }
+
+  ${TaskCard}:hover &::after {
+    opacity: 0.7;
+    animation: ${glitch} 1s infinite;
+  }
+`;
+
+const RiskBadge = styled.div<{ risk: string }>`
+  color: ${({ risk }) => getRiskColor(risk)};
+  border: 1px solid currentColor;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 0 5px currentColor;
+
+  ${({ risk }) => risk === 'CRITICAL' && css`
+    animation: ${glitch} 3s infinite;
+    &::before {
+      content: 'DANGER';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: red;
+      mix-blend-mode: multiply;
+      animation: ${dataCorruption} 2s infinite;
+    }
+  `}
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: currentColor;
+    opacity: 0.1;
+  }
+`;
+
+const DifficultyMeter = styled.div`
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 1rem 0;
+  position: relative;
+  overflow: hidden;
+`;
+
+const DifficultyFill = styled.div<{ difficulty: number; type: string }>`
+  width: ${({ difficulty }) => (difficulty * 10)}%;
+  height: 100%;
+  background: ${({ type }) => getTypeColor(type)};
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2px;
+    height: 100%;
+    background: white;
+    opacity: 0.5;
+  }
+`;
+
+const TaskDescription = styled.p`
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  line-height: 1.6;
+`;
+
+const TaskFooter = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const RewardSection = styled.div``;
+
+const BaseReward = styled.div<{ type: string }>`
+  color: ${({ type }) => getTypeColor(type)};
+  font-size: 1.2rem;
+  font-family: 'Share Tech Mono', monospace;
+  
+  &::before {
+    content: '¥';
+    margin-right: 0.3rem;
+    opacity: 0.7;
+  }
+`;
+
+const StreakMultiplier = styled.div`
+  color: #ffff00;
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+`;
+
+const ExecuteButton = styled(motion.button)<{ type: string }>`
+  background: transparent;
+  border: 2px solid ${({ type }) => getTypeColor(type)};
+  color: ${({ type }) => getTypeColor(type)};
+  padding: 0.7rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px currentColor;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: ${({ type }) => getTypeColor(type)};
+    opacity: 0.2;
+    transition: all 0.3s ease;
+    z-index: -1;
+  }
+
+  &:hover:not(:disabled) {
+    background: ${({ type }) => getTypeColor(type)};
+    color: #000000;
+    text-shadow: none;
+    
+    &::before {
+      left: 0;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-style: dashed;
+    
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #00ff9d;
+    }
+  }
+`;
+
+const TaskStats = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+`;
+
+const StatItem = styled.div<{ type: string }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  
+  span:first-child {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+  }
+  
+  span:last-child {
+    font-size: 1rem;
+    color: ${({ type }) => getTypeColor(type)};
+    font-family: 'Share Tech Mono', monospace;
+  }
+`;
+
+const ProgressBar = styled.div<{ progress: number; type: string }>`
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  position: relative;
+  margin: 1rem 0;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: ${props => props.progress}%;
+    background: ${props => getTypeColor(props.type)};
+    box-shadow: 0 0 10px ${props => getTypeColor(props.type)};
+    transition: width 0.3s ease;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: ${props => props.progress}%;
+    height: 100%;
+    width: 4px;
+    background: white;
+    opacity: 0.5;
+    box-shadow: 0 0 5px white;
+  }
+`;
+
+// Add a type for our different views
+type ViewType = 'daily' | 'missions' | 'market' | 'messages';
+
+// Add back the core styled components
 const AppContainer = styled.div`
   background-color: #0a0a12;
   min-height: 100vh;
@@ -108,137 +580,6 @@ const MainContent = styled.main`
   margin: 2rem auto;
   padding: 0 1.5rem;
 `;
-
-const MissionGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-`;
-
-const TitleRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-`;
-
-const FilterContainer = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-`;
-
-const MissionCard = styled(motion.div)<{ difficulty: string; completed: boolean }>`
-  background: ${props => props.completed ? 'rgba(35, 209, 139, 0.05)' : 'rgba(10, 10, 18, 0.7)'};
-  border: 1px solid ${props => 
-    props.completed ? '#23d18b' : 
-    props.difficulty === 'easy' ? '#10823A' : 
-    props.difficulty === 'medium' ? '#FF8A15' : 
-    '#E93845'};
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 
-    ${props => props.completed ? 
-    '0 0 10px rgba(35, 209, 139, 0.3)' : 
-    '0 0 8px rgba(255, 62, 136, 0.2)'};
-  padding: 1.5rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  
-  ${props => props.completed && css`
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: linear-gradient(90deg, #23d18b, transparent);
-    }
-  `}
-`;
-
-const MissionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-`;
-
-const MissionTitle = styled.h3`
-  font-size: 1.3rem;
-  color: #e4f3ff;
-  margin: 0;
-  font-weight: 600;
-  letter-spacing: 1px;
-`;
-
-const MissionId = styled.span`
-  font-size: 0.8rem;
-  color: #b8c0c2;
-  font-family: 'Share Tech Mono', monospace;
-  opacity: 0.7;
-`;
-
-const MissionDetails = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-`;
-
-const MissionFixer = styled.span`
-  font-size: 0.9rem;
-  color: #00f6ff;
-`;
-
-const MissionLocation = styled.span`
-  font-size: 0.9rem;
-  color: #b8c0c2;
-`;
-
-const MissionReward = styled.div`
-  font-size: 1.4rem;
-  color: #23d18b;
-  font-weight: 700;
-  margin: 1rem 0;
-  text-shadow: 0 0 5px rgba(35, 209, 139, 0.5);
-`;
-
-const CompleteButton = styled(motion.button)`
-  width: 100%;
-  padding: 0.7rem;
-  background: linear-gradient(90deg, #23d18b 0%, #1aa073 100%);
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-top: 1rem;
-  box-shadow: 0 0 10px rgba(35, 209, 139, 0.3);
-  
-  &:hover {
-    background: linear-gradient(90deg, #29eca0 0%, #1fc088 100%);
-  }
-`;
-
-const CompletedBadge = styled(motion.div)`
-  background: rgba(35, 209, 139, 0.2);
-  color: #23d18b;
-  text-align: center;
-  padding: 0.7rem;
-  border-radius: 5px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  margin-top: 1rem;
-  border: 1px solid #23d18b;
-`;
-
-
 
 const StatusBar = styled.div`
   background: rgba(10, 10, 18, 0.9);
@@ -288,264 +629,224 @@ const GlitchText = styled(motion.span)`
   }
 `;
 
-const SectionTitle = styled.h2`
-  color: #e4f3ff;
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-  padding-bottom: 0.5rem;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 100%;
-    background: linear-gradient(90deg, #ff3e88, transparent);
-  }
-`;
-
-
-
-const FilterButton = styled(motion.button)<{ active?: boolean; isCompleted?: boolean }>`
-  padding: 0.5rem 1rem;
-  background: ${({ active, isCompleted }) => 
-    isCompleted && active ? 'rgba(35, 209, 139, 0.2)' :
-    active ? 'rgba(255, 62, 136, 0.2)' : 
-    'rgba(15, 15, 35, 0.6)'};
-  border: 1px solid ${({ active, isCompleted }) => 
-    isCompleted && active ? '#23d18b' :
-    active ? '#ff3e88' : 
-    'rgba(0, 246, 255, 0.3)'};
-  border-radius: 4px;
-  color: ${({ active, isCompleted }) => 
-    isCompleted && active ? '#23d18b' :
-    active ? '#ff3e88' : 
-    '#e4f3ff'};
-  font-size: 0.9rem;
-  font-weight: 600;
+const AddJobButton = styled(motion.button)`
+  background: rgba(0, 246, 255, 0.1);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  color: #00f6ff;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    border-color: ${({ isCompleted }) => isCompleted ? '#23d18b' : '#ff3e88'};
-    background: ${({ isCompleted }) => 
-      isCompleted ? 'rgba(35, 209, 139, 0.1)' : 
-      'rgba(255, 62, 136, 0.1)'};
-  }
-`;
-
-// Add these new styled components for the job form modal
-const ModalOverlay = styled(motion.div)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(7, 10, 25, 0.85);
-  backdrop-filter: blur(5px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled(motion.div)`
-  background: #0a0a12;
-  border: 1px solid #00f6ff;
-  border-radius: 5px;
-  padding: 2rem;
-  width: 90%;
-  max-width: 600px;
-  color: #e4f3ff;
   position: relative;
   overflow: hidden;
-  
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px currentColor;
+  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  align-self: flex-start;
+
   &::before {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #ff3e88, #00f6ff);
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 50% 0%, rgba(0, 246, 255, 0.1), transparent 70%);
-    pointer-events: none;
+    background: rgba(0, 246, 255, 0.1);
+    transition: 0.5s;
+    z-index: -1;
   }
+
+  &:hover {
+    background: rgba(0, 246, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 246, 255, 0.2);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &::after {
+    content: '+';
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-right: 0.5rem;
+  }
+`;
+
+const HeaderSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+`;
+
+// Add modal styled components
+const ModalOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(5px);
+`;
+
+const ModalContent = styled(motion.div)`
+  background: rgba(10, 10, 18, 0.95);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  padding: 2rem;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
 `;
 
 const FormTitle = styled.h2`
   color: #00f6ff;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  position: relative;
-  display: inline-block;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -5px;
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, #00f6ff, transparent);
-  }
+  font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px currentColor;
 `;
 
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  
+  margin-bottom: 2rem;
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
-`;
 
-const FormGroup = styled.div`
-  margin-bottom: 1.2rem;
-  
-  &.full-width {
+  .full-width {
     grid-column: 1 / -1;
   }
 `;
 
+const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
 const Label = styled.label`
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #00f6ff;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 `;
 
 const Input = styled.input`
-  width: 100%;
-  padding: 0.7rem;
-  background: rgba(7, 15, 25, 0.7);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 246, 255, 0.3);
-  border-radius: 4px;
-  color: #e4f3ff;
+  padding: 0.75rem;
+  color: #fff;
   font-family: 'Share Tech Mono', monospace;
-  transition: border-color 0.2s ease;
-  
+  outline: none;
+  transition: all 0.3s ease;
+
   &:focus {
-    outline: none;
     border-color: #00f6ff;
-    box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
   }
 `;
 
 const TextArea = styled.textarea`
-  width: 100%;
-  padding: 0.7rem;
-  background: rgba(7, 15, 25, 0.7);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 246, 255, 0.3);
-  border-radius: 4px;
-  color: #e4f3ff;
+  padding: 0.75rem;
+  color: #fff;
   font-family: 'Share Tech Mono', monospace;
+  outline: none;
+  transition: all 0.3s ease;
   min-height: 100px;
   resize: vertical;
-  
+
   &:focus {
-    outline: none;
     border-color: #00f6ff;
-    box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
   }
 `;
 
 const Select = styled.select`
-  width: 100%;
-  padding: 0.7rem;
-  background: rgba(7, 15, 25, 0.7);
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 246, 255, 0.3);
-  border-radius: 4px;
-  color: #e4f3ff;
+  padding: 0.75rem;
+  color: #fff;
   font-family: 'Share Tech Mono', monospace;
-  
+  outline: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
   &:focus {
-    outline: none;
     border-color: #00f6ff;
-    box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+  }
+
+  option {
+    background: #0a0a12;
   }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 1rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  gap: 1rem;
+  margin-top: 2rem;
 `;
 
 const Button = styled(motion.button)`
-  padding: 0.7rem 1.5rem;
-  background: rgba(255, 62, 136, 0.2);
-  border: 1px solid #ff3e88;
-  border-radius: 4px;
-  color: #ff3e88;
-  font-size: 0.9rem;
-  font-weight: 600;
+  background: transparent;
+  border: 1px solid #00f6ff;
+  color: #00f6ff;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
   cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background: rgba(255, 62, 136, 0.3);
-    box-shadow: 0 0 15px rgba(255, 62, 136, 0.5);
-  }
-  
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+
   &.cancel {
-    background: rgba(7, 15, 25, 0.7);
-    border-color: rgba(0, 246, 255, 0.3);
-    color: #e4f3ff;
-    
-    &:hover {
-      border-color: #00f6ff;
-      box-shadow: 0 0 15px rgba(0, 246, 255, 0.3);
-    }
+    border-color: #ff3e88;
+    color: #ff3e88;
   }
-`;
 
-const AddButton = styled(motion.button)`
-  padding: 0.7rem 1.5rem;
-  background: rgba(35, 209, 139, 0.2);
-  border: 1px solid #23d18b;
-  border-radius: 4px;
-  color: #23d18b;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-left: auto; /* Push to the right */
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  
   &:hover {
-    background: rgba(35, 209, 139, 0.3);
-    box-shadow: 0 0 15px rgba(35, 209, 139, 0.3);
+    background: rgba(0, 246, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 246, 255, 0.2);
+  }
+
+  &.cancel:hover {
+    background: rgba(255, 62, 136, 0.1);
+    box-shadow: 0 0 20px rgba(255, 62, 136, 0.2);
   }
 `;
 
-
-// Add a type for our different views
-type ViewType = 'daily' | 'missions' | 'market' | 'messages';
+// Add new job interface
+interface NewJob {
+  title: string;
+  description: string;
+  baseReward: number;
+  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  type: 'HACK' | 'COMBAT' | 'STEALTH' | 'TECH';
+  difficulty: number;
+}
 
 function App() {
-  // Initialize state from localStorage or use default values if no saved data exists
-  const [missions, setMissions] = useState<Mission[]>(() => {
-    const savedMissions = localStorage.getItem('cyberpunk_missions');
-    return savedMissions ? JSON.parse(savedMissions) : SAMPLE_MISSIONS;
-  });
-  
-  const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
+  const [currentView, setCurrentView] = useState<ViewType>('daily');
+  const [currency, setCurrency] = useState<number>(0);
+  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
   const [dateTime] = useState<string>(new Date().toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -553,162 +854,130 @@ function App() {
     hour: '2-digit',
     minute: '2-digit'
   }));
-  const [filter, setFilter] = useState<string>('all');
-  // Always show splash screen on refresh
-  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
-  
-  // Currency system - load from localStorage or start at 0
-  const [currency, setCurrency] = useState<number>(() => {
-    const savedCurrency = localStorage.getItem('cyberpunk_currency');
-    return savedCurrency ? parseInt(savedCurrency, 10) : 0;
-  });
-  
-  // New state for job form modal
-  const [isAddJobModalOpen, setIsAddJobModalOpen] = useState<boolean>(false);
-  const [newJob, setNewJob] = useState<Partial<Mission>>({
-    difficulty: 'medium' // Default value
-  });
 
-  const [currentView, setCurrentView] = useState<ViewType>('daily');
-
-  // Save missions to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('cyberpunk_missions', JSON.stringify(missions));
-  }, [missions]);
-  
-  // Save currency to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('cyberpunk_currency', currency.toString());
-  }, [currency]);
-
-  // Function to complete a mission and earn reward
-  const handleCompleteMission = (missionId: string) => {
-    // Find the mission
-    const missionToComplete = missions.find(m => m.id === missionId);
-    
-    if (missionToComplete && !missionToComplete.completed) {
-      // Extract the numeric value from the reward string (e.g., "¥5,000" -> 5000)
-      const rewardValue = parseInt(missionToComplete.reward.replace(/\D/g, ''), 10);
-      
-      // Update currency
-      setCurrency(prev => prev + rewardValue);
-      
-      // Mark mission as completed
-      setMissions(prev => 
-        prev.map(mission => 
-          mission.id === missionId 
-            ? { ...mission, completed: true } 
-            : mission
-        )
-      );
-      
-      // Close modal if it's open
-      setSelectedMission(null);
+  const [tasks, setTasks] = useState<Task[]>([
+    {
+      id: '1',
+      title: 'System Breach',
+      description: 'Infiltrate corporate security systems and disable primary firewalls.',
+      baseReward: 500,
+      riskLevel: 'MEDIUM',
+      type: 'HACK',
+      completed: false,
+      difficulty: 6,
+      consecutiveCompletions: 0
+    },
+    {
+      id: '2',
+      title: 'Street Cleanup',
+      description: 'Clear out hostile gang members from the local district.',
+      baseReward: 750,
+      riskLevel: 'HIGH',
+      type: 'COMBAT',
+      completed: false,
+      difficulty: 8,
+      consecutiveCompletions: 0
+    },
+    {
+      id: '3',
+      title: 'Data Extraction',
+      description: 'Retrieve sensitive data from a heavily guarded server room.',
+      baseReward: 1000,
+      riskLevel: 'CRITICAL',
+      type: 'STEALTH',
+      completed: false,
+      difficulty: 9,
+      consecutiveCompletions: 0
+    },
+    {
+      id: '4',
+      title: 'Cyberware Maintenance',
+      description: "Perform routine maintenance on local clinic's medical equipment.",
+      baseReward: 300,
+      riskLevel: 'LOW',
+      type: 'TECH',
+      completed: false,
+      difficulty: 4,
+      consecutiveCompletions: 0
     }
-  };
+  ]);
 
-  const handleMissionClick = (mission: Mission) => {
-    setSelectedMission(mission);
-  };
-
-  const handleCloseModal = () => {
-    setSelectedMission(null);
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newJob, setNewJob] = useState<NewJob>({
+    title: '',
+    description: '',
+    baseReward: 500,
+    riskLevel: 'MEDIUM',
+    type: 'HACK',
+    difficulty: 5
+  });
 
   const handleSplashEnter = () => {
     console.log('Splash screen complete, showing main app');
     setSplashScreenActive(false);
   };
-  
-  // Add Job form handlers
-  const openAddJobModal = () => {
-    setIsAddJobModalOpen(true);
-  };
-  
-  const closeAddJobModal = () => {
-    setIsAddJobModalOpen(false);
-    // Reset form when closing
-    setNewJob({
-      difficulty: 'medium'
-    });
-  };
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    if (name === 'reward') {
-      // Remove any non-digit characters from the input
-      const numericValue = value.replace(/\D/g, '');
-      
-      if (numericValue === '') {
-        setNewJob(prev => ({
-          ...prev,
-          reward: ''
-        }));
-      } else {
-        // Convert to number and format with yen symbol and commas
-        const formattedValue = `¥${parseInt(numericValue).toLocaleString()}`;
-        setNewJob(prev => ({
-          ...prev,
-          reward: formattedValue
-        }));
-      }
-    } else if (name === 'deadline') {
-      // Remove any non-digit characters from the input
-      const numericValue = value.replace(/\D/g, '');
-      
-      if (numericValue === '') {
-        setNewJob(prev => ({
-          ...prev,
-          deadline: ''
-        }));
-      } else {
-        // Add "hours" after the number
-        const formattedValue = `${parseInt(numericValue)} hours`;
-        setNewJob(prev => ({
-          ...prev,
-          deadline: formattedValue
-        }));
-      }
+    if (name === 'baseReward') {
+      // Remove all non-numeric characters and parse as integer
+      const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0;
+      setNewJob(prev => ({
+        ...prev,
+        baseReward: numericValue
+      }));
     } else {
       setNewJob(prev => ({
         ...prev,
-        [name]: value
+        [name]: name === 'difficulty' ? Number(value) : value
       }));
     }
   };
-  
-  const handleAddJob = (e: FormEvent) => {
-    e.preventDefault();
-    
-    // Generate a unique ID
-    const id = `00${missions.length + 1}`;
-    
-    // Create new mission object
-    const newMission: Mission = {
-      id,
-      title: newJob.title || 'Untitled Job',
-      description: newJob.description || 'No description provided.',
-      reward: newJob.reward || '¥0',
-      difficulty: (newJob.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
-      fixer: newJob.fixer || 'Anonymous',
-      location: newJob.location || 'Unknown',
-      deadline: newJob.deadline || '24 hours',
-      completed: false
-    };
-    
-    // Add to missions array
-    setMissions(prev => [...prev, newMission]);
-    
-    // Close modal
-    closeAddJobModal();
+
+  const handleAddJob = () => {
+    setIsModalOpen(true);
+    setNewJob({
+      title: '',
+      description: '',
+      baseReward: 500,
+      riskLevel: 'MEDIUM',
+      type: 'HACK',
+      difficulty: 5
+    });
   };
 
-  const filteredMissions = filter === 'completed' 
-    ? missions.filter(mission => mission.completed)
-    : filter === 'all' 
-      ? missions.filter(mission => !mission.completed)
-      : missions.filter(mission => mission.difficulty === filter && !mission.completed);
+  const handleSubmitJob = () => {
+    const task: Task = {
+      id: (tasks.length + 1).toString(),
+      ...newJob,
+      completed: false,
+      consecutiveCompletions: 0
+    };
+    setTasks([...tasks, task]);
+    setIsModalOpen(false);
+  };
+
+  const handleExecuteTask = (taskId: string) => {
+    setTasks(prevTasks => prevTasks.map(task => {
+      if (task.id === taskId && !task.completed) {
+        // Calculate reward with streak bonus
+        const streakBonus = task.consecutiveCompletions * 0.1;
+        const totalReward = Math.floor(task.baseReward * (1 + streakBonus));
+        
+        // Add reward to currency
+        setCurrency(prev => prev + totalReward);
+        
+        // Update task
+        return {
+          ...task,
+          completed: true,
+          consecutiveCompletions: task.consecutiveCompletions + 1
+        };
+      }
+      return task;
+    }));
+  };
 
   // Render splash screen if active
   if (splashScreenActive) {
@@ -726,7 +995,7 @@ function App() {
       >
         <AppContainer>
           <NavHeader 
-            missionCount={missions.length} 
+            missionCount={0}
             currency={currency}
             currentView={currentView}
             onViewChange={setCurrentView}
@@ -739,148 +1008,118 @@ function App() {
               />
             )}
             {currentView === 'missions' && (
-              <>
-                <StatusBar>
-                  <StatusText>
-                    <GlitchText
-                      data-text="SYSTEM:"
-                      animate={{
-                        x: [0, -2, 0, 2, 0],
-                      }}
-                      transition={{
-                        duration: 0.5,
-                        repeat: Infinity,
-                        repeatType: "mirror",
-                        repeatDelay: 5
-                      }}
-                    >
-                      SYSTEM:
-                    </GlitchText> Welcome, netrunner. <StatusHighlight>{missions.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
-                  </StatusText>
-                  <StatusText>
-                    <GlitchText
-                      data-text="STATUS:"
-                      animate={{
-                        x: [0, -1, 0, 1, 0],
-                      }}
-                      transition={{
-                        duration: 0.3,
-                        repeat: Infinity,
-                        repeatType: "mirror",
-                        repeatDelay: 7
-                      }}
-                    >
-                      STATUS:
-                    </GlitchText> {dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight>
-                  </StatusText>
-                </StatusBar>
-                
-                <TitleRow>
-                  <SectionTitle>
-                    ACTIVE GIGS
-                  </SectionTitle>
-                  <AddButton
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={openAddJobModal}
+              <Container>
+                <HeaderSection>
+                  <StatusBar>
+                    <StatusText>
+                      <GlitchText
+                        data-text="SYSTEM:"
+                        animate={{
+                          x: [0, -2, 0, 2, 0],
+                        }}
+                        transition={{
+                          duration: 0.5,
+                          repeat: Infinity,
+                          repeatType: "mirror",
+                          repeatDelay: 5
+                        }}
+                      >
+                        SYSTEM:
+                      </GlitchText> Welcome, netrunner. <StatusHighlight>{tasks.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
+                    </StatusText>
+                    <StatusText>
+                      <GlitchText
+                        data-text="STATUS:"
+                        animate={{
+                          x: [0, -1, 0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 0.3,
+                          repeat: Infinity,
+                          repeatType: "mirror",
+                          repeatDelay: 7
+                        }}
+                      >
+                        STATUS:
+                      </GlitchText> {dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight>
+                    </StatusText>
+                  </StatusBar>
+                  <AddJobButton
+                    onClick={handleAddJob}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    + NEW JOB
-                  </AddButton>
-                </TitleRow>
-                
-                <FilterContainer>
-                  <FilterButton 
-                    active={filter === 'all'} 
-                    onClick={() => setFilter('all')}
-                    whileHover={{ y: -3 }}
-                    whileTap={{ y: 0 }}
-                  >
-                    ALL JOBS
-                  </FilterButton>
-                  <FilterButton 
-                    active={filter === 'easy'} 
-                    onClick={() => setFilter('easy')}
-                    whileHover={{ y: -3 }}
-                    whileTap={{ y: 0 }}
-                    color="#10823A"
-                  >
-                    EASY
-                  </FilterButton>
-                  <FilterButton 
-                    active={filter === 'medium'} 
-                    onClick={() => setFilter('medium')}
-                    whileHover={{ y: -3 }}
-                    whileTap={{ y: 0 }}
-                    color="#FF8A15"
-                  >
-                    MEDIUM
-                  </FilterButton>
-                  <FilterButton 
-                    active={filter === 'hard'} 
-                    onClick={() => setFilter('hard')}
-                    whileHover={{ y: -3 }}
-                    whileTap={{ y: 0 }}
-                    color="#E93845"
-                  >
-                    HARD
-                  </FilterButton>
-                  <FilterButton 
-                    active={filter === 'completed'} 
-                    onClick={() => setFilter('completed')}
-                    whileHover={{ y: -3 }}
-                    whileTap={{ y: 0 }}
-                    isCompleted={true}
-                  >
-                    COMPLETED
-                  </FilterButton>
-                </FilterContainer>
-                
-                <MissionGrid>
-                  {filteredMissions.map(mission => (
-                    <MissionCard 
-                      key={mission.id}
-                      onClick={() => handleMissionClick(mission)}
-                      whileHover={{ y: -5, boxShadow: '0 8px 30px rgba(0, 0, 0, 0.2)' }}
-                      whileTap={{ y: 0 }}
-                      difficulty={mission.difficulty}
-                      completed={mission.completed}
-                    >
-                      <MissionHeader>
-                        <MissionTitle>{mission.title}</MissionTitle>
-                        <MissionId>ID: {mission.id}</MissionId>
-                      </MissionHeader>
-                      
-                      <MissionDetails>
-                        <MissionFixer>{mission.fixer}</MissionFixer>
-                        <MissionLocation>{mission.location}</MissionLocation>
-                      </MissionDetails>
-                      
-                      <MissionReward>{mission.reward}</MissionReward>
-                      
-                      {mission.completed ? (
-                        <CompletedBadge 
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        >
-                          COMPLETED
-                        </CompletedBadge>
-                      ) : (
-                        <CompleteButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCompleteMission(mission.id);
-                          }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          COMPLETE
-                        </CompleteButton>
-                      )}
-                    </MissionCard>
-                  ))}
-                </MissionGrid>
-              </>
+                    NEW JOB
+                  </AddJobButton>
+                </HeaderSection>
+
+                <TaskGrid>
+                  <AnimatePresence>
+                    {tasks.map(task => (
+                      <TaskCard
+                        key={task.id}
+                        type={task.type}
+                        riskLevel={task.riskLevel}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <TaskHeader>
+                          <TaskTitle type={task.type}>{task.title}</TaskTitle>
+                          <RiskBadge risk={task.riskLevel}>{task.riskLevel}</RiskBadge>
+                        </TaskHeader>
+
+                        <DifficultyMeter>
+                          <DifficultyFill difficulty={task.difficulty} type={task.type} />
+                        </DifficultyMeter>
+
+                        <TaskStats>
+                          <StatItem type={task.type}>
+                            <span>DIFFICULTY</span>
+                            <span>{task.difficulty}/10</span>
+                          </StatItem>
+                          <StatItem type={task.type}>
+                            <span>STREAK</span>
+                            <span>{task.consecutiveCompletions}x</span>
+                          </StatItem>
+                          <StatItem type={task.type}>
+                            <span>REWARD</span>
+                            <span>¥{task.baseReward}</span>
+                          </StatItem>
+                        </TaskStats>
+
+                        <TaskDescription>{task.description}</TaskDescription>
+
+                        <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
+
+                        <TaskFooter>
+                          <RewardSection>
+                            <BaseReward type={task.type}>
+                              {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}
+                            </BaseReward>
+                            {task.consecutiveCompletions > 0 && (
+                              <StreakMultiplier>
+                                {task.consecutiveCompletions}x STREAK (+{task.consecutiveCompletions * 10}%)
+                              </StreakMultiplier>
+                            )}
+                          </RewardSection>
+
+                          <ExecuteButton
+                            type={task.type}
+                            onClick={() => handleExecuteTask(task.id)}
+                            disabled={task.completed}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            {task.completed ? 'COMPLETED' : 'EXECUTE'}
+                          </ExecuteButton>
+                        </TaskFooter>
+                      </TaskCard>
+                    ))}
+                  </AnimatePresence>
+                </TaskGrid>
+              </Container>
             )}
             {currentView === 'market' && (
               <div>Market coming soon...</div>
@@ -890,145 +1129,125 @@ function App() {
             )}
           </MainContent>
           
-          {/* Mission Detail Modal */}
           <AnimatePresence>
-            {selectedMission && (
-              <MissionDetailModal 
-                mission={selectedMission} 
-                onClose={handleCloseModal}
-                onComplete={handleCompleteMission}
-              />
-            )}
-          </AnimatePresence>
-          
-          {/* New Job Form Modal */}
-          <AnimatePresence>
-            {isAddJobModalOpen && (
+            {isModalOpen && (
               <ModalOverlay
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={closeAddJobModal}
+                onClick={() => setIsModalOpen(false)}
               >
                 <ModalContent
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.9, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                  onClick={(e) => e.stopPropagation()} // Prevent closing when clicking form
+                  onClick={e => e.stopPropagation()}
                 >
                   <FormTitle>CREATE NEW JOB</FormTitle>
-                  <form onSubmit={handleAddJob}>
+                  <form onSubmit={e => { e.preventDefault(); handleSubmitJob(); }}>
                     <FormGrid>
                       <FormGroup>
                         <Label htmlFor="title">Job Title</Label>
-                        <Input 
-                          type="text" 
-                          id="title" 
-                          name="title" 
-                          value={newJob.title || ''} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter job title" 
-                          required 
+                        <Input
+                          type="text"
+                          id="title"
+                          name="title"
+                          value={newJob.title}
+                          onChange={handleInputChange}
+                          placeholder="Enter job title"
+                          required
                         />
                       </FormGroup>
-                      
+
                       <FormGroup>
-                        <Label htmlFor="reward">Reward</Label>
-                        <Input 
-                          type="text" 
-                          id="reward" 
-                          name="reward" 
-                          value={newJob.reward || ''} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter reward amount" 
-                          required 
+                        <Label htmlFor="baseReward">Reward</Label>
+                        <Input
+                          type="text"
+                          id="baseReward"
+                          name="baseReward"
+                          value={`¥${newJob.baseReward.toLocaleString()}`}
+                          onChange={handleInputChange}
+                          placeholder="¥1,000"
+                          required
                         />
                       </FormGroup>
-                      
+
                       <FormGroup className="full-width">
                         <Label htmlFor="description">Description</Label>
-                        <TextArea 
-                          id="description" 
-                          name="description" 
-                          value={newJob.description || ''} 
-                          onChange={handleInputChange} 
-                          placeholder="Describe the job in detail" 
-                          required 
+                        <TextArea
+                          id="description"
+                          name="description"
+                          value={newJob.description}
+                          onChange={handleInputChange}
+                          placeholder="Describe the job in detail"
+                          required
                         />
                       </FormGroup>
-                      
+
                       <FormGroup>
-                        <Label htmlFor="difficulty">Difficulty</Label>
-                        <Select 
-                          id="difficulty" 
-                          name="difficulty" 
-                          value={newJob.difficulty || 'medium'} 
-                          onChange={handleInputChange} 
+                        <Label htmlFor="type">Job Type</Label>
+                        <Select
+                          id="type"
+                          name="type"
+                          value={newJob.type}
+                          onChange={handleInputChange}
                           required
                         >
-                          <option value="easy">Easy</option>
-                          <option value="medium">Medium</option>
-                          <option value="hard">Hard</option>
+                          <option value="HACK">HACK</option>
+                          <option value="COMBAT">COMBAT</option>
+                          <option value="STEALTH">STEALTH</option>
+                          <option value="TECH">TECH</option>
                         </Select>
                       </FormGroup>
-                      
+
                       <FormGroup>
-                        <Label htmlFor="deadline">Deadline</Label>
-                        <Input 
-                          type="text" 
-                          id="deadline" 
-                          name="deadline" 
-                          value={newJob.deadline || ''} 
-                          onChange={handleInputChange} 
-                          placeholder="Enter hours (numbers only)" 
-                          required 
-                        />
+                        <Label htmlFor="riskLevel">Risk Level</Label>
+                        <Select
+                          id="riskLevel"
+                          name="riskLevel"
+                          value={newJob.riskLevel}
+                          onChange={handleInputChange}
+                          required
+                        >
+                          <option value="LOW">LOW</option>
+                          <option value="MEDIUM">MEDIUM</option>
+                          <option value="HIGH">HIGH</option>
+                          <option value="CRITICAL">CRITICAL</option>
+                        </Select>
                       </FormGroup>
-                      
+
                       <FormGroup>
-                        <Label htmlFor="fixer">Fixer</Label>
-                        <Input 
-                          type="text" 
-                          id="fixer" 
-                          name="fixer" 
-                          value={newJob.fixer || ''} 
-                          onChange={handleInputChange} 
-                          placeholder="Who's offering this job?" 
-                          required 
-                        />
-                      </FormGroup>
-                      
-                      <FormGroup>
-                        <Label htmlFor="location">Location</Label>
-                        <Input 
-                          type="text" 
-                          id="location" 
-                          name="location" 
-                          value={newJob.location || ''} 
-                          onChange={handleInputChange} 
-                          placeholder="Night City, Downtown" 
-                          required 
+                        <Label htmlFor="difficulty">Difficulty (1-10)</Label>
+                        <Input
+                          type="number"
+                          id="difficulty"
+                          name="difficulty"
+                          value={newJob.difficulty}
+                          onChange={handleInputChange}
+                          min="1"
+                          max="10"
+                          required
                         />
                       </FormGroup>
                     </FormGrid>
-                    
+
                     <ButtonGroup>
-                      <Button 
-                        className="cancel" 
-                        type="button" 
-                        onClick={closeAddJobModal}
+                      <Button
+                        className="cancel"
+                        type="button"
+                        onClick={() => setIsModalOpen(false)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
                         CANCEL
                       </Button>
-                      <Button 
+                      <Button
                         type="submit"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        SUBMIT JOB
+                        CREATE JOB
                       </Button>
                     </ButtonGroup>
                   </form>
@@ -1036,7 +1255,7 @@ function App() {
               </ModalOverlay>
             )}
           </AnimatePresence>
-          
+
           <CyberFooter />
         </AppContainer>
       </FadeIn>
