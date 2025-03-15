@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavHeaderProps {
   missionCount: number;
@@ -81,6 +81,10 @@ const HeaderContainer = styled.header`
     );
     pointer-events: none;
   }
+  
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+  }
 `;
 
 const ScanLineEffect = styled.div`
@@ -134,6 +138,11 @@ const HeaderContent = styled.div`
   z-index: 20;
   position: relative;
   padding-left: 0;
+  
+  @media (max-width: 768px) {
+    padding: 0;
+    gap: 0.5rem;
+  }
 `;
 
 const LogoContainer = styled.div`
@@ -141,6 +150,11 @@ const LogoContainer = styled.div`
   flex-direction: column;
   margin-left: -30px;
   padding-left: 0;
+  
+  @media (max-width: 768px) {
+    margin-left: 0;
+    margin-right: auto;
+  }
 `;
 
 const Logo = styled(motion.h1)`
@@ -152,6 +166,11 @@ const Logo = styled(motion.h1)`
   letter-spacing: 3px;
   position: relative;
   display: inline-block;
+  
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
 `;
 
 const GlitchLogo = styled.div`
@@ -194,11 +213,22 @@ const Tagline = styled.p`
   position: relative;
   padding-left: 25px;
   
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    margin: 0.4rem 0 0;
+    padding-left: 20px;
+    letter-spacing: 1px;
+  }
+  
   &::before {
     content: '>>';
     position: absolute;
     left: 2px;
     color: #ff3e88;
+    
+    @media (max-width: 768px) {
+      font-size: 0.7rem;
+    }
   }
 `;
 
@@ -206,6 +236,10 @@ const NavContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const NavMenu = styled.nav`
@@ -327,11 +361,129 @@ const UserStatus = styled.div`
   }
 `;
 
+const MenuIconWrapper = styled.div<{ isOpen: boolean }>`
+  width: 20px;
+  height: 20px;
+  position: relative;
+  transform: rotate(0deg);
+  transition: .5s ease-in-out;
+  cursor: pointer;
+
+  span {
+    display: block;
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: #00f6ff;
+    border-radius: 2px;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+    box-shadow: 0 0 5px rgba(0, 246, 255, 0.5);
+
+    &:nth-child(1) {
+      top: ${({ isOpen }) => isOpen ? '9px' : '0px'};
+      transform: ${({ isOpen }) => isOpen ? 'rotate(135deg)' : 'rotate(0)'};
+    }
+
+    &:nth-child(2) {
+      top: 9px;
+      opacity: ${({ isOpen }) => isOpen ? '0' : '1'};
+      transform: ${({ isOpen }) => isOpen ? 'translateX(20px)' : 'translateX(0)'};
+    }
+
+    &:nth-child(3) {
+      top: ${({ isOpen }) => isOpen ? '9px' : '18px'};
+      transform: ${({ isOpen }) => isOpen ? 'rotate(-135deg)' : 'rotate(0)'};
+    }
+  }
+`;
+
+const MobileMenuButton = styled.button`
+  display: none;
+  background: transparent;
+  border: none;
+  color: #00f6ff;
+  cursor: pointer;
+  z-index: 1000;
+  padding: 0.5rem;
+  transition: all 0.3s ease;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(0, 246, 255, 0.3);
+    border-radius: 50%;
+    margin-left: 0.5rem;
+    
+    &:hover {
+      background: rgba(0, 246, 255, 0.1);
+    }
+  }
+`;
+
+const MobileMenu = styled(motion.div)`
+  display: none;
+  
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(10, 10, 18, 0.95);
+    backdrop-filter: blur(10px);
+    border-left: 1px solid rgba(0, 246, 255, 0.3);
+    padding: 5rem 1.5rem;
+    z-index: 999;
+  }
+`;
+
+const MobileNavList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+const MobileNavItem = styled.button<{ active?: boolean }>`
+  width: 100%;
+  background: ${({ active }) => active ? 'rgba(0, 246, 255, 0.1)' : 'transparent'};
+  border: 1px solid ${({ active }) => active ? '#00f6ff' : 'rgba(0, 246, 255, 0.3)'};
+  color: ${({ active }) => active ? '#00f6ff' : '#e4f3ff'};
+  padding: 0.8rem;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &:hover {
+    background: rgba(0, 246, 255, 0.1);
+    border-color: #00f6ff;
+  }
+`;
+
+const MobileUserSection = styled.div`
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(0, 246, 255, 0.3);
+`;
+
 const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange }) => {
   const [currentUser] = useState({
     name: 'V',
     status: 'Connected'
   });
+  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <HeaderContainer>
@@ -394,9 +546,84 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
             </UserInfo>
           </UserPanel>
         </NavContainer>
+
+        <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <MenuIconWrapper isOpen={isMobileMenuOpen}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </MenuIconWrapper>
+        </MobileMenuButton>
+
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <MobileMenu
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+            >
+              <MobileNavList>
+                <MobileNavItem 
+                  active={currentView === 'daily'}
+                  onClick={() => {
+                    onViewChange('daily');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <NavItemIndicator />
+                  DAILY TASKS
+                </MobileNavItem>
+                <MobileNavItem 
+                  active={currentView === 'missions'}
+                  onClick={() => {
+                    onViewChange('missions');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <NavItemIndicator />
+                  MISSIONS
+                </MobileNavItem>
+                <MobileNavItem 
+                  active={currentView === 'market'}
+                  onClick={() => {
+                    onViewChange('market');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <NavItemIndicator />
+                  MARKET
+                </MobileNavItem>
+                <MobileNavItem 
+                  active={currentView === 'messages'}
+                  onClick={() => {
+                    onViewChange('messages');
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <NavItemIndicator />
+                  MESSAGES
+                </MobileNavItem>
+              </MobileNavList>
+
+              <MobileUserSection>
+                <CurrencyDisplay style={{ marginBottom: '1rem' }}>
+                  {currency.toLocaleString()}
+                </CurrencyDisplay>
+                <UserPanel>
+                  <Avatar>{currentUser.name}</Avatar>
+                  <UserInfo>
+                    <Username>{currentUser.name}</Username>
+                    <UserStatus>{currentUser.status}</UserStatus>
+                  </UserInfo>
+                </UserPanel>
+              </MobileUserSection>
+            </MobileMenu>
+          )}
+        </AnimatePresence>
       </HeaderContent>
     </HeaderContainer>
   );
 };
 
-export default NavHeader; 
+export default NavHeader;
