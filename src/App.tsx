@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import NavHeader from './components/NavHeader';
@@ -6,19 +6,7 @@ import CyberFooter from './components/CyberFooter';
 import SplashScreen from './components/SplashScreen';
 import DailyTasks from './components/DailyTasks';
 
-// Types for our mission data
-interface Mission {
-  id: string;
-  title: string;
-  description: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  fixer: string;
-  location: string;
-  deadline: string;
-  reward: number;
-  completed: boolean;
-  progress: number;
-}
+
 
 // Add task type
 interface Task {
@@ -57,11 +45,7 @@ const glitch = keyframes`
   }
 `;
 
-const pulse = keyframes`
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-`;
+
 
 const scanlines = keyframes`
   0% {
@@ -72,20 +56,7 @@ const scanlines = keyframes`
   }
 `;
 
-const holographicShimmer = keyframes`
-  0% {
-    opacity: 0.3;
-    transform: translateY(-10px) rotate(0deg);
-  }
-  50% {
-    opacity: 0.7;
-    transform: translateY(5px) rotate(0.5deg);
-  }
-  100% {
-    opacity: 0.3;
-    transform: translateY(-10px) rotate(0deg);
-  }
-`;
+
 
 const dataCorruption = keyframes`
   0% {
