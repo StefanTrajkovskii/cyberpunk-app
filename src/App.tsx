@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import styled, { keyframes, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import MissionDetailModal from './components/MissionDetailModal';
 import NavHeader from './components/NavHeader';
@@ -67,74 +67,7 @@ const SAMPLE_MISSIONS: Mission[] = [
   }
 ];
 
-// Define glitch animation keyframes
-const glitchEffect = keyframes`
-  0% {
-    transform: translate(0);
-  }
-  20% {
-    transform: translate(-2px, 2px);
-  }
-  40% {
-    transform: translate(-2px, -2px);
-  }
-  60% {
-    transform: translate(2px, 2px);
-  }
-  80% {
-    transform: translate(2px, -2px);
-  }
-  100% {
-    transform: translate(0);
-  }
-`;
 
-const glitchText = keyframes`
-  0% {
-    text-shadow: -2px 0 #ff3e88, 2px 0 #00f6ff;
-    opacity: 1;
-  }
-  10% {
-    text-shadow: 2px 0 #ff3e88, -2px 0 #00f6ff;
-    opacity: 0.9;
-  }
-  20% {
-    text-shadow: -3px 0 #ff3e88, 3px 0 #00f6ff;
-    opacity: 1;
-  }
-  30% {
-    text-shadow: 3px 0 #ff3e88, -3px 0 #00f6ff;
-    opacity: 0.9;
-  }
-  40% {
-    text-shadow: -1px 0 #ff3e88, 1px 0 #00f6ff;
-    opacity: 1;
-  }
-  50% {
-    text-shadow: 1px 0 #ff3e88, -1px 0 #00f6ff;
-    opacity: 0.9;
-  }
-  60% {
-    text-shadow: -2px 0 #ff3e88, 2px 0 #00f6ff;
-    opacity: 1;
-  }
-  70% {
-    text-shadow: 2px 0 #ff3e88, -2px 0 #00f6ff;
-    opacity: 0.9;
-  }
-  80% {
-    text-shadow: -3px 0 #ff3e88, 3px 0 #00f6ff;
-    opacity: 1;
-  }
-  90% {
-    text-shadow: 3px 0 #ff3e88, -3px 0 #00f6ff;
-    opacity: 0.9;
-  }
-  100% {
-    text-shadow: -1px 0 #ff3e88, 1px 0 #00f6ff;
-    opacity: 1;
-  }
-`;
 
 // Styled components
 const AppContainer = styled.div`
@@ -302,62 +235,7 @@ const CompletedBadge = styled(motion.div)`
   border: 1px solid #23d18b;
 `;
 
-const MissionDesc = styled.p`
-  color: #b8c0c2;
-  margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-  line-height: 1.4;
-`;
 
-const MissionMeta = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  font-size: 0.9rem;
-`;
-
-const MetaItem = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const MetaLabel = styled.span`
-  color: #00f6ff;
-  margin-right: 0.5rem;
-  font-weight: 600;
-`;
-
-const MetaValue = styled.span`
-  color: #e4f3ff;
-`;
-
-const DifficultyBadge = styled.span<{ level: 'easy' | 'medium' | 'hard' }>`
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  background-color: ${({ level }) => 
-    level === 'easy' ? '#10823A' : 
-    level === 'medium' ? '#FF8A15' : 
-    '#E93845'};
-  color: white;
-`;
-
-const RewardTag = styled.div`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(15, 15, 35, 0.9);
-  border: 1px solid #00f6ff;
-  color: #00f6ff;
-  padding: 0.4rem 0.8rem;
-  font-weight: 700;
-  font-size: 1.1rem;
-  border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0, 246, 255, 0.4);
-`;
 
 const StatusBar = styled.div`
   background: rgba(10, 10, 18, 0.9);
@@ -426,13 +304,7 @@ const SectionTitle = styled.h2`
   }
 `;
 
-const FilterBar = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  align-items: center;
-`;
+
 
 const FilterButton = styled(motion.button)<{ active?: boolean; isCompleted?: boolean }>`
   padding: 0.5rem 1rem;
@@ -675,11 +547,8 @@ function App() {
     minute: '2-digit'
   }));
   const [filter, setFilter] = useState<string>('all');
-  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(() => {
-    // Only show splash screen if this is the first visit or it's been explicitly requested
-    const hasVisited = localStorage.getItem('cyberpunk_visited');
-    return !hasVisited;
-  });
+  // Always show splash screen on refresh
+  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
   
   // Currency system - load from localStorage or start at 0
   const [currency, setCurrency] = useState<number>(() => {
@@ -702,42 +571,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem('cyberpunk_currency', currency.toString());
   }, [currency]);
-  
-  // Mark that the user has visited the site when splash screen is closed
-  useEffect(() => {
-    if (!splashScreenActive) {
-      localStorage.setItem('cyberpunk_visited', 'true');
-    }
-  }, [splashScreenActive]);
-
-  // Log component mount for debugging
-  useEffect(() => {
-    console.log('App component mounted');
-    
-    // Add listener for special key combination to reset splash screen (for testing)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+Shift+R to reset splash screen
-      if (e.ctrlKey && e.shiftKey && e.key === 'R') {
-        console.log('Debug key combination pressed - resetting splash screen');
-        localStorage.removeItem('cyberpunk_visited');
-        setSplashScreenActive(true);
-        e.preventDefault();
-      }
-      
-      // Ctrl+Shift+C to clear all data (for testing)
-      if (e.ctrlKey && e.shiftKey && e.key === 'C') {
-        console.log('Debug key combination pressed - clearing all data');
-        localStorage.removeItem('cyberpunk_missions');
-        localStorage.removeItem('cyberpunk_currency');
-        setMissions(SAMPLE_MISSIONS);
-        setCurrency(0);
-        e.preventDefault();
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   // Function to complete a mission and earn reward
   const handleCompleteMission = (missionId: string) => {
