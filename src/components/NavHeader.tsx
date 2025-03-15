@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface NavHeaderProps {
   missionCount: number;
   currency: number;
+  currentView: 'daily' | 'missions' | 'market' | 'messages';
+  onViewChange: (view: 'daily' | 'missions' | 'market' | 'messages') => void;
 }
 
 // Animation keyframes
@@ -180,48 +182,6 @@ const GlitchLogo = styled.div`
     clip: rect(85px, 550px, 140px, 0);
     animation: glitch-anim-2 2s infinite linear alternate-reverse;
   }
-  
-  @keyframes glitch-anim-1 {
-    0% {
-      clip: rect(8px, 9999px, 44px, 0);
-    }
-    20% {
-      clip: rect(79px, 9999px, 33px, 0);
-    }
-    40% {
-      clip: rect(32px, 9999px, 93px, 0);
-    }
-    60% {
-      clip: rect(19px, 9999px, 67px, 0);
-    }
-    80% {
-      clip: rect(65px, 9999px, 23px, 0);
-    }
-    100% {
-      clip: rect(84px, 9999px, 77px, 0);
-    }
-  }
-  
-  @keyframes glitch-anim-2 {
-    0% {
-      clip: rect(12px, 9999px, 32px, 0);
-    }
-    20% {
-      clip: rect(54px, 9999px, 12px, 0);
-    }
-    40% {
-      clip: rect(98px, 9999px, 71px, 0);
-    }
-    60% {
-      clip: rect(33px, 9999px, 81px, 0);
-    }
-    80% {
-      clip: rect(64px, 9999px, 11px, 0);
-    }
-    100% {
-      clip: rect(29px, 9999px, 91px, 0);
-    }
-  }
 `;
 
 const Tagline = styled.p`
@@ -268,8 +228,8 @@ const NavItemIndicator = styled.span`
   box-shadow: 0 0 8px rgba(255, 62, 136, 0.7);
 `;
 
-const NavItem = styled(motion.a)`
-  color: #e4f3ff;
+const NavItem = styled(motion.a)<{ active?: boolean }>`
+  color: ${({ active }) => active ? '#00f6ff' : '#e4f3ff'};
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
@@ -287,57 +247,23 @@ const NavItem = styled(motion.a)`
   }
 `;
 
-const NotificationBadge = styled.div`
-  position: absolute;
-  top: -5px;
-  right: -10px;
-  background-color: #ff3e88;
-  color: #0a0a12;
-  font-size: 0.7rem;
-  font-weight: bold;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+const CurrencyDisplay = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 10px rgba(255, 62, 136, 0.7);
-`;
-
-const StatsTag = styled(motion.div)`
-  background: rgba(255, 62, 136, 0.2);
-  border: 1px solid #ff3e88;
-  color: #ff3e88;
-  padding: 0.4rem 0.8rem;
-  font-weight: 600;
-  font-size: 0.9rem;
+  background: rgba(10, 10, 18, 0.8);
+  border: 1px solid #23d18b;
   border-radius: 30px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: 'Share Tech Mono', monospace;
+  padding: 0.4rem 1rem;
+  margin-right: 1rem;
+  color: #23d18b;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 0 10px rgba(35, 209, 139, 0.2);
   
   &::before {
-    content: '';
-    display: block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #ff3e88;
-    box-shadow: 0 0 8px #ff3e88;
-    animation: pulse 2s infinite;
-  }
-  
-  @keyframes pulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(255, 62, 136, 0.7);
-    }
-    70% {
-      box-shadow: 0 0 0 10px rgba(255, 62, 136, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(255, 62, 136, 0);
-    }
+    content: "¥";
+    margin-right: 0.2rem;
+    font-size: 1rem;
   }
 `;
 
@@ -401,128 +327,11 @@ const UserStatus = styled.div`
   }
 `;
 
-const CurrencyDisplay = styled.div`
-  display: flex;
-  align-items: center;
-  background: rgba(10, 10, 18, 0.8);
-  border: 1px solid #23d18b;
-  border-radius: 30px;
-  padding: 0.4rem 1rem;
-  margin-right: 1rem;
-  color: #23d18b;
-  font-weight: bold;
-  font-size: 0.9rem;
-  box-shadow: 0 0 10px rgba(35, 209, 139, 0.2);
-  
-  &::before {
-    content: "¥";
-    margin-right: 0.2rem;
-    font-size: 1rem;
-  }
-`;
-
-const DropdownContent = styled(motion.div)`
-  position: fixed;
-  top: calc(var(--dropdown-top) + 0.5rem);
-  right: var(--dropdown-right);
-  background: #0a0a12;
-  border: 1px solid #00f6ff;
-  border-radius: 5px;
-  padding: 1rem;
-  width: 200px;
-  z-index: 1000;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    right: 20px;
-    width: 10px;
-    height: 10px;
-    background: #0a0a12;
-    transform: rotate(45deg);
-    border-left: 1px solid #00f6ff;
-    border-top: 1px solid #00f6ff;
-  }
-`;
-
-const DropdownItem = styled.div`
-  padding: 0.5rem 0;
-  color: #e4f3ff;
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(0, 246, 255, 0.1);
-  transition: all 0.2s ease;
-  cursor: pointer;
-  
-  &:last-child {
-    border-bottom: none;
-  }
-  
-  &:hover {
-    color: #ff3e88;
-    padding-left: 0.5rem;
-  }
-`;
-
-const DropdownHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-`;
-
-const UserAvatar = styled.div`
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #ff3e88, #00f6ff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  color: #0a0a12;
-  border: 2px solid #e4f3ff;
-  box-shadow: 0 0 10px rgba(0, 246, 255, 0.5);
-`;
-
-const DropdownUserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const DropdownUserName = styled.span`
-  color: #00f6ff;
-  font-weight: 600;
-  font-size: 0.9rem;
-`;
-
-const DropdownStatus = styled.span`
-  font-size: 0.8rem;
-  color: #b8c0c2;
-`;
-
-const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency }) => {
+const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange }) => {
   const [currentUser] = useState({
     name: 'V',
     status: 'Connected'
   });
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
-  
-  const toggleDropdown = () => {
-    if (!isDropdownOpen) {
-      const userPanel = document.querySelector('#user-panel');
-      if (userPanel) {
-        const rect = userPanel.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom,
-          right: window.innerWidth - rect.right
-        });
-      }
-    }
-    setIsDropdownOpen(!isDropdownOpen);
-  };
 
   return (
     <HeaderContainer>
@@ -539,19 +348,35 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency }) => {
         
         <NavContainer>
           <NavMenu>
-            <NavItem whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <NavItemIndicator />MAR MISSIONS
-            </NavItem>
-            <NavItem whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <NavItemIndicator />FIXERS
-            </NavItem>
-            <NavItem whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-              <NavItemIndicator />GEAR
-            </NavItem>
             <NavItem 
+              active={currentView === 'daily'} 
+              onClick={() => onViewChange('daily')}
               whileHover={{ y: -2 }} 
               whileTap={{ y: 0 }}
-              style={{ position: 'relative' }}
+            >
+              <NavItemIndicator />DAILY TASKS
+            </NavItem>
+            <NavItem 
+              active={currentView === 'missions'} 
+              onClick={() => onViewChange('missions')}
+              whileHover={{ y: -2 }} 
+              whileTap={{ y: 0 }}
+            >
+              <NavItemIndicator />MISSIONS
+            </NavItem>
+            <NavItem 
+              active={currentView === 'market'} 
+              onClick={() => onViewChange('market')}
+              whileHover={{ y: -2 }} 
+              whileTap={{ y: 0 }}
+            >
+              <NavItemIndicator />MARKET
+            </NavItem>
+            <NavItem 
+              active={currentView === 'messages'} 
+              onClick={() => onViewChange('messages')}
+              whileHover={{ y: -2 }} 
+              whileTap={{ y: 0 }}
             >
               <NavItemIndicator />MESSAGES
             </NavItem>
@@ -561,38 +386,13 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency }) => {
             {currency.toLocaleString()}
           </CurrencyDisplay>
           
-          <div style={{ position: 'relative', zIndex: 900 }}>
-            <UserPanel id="user-panel" onClick={toggleDropdown}>
-              <Avatar>V</Avatar>
-              <UserInfo>
-                <Username>{currentUser.name}</Username>
-                <UserStatus>Connected</UserStatus>
-              </UserInfo>
-            </UserPanel>
-            
-            {isDropdownOpen && (
-              <DropdownContent
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              >
-                <DropdownHeader>
-                  <UserAvatar>{currentUser.name[0]}</UserAvatar>
-                  <DropdownUserInfo>
-                    <DropdownUserName>{currentUser.name}</DropdownUserName>
-                    <DropdownStatus>{currentUser.status}</DropdownStatus>
-                  </DropdownUserInfo>
-                </DropdownHeader>
-                
-                <DropdownItem>Profile</DropdownItem>
-                <DropdownItem>Settings</DropdownItem>
-                <DropdownItem>Reputation: 85%</DropdownItem>
-                <DropdownItem>Eurodollars: ¥{currency.toLocaleString()}</DropdownItem>
-                <DropdownItem>Log Out</DropdownItem>
-              </DropdownContent>
-            )}
-          </div>
+          <UserPanel>
+            <Avatar>{currentUser.name}</Avatar>
+            <UserInfo>
+              <Username>{currentUser.name}</Username>
+              <UserStatus>{currentUser.status}</UserStatus>
+            </UserInfo>
+          </UserPanel>
         </NavContainer>
       </HeaderContent>
     </HeaderContainer>

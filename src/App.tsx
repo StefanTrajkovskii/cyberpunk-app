@@ -5,6 +5,9 @@ import MissionDetailModal from './components/MissionDetailModal';
 import NavHeader from './components/NavHeader';
 import CyberFooter from './components/CyberFooter';
 import SplashScreen from './components/SplashScreen';
+import DailyTasks from './components/DailyTasks'; 
+
+
 
 // Types for our mission data
 interface Mission {
@@ -531,6 +534,97 @@ const AddButton = styled(motion.button)`
   }
 `;
 
+const NavMenu = styled.nav`
+  display: flex;
+  gap: 2rem;
+  margin-left: 2rem;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+`;
+
+const NavLink = styled(motion.a)<{ active?: boolean }>`
+  color: ${({ active }) => active ? '#00f6ff' : '#e4f3ff'};
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background: ${({ active }) => active ? 'rgba(0, 246, 255, 0.1)' : 'transparent'};
+  border: 1px solid ${({ active }) => active ? '#00f6ff' : 'transparent'};
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: #00f6ff;
+    border-color: #00f6ff;
+  }
+`;
+
+const LogoSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const Logo = styled.div`
+  background: #00f6ff;
+  color: #0a0a12;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 8px;
+`;
+
+const LogoText = styled.h1`
+  color: #e4f3ff;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+`;
+
+const UserSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const CurrencyDisplay = styled.div`
+  color: #23d18b;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 600;
+`;
+
+const UserButton = styled.button`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0, 246, 255, 0.1);
+  border: 1px solid #00f6ff;
+  color: #00f6ff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 246, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+  }
+`;
+
+// Add a type for our different views
+type ViewType = 'daily' | 'missions' | 'market' | 'messages';
+
 function App() {
   // Initialize state from localStorage or use default values if no saved data exists
   const [missions, setMissions] = useState<Mission[]>(() => {
@@ -561,6 +655,8 @@ function App() {
   const [newJob, setNewJob] = useState<Partial<Mission>>({
     difficulty: 'medium' // Default value
   });
+
+  const [currentView, setCurrentView] = useState<ViewType>('daily');
 
   // Save missions to localStorage whenever they change
   useEffect(() => {
@@ -716,149 +812,169 @@ function App() {
         transition={{ duration: 0.8 }}
       >
         <AppContainer>
-          <NavHeader missionCount={missions.length} currency={currency} />
+          <NavHeader 
+            missionCount={missions.length} 
+            currency={currency}
+            currentView={currentView}
+            onViewChange={setCurrentView}
+          />
           
           <MainContent>
-            <StatusBar>
-              <StatusText>
-                <GlitchText
-                  data-text="SYSTEM:"
-                  animate={{
-                    x: [0, -2, 0, 2, 0],
-                  }}
-                  transition={{
-                    duration: 0.5,
-                    repeat: Infinity,
-                    repeatType: "mirror",
-                    repeatDelay: 5
-                  }}
-                >
-                  SYSTEM:
-                </GlitchText> Welcome, netrunner. <StatusHighlight>{missions.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
-              </StatusText>
-              <StatusText>
-                <GlitchText
-                  data-text="STATUS:"
-                  animate={{
-                    x: [0, -1, 0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 0.3,
-                    repeat: Infinity,
-                    repeatType: "mirror",
-                    repeatDelay: 7
-                  }}
-                >
-                  STATUS:
-                </GlitchText> {dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight>
-              </StatusText>
-            </StatusBar>
-            
-            <TitleRow>
-              <SectionTitle>
-                ACTIVE GIGS
-              </SectionTitle>
-              <AddButton
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={openAddJobModal}
-              >
-                + NEW JOB
-              </AddButton>
-            </TitleRow>
-            
-            <FilterContainer>
-              <FilterButton 
-                active={filter === 'all'} 
-                onClick={() => setFilter('all')}
-                whileHover={{ y: -3 }}
-                whileTap={{ y: 0 }}
-              >
-                ALL JOBS
-              </FilterButton>
-              <FilterButton 
-                active={filter === 'easy'} 
-                onClick={() => setFilter('easy')}
-                whileHover={{ y: -3 }}
-                whileTap={{ y: 0 }}
-                color="#10823A"
-              >
-                EASY
-              </FilterButton>
-              <FilterButton 
-                active={filter === 'medium'} 
-                onClick={() => setFilter('medium')}
-                whileHover={{ y: -3 }}
-                whileTap={{ y: 0 }}
-                color="#FF8A15"
-              >
-                MEDIUM
-              </FilterButton>
-              <FilterButton 
-                active={filter === 'hard'} 
-                onClick={() => setFilter('hard')}
-                whileHover={{ y: -3 }}
-                whileTap={{ y: 0 }}
-                color="#E93845"
-              >
-                HARD
-              </FilterButton>
-              <FilterButton 
-                active={filter === 'completed'} 
-                onClick={() => setFilter('completed')}
-                whileHover={{ y: -3 }}
-                whileTap={{ y: 0 }}
-                isCompleted={true}
-              >
-                COMPLETED
-              </FilterButton>
-            </FilterContainer>
-            
-            <MissionGrid>
-              {filteredMissions.map(mission => (
-                <MissionCard 
-                  key={mission.id}
-                  onClick={() => handleMissionClick(mission)}
-                  whileHover={{ y: -5, boxShadow: '0 8px 30px rgba(0, 0, 0, 0.2)' }}
-                  whileTap={{ y: 0 }}
-                  difficulty={mission.difficulty}
-                  completed={mission.completed}
-                >
-                  <MissionHeader>
-                    <MissionTitle>{mission.title}</MissionTitle>
-                    <MissionId>ID: {mission.id}</MissionId>
-                  </MissionHeader>
-                  
-                  <MissionDetails>
-                    <MissionFixer>{mission.fixer}</MissionFixer>
-                    <MissionLocation>{mission.location}</MissionLocation>
-                  </MissionDetails>
-                  
-                  <MissionReward>{mission.reward}</MissionReward>
-                  
-                  {mission.completed ? (
-                    <CompletedBadge 
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    >
-                      COMPLETED
-                    </CompletedBadge>
-                  ) : (
-                    <CompleteButton
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCompleteMission(mission.id);
+            {currentView === 'daily' && (
+              <DailyTasks 
+                onComplete={(reward: number) => setCurrency(prev => prev + reward)}
+              />
+            )}
+            {currentView === 'missions' && (
+              <>
+                <StatusBar>
+                  <StatusText>
+                    <GlitchText
+                      data-text="SYSTEM:"
+                      animate={{
+                        x: [0, -2, 0, 2, 0],
                       }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      transition={{
+                        duration: 0.5,
+                        repeat: Infinity,
+                        repeatType: "mirror",
+                        repeatDelay: 5
+                      }}
                     >
-                      COMPLETE
-                    </CompleteButton>
-                  )}
-                </MissionCard>
-              ))}
-            </MissionGrid>
+                      SYSTEM:
+                    </GlitchText> Welcome, netrunner. <StatusHighlight>{missions.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
+                  </StatusText>
+                  <StatusText>
+                    <GlitchText
+                      data-text="STATUS:"
+                      animate={{
+                        x: [0, -1, 0, 1, 0],
+                      }}
+                      transition={{
+                        duration: 0.3,
+                        repeat: Infinity,
+                        repeatType: "mirror",
+                        repeatDelay: 7
+                      }}
+                    >
+                      STATUS:
+                    </GlitchText> {dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight>
+                  </StatusText>
+                </StatusBar>
+                
+                <TitleRow>
+                  <SectionTitle>
+                    ACTIVE GIGS
+                  </SectionTitle>
+                  <AddButton
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={openAddJobModal}
+                  >
+                    + NEW JOB
+                  </AddButton>
+                </TitleRow>
+                
+                <FilterContainer>
+                  <FilterButton 
+                    active={filter === 'all'} 
+                    onClick={() => setFilter('all')}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ y: 0 }}
+                  >
+                    ALL JOBS
+                  </FilterButton>
+                  <FilterButton 
+                    active={filter === 'easy'} 
+                    onClick={() => setFilter('easy')}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ y: 0 }}
+                    color="#10823A"
+                  >
+                    EASY
+                  </FilterButton>
+                  <FilterButton 
+                    active={filter === 'medium'} 
+                    onClick={() => setFilter('medium')}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ y: 0 }}
+                    color="#FF8A15"
+                  >
+                    MEDIUM
+                  </FilterButton>
+                  <FilterButton 
+                    active={filter === 'hard'} 
+                    onClick={() => setFilter('hard')}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ y: 0 }}
+                    color="#E93845"
+                  >
+                    HARD
+                  </FilterButton>
+                  <FilterButton 
+                    active={filter === 'completed'} 
+                    onClick={() => setFilter('completed')}
+                    whileHover={{ y: -3 }}
+                    whileTap={{ y: 0 }}
+                    isCompleted={true}
+                  >
+                    COMPLETED
+                  </FilterButton>
+                </FilterContainer>
+                
+                <MissionGrid>
+                  {filteredMissions.map(mission => (
+                    <MissionCard 
+                      key={mission.id}
+                      onClick={() => handleMissionClick(mission)}
+                      whileHover={{ y: -5, boxShadow: '0 8px 30px rgba(0, 0, 0, 0.2)' }}
+                      whileTap={{ y: 0 }}
+                      difficulty={mission.difficulty}
+                      completed={mission.completed}
+                    >
+                      <MissionHeader>
+                        <MissionTitle>{mission.title}</MissionTitle>
+                        <MissionId>ID: {mission.id}</MissionId>
+                      </MissionHeader>
+                      
+                      <MissionDetails>
+                        <MissionFixer>{mission.fixer}</MissionFixer>
+                        <MissionLocation>{mission.location}</MissionLocation>
+                      </MissionDetails>
+                      
+                      <MissionReward>{mission.reward}</MissionReward>
+                      
+                      {mission.completed ? (
+                        <CompletedBadge 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        >
+                          COMPLETED
+                        </CompletedBadge>
+                      ) : (
+                        <CompleteButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCompleteMission(mission.id);
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          COMPLETE
+                        </CompleteButton>
+                      )}
+                    </MissionCard>
+                  ))}
+                </MissionGrid>
+              </>
+            )}
+            {currentView === 'market' && (
+              <div>Market coming soon...</div>
+            )}
+            {currentView === 'messages' && (
+              <div>Messages coming soon...</div>
+            )}
           </MainContent>
           
           {/* Mission Detail Modal */}
