@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavHeaderProps {
   missionCount: number;
+  currency: number;
 }
 
 // Animation keyframes
@@ -383,21 +384,40 @@ const Username = styled.span`
   font-size: 0.9rem;
 `;
 
-const UserStatus = styled.span`
-  color: #b8c0c2;
+const UserStatus = styled.div`
   font-size: 0.8rem;
+  color: #b8c0c2;
   display: flex;
   align-items: center;
   
   &::before {
-    content: '';
+    content: "";
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
+    margin-right: 0.3rem;
     border-radius: 50%;
     background-color: #23d18b;
-    box-shadow: 0 0 5px #23d18b;
-    margin-right: 0.3rem;
+  }
+`;
+
+const CurrencyDisplay = styled.div`
+  display: flex;
+  align-items: center;
+  background: rgba(10, 10, 18, 0.8);
+  border: 1px solid #23d18b;
+  border-radius: 30px;
+  padding: 0.4rem 1rem;
+  margin-right: 1rem;
+  color: #23d18b;
+  font-weight: bold;
+  font-size: 0.9rem;
+  box-shadow: 0 0 10px rgba(35, 209, 139, 0.2);
+  
+  &::before {
+    content: "¥";
+    margin-right: 0.2rem;
+    font-size: 1rem;
   }
 `;
 
@@ -445,17 +465,53 @@ const DropdownItem = styled.div`
   }
 `;
 
-const NavHeader: React.FC<NavHeaderProps> = ({ missionCount }) => {
+const DropdownHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+`;
+
+const UserAvatar = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff3e88, #00f6ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #0a0a12;
+  border: 2px solid #e4f3ff;
+  box-shadow: 0 0 10px rgba(0, 246, 255, 0.5);
+`;
+
+const DropdownUserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const DropdownUserName = styled.span`
+  color: #00f6ff;
+  font-weight: 600;
+  font-size: 0.9rem;
+`;
+
+const DropdownStatus = styled.span`
+  font-size: 0.8rem;
+  color: #b8c0c2;
+`;
+
+const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency }) => {
   const [currentUser] = useState({
     name: 'V',
     status: 'Connected'
   });
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [newNotifications] = useState(3);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
   
-  const toggleUserDropdown = () => {
-    if (!showUserDropdown) {
+  const toggleDropdown = () => {
+    if (!isDropdownOpen) {
       const userPanel = document.querySelector('#user-panel');
       if (userPanel) {
         const rect = userPanel.getBoundingClientRect();
@@ -465,7 +521,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount }) => {
         });
       }
     }
-    setShowUserDropdown(!showUserDropdown);
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   return (
@@ -498,21 +554,15 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount }) => {
               style={{ position: 'relative' }}
             >
               <NavItemIndicator />MESSAGES
-              {newNotifications > 0 && (
-                <NotificationBadge>{newNotifications}</NotificationBadge>
-              )}
             </NavItem>
           </NavMenu>
           
-          <StatsTag
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            ACTIVE GIGS: {missionCount}
-          </StatsTag>
+          <CurrencyDisplay>
+            {currency.toLocaleString()}
+          </CurrencyDisplay>
           
           <div style={{ position: 'relative', zIndex: 900 }}>
-            <UserPanel id="user-panel" onClick={toggleUserDropdown}>
+            <UserPanel id="user-panel" onClick={toggleDropdown}>
               <Avatar>V</Avatar>
               <UserInfo>
                 <Username>{currentUser.name}</Username>
@@ -520,26 +570,28 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount }) => {
               </UserInfo>
             </UserPanel>
             
-            <AnimatePresence>
-              {showUserDropdown && (
-                <DropdownContent
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ 
-                    '--dropdown-top': `${dropdownPosition.top}px`,
-                    '--dropdown-right': `${dropdownPosition.right}px`
-                  } as React.CSSProperties}
-                >
-                  <DropdownItem>Profile</DropdownItem>
-                  <DropdownItem>Settings</DropdownItem>
-                  <DropdownItem>Reputation: 85%</DropdownItem>
-                  <DropdownItem>Eurodollars: ¥12,450</DropdownItem>
-                  <DropdownItem>Log Out</DropdownItem>
-                </DropdownContent>
-              )}
-            </AnimatePresence>
+            {isDropdownOpen && (
+              <DropdownContent
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <DropdownHeader>
+                  <UserAvatar>{currentUser.name[0]}</UserAvatar>
+                  <DropdownUserInfo>
+                    <DropdownUserName>{currentUser.name}</DropdownUserName>
+                    <DropdownStatus>{currentUser.status}</DropdownStatus>
+                  </DropdownUserInfo>
+                </DropdownHeader>
+                
+                <DropdownItem>Profile</DropdownItem>
+                <DropdownItem>Settings</DropdownItem>
+                <DropdownItem>Reputation: 85%</DropdownItem>
+                <DropdownItem>Eurodollars: ¥{currency.toLocaleString()}</DropdownItem>
+                <DropdownItem>Log Out</DropdownItem>
+              </DropdownContent>
+            )}
           </div>
         </NavContainer>
       </HeaderContent>

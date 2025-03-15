@@ -16,6 +16,7 @@ interface Mission {
   fixer: string;
   location: string;
   deadline: string;
+  completed: boolean;
 }
 
 // Sample mission data
@@ -28,7 +29,8 @@ const SAMPLE_MISSIONS: Mission[] = [
     difficulty: 'hard',
     fixer: 'Wakako Okada',
     location: 'Night City, Downtown',
-    deadline: '48 hours'
+    deadline: '48 hours',
+    completed: false
   },
   {
     id: '002',
@@ -38,7 +40,8 @@ const SAMPLE_MISSIONS: Mission[] = [
     difficulty: 'medium',
     fixer: 'Dexter DeShawn',
     location: 'Watson District',
-    deadline: '24 hours'
+    deadline: '24 hours',
+    completed: false
   },
   {
     id: '003',
@@ -48,7 +51,8 @@ const SAMPLE_MISSIONS: Mission[] = [
     difficulty: 'medium',
     fixer: 'Regina Jones',
     location: 'Pacifica',
-    deadline: '72 hours'
+    deadline: '72 hours',
+    completed: false
   },
   {
     id: '004',
@@ -58,7 +62,8 @@ const SAMPLE_MISSIONS: Mission[] = [
     difficulty: 'easy',
     fixer: 'Sebastian "Padre" Ibarra',
     location: 'Northside',
-    deadline: '12 hours'
+    deadline: '12 hours',
+    completed: false
   }
 ];
 
@@ -174,55 +179,127 @@ const MissionGrid = styled.div`
   gap: 1.5rem;
 `;
 
-const MissionCard = styled(motion.div)`
-  background-color: rgba(7, 15, 25, 0.85);
-  border: 1px solid rgba(0, 246, 255, 0.3);
+const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+`;
+
+const MissionCard = styled(motion.div)<{ difficulty: string; completed: boolean }>`
+  background: ${props => props.completed ? 'rgba(35, 209, 139, 0.05)' : 'rgba(10, 10, 18, 0.7)'};
+  border: 1px solid ${props => 
+    props.completed ? '#23d18b' : 
+    props.difficulty === 'easy' ? '#10823A' : 
+    props.difficulty === 'medium' ? '#FF8A15' : 
+    '#E93845'};
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 
+    ${props => props.completed ? 
+    '0 0 10px rgba(35, 209, 139, 0.3)' : 
+    '0 0 8px rgba(255, 62, 136, 0.2)'};
   padding: 1.5rem;
-  border-radius: 0.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  cursor: pointer;
   position: relative;
   overflow: hidden;
-  cursor: pointer;
-  backdrop-filter: blur(10px);
   
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      45deg,
-      rgba(0, 246, 255, 0.05) 0%,
-      rgba(255, 62, 136, 0.05) 100%
-    );
-    pointer-events: none;
-  }
-  
-  &:hover {
-    .mission-title {
-      animation: ${glitchText} 0.2s linear 1;
-    }
-    
+  ${props => props.completed && css`
     &::after {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
-      height: 100%;
-      background: rgba(0, 246, 255, 0.05);
-      animation: ${glitchEffect} 0.2s linear 1;
-      pointer-events: none;
+      height: 5px;
+      background: linear-gradient(90deg, #23d18b, transparent);
     }
+  `}
+`;
+
+const MissionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+`;
+
+const MissionTitle = styled.h3`
+  font-size: 1.3rem;
+  color: #e4f3ff;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 1px;
+`;
+
+const MissionId = styled.span`
+  font-size: 0.8rem;
+  color: #b8c0c2;
+  font-family: 'Share Tech Mono', monospace;
+  opacity: 0.7;
+`;
+
+const MissionDetails = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+`;
+
+const MissionFixer = styled.span`
+  font-size: 0.9rem;
+  color: #00f6ff;
+`;
+
+const MissionLocation = styled.span`
+  font-size: 0.9rem;
+  color: #b8c0c2;
+`;
+
+const MissionReward = styled.div`
+  font-size: 1.4rem;
+  color: #23d18b;
+  font-weight: 700;
+  margin: 1rem 0;
+  text-shadow: 0 0 5px rgba(35, 209, 139, 0.5);
+`;
+
+const CompleteButton = styled(motion.button)`
+  width: 100%;
+  padding: 0.7rem;
+  background: linear-gradient(90deg, #23d18b 0%, #1aa073 100%);
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+  box-shadow: 0 0 10px rgba(35, 209, 139, 0.3);
+  
+  &:hover {
+    background: linear-gradient(90deg, #29eca0 0%, #1fc088 100%);
   }
 `;
 
-const MissionTitle = styled.h2`
-  color: #ff3e88;
-  margin-top: 0;
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
+const CompletedBadge = styled(motion.div)`
+  background: rgba(35, 209, 139, 0.2);
+  color: #23d18b;
+  text-align: center;
+  padding: 0.7rem;
+  border-radius: 5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+  border: 1px solid #23d18b;
 `;
 
 const MissionDesc = styled.p`
@@ -590,6 +667,9 @@ function App() {
   const [filter, setFilter] = useState<string>('all');
   const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
   
+  // Currency system
+  const [currency, setCurrency] = useState<number>(0);
+  
   // New state for job form modal
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState<boolean>(false);
   const [newJob, setNewJob] = useState<Partial<Mission>>({
@@ -613,6 +693,32 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  // Function to complete a mission and earn reward
+  const handleCompleteMission = (missionId: string) => {
+    // Find the mission
+    const missionToComplete = missions.find(m => m.id === missionId);
+    
+    if (missionToComplete && !missionToComplete.completed) {
+      // Extract the numeric value from the reward string (e.g., "¥5,000" -> 5000)
+      const rewardValue = parseInt(missionToComplete.reward.replace(/\D/g, ''), 10);
+      
+      // Update currency
+      setCurrency(prev => prev + rewardValue);
+      
+      // Mark mission as completed
+      setMissions(prev => 
+        prev.map(mission => 
+          mission.id === missionId 
+            ? { ...mission, completed: true } 
+            : mission
+        )
+      );
+      
+      // Close modal if it's open
+      setSelectedMission(null);
+    }
+  };
 
   const handleMissionClick = (mission: Mission) => {
     setSelectedMission(mission);
@@ -663,7 +769,8 @@ function App() {
       difficulty: (newJob.difficulty as 'easy' | 'medium' | 'hard') || 'medium',
       fixer: newJob.fixer || 'Anonymous',
       location: newJob.location || 'Unknown',
-      deadline: newJob.deadline || '24 hours'
+      deadline: newJob.deadline || '24 hours',
+      completed: false
     };
     
     // Add to missions array
@@ -692,7 +799,7 @@ function App() {
         transition={{ duration: 0.8 }}
       >
         <AppContainer>
-          <NavHeader missionCount={missions.length} />
+          <NavHeader missionCount={missions.length} currency={currency} />
           
           <MainContent>
             <StatusBar>
@@ -710,107 +817,134 @@ function App() {
                   }}
                 >
                   SYSTEM:
-                </GlitchText> Welcome, netrunner. <StatusHighlight>{missions.length}</StatusHighlight> gigs available on the board.
+                </GlitchText> Welcome, netrunner. <StatusHighlight>{missions.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
               </StatusText>
               <StatusText>
-                Last scan: <StatusHighlight>{dateTime}</StatusHighlight>
+                <GlitchText
+                  data-text="STATUS:"
+                  animate={{
+                    x: [0, -1, 0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 0.3,
+                    repeat: Infinity,
+                    repeatType: "mirror",
+                    repeatDelay: 7
+                  }}
+                >
+                  STATUS:
+                </GlitchText> {dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight>
               </StatusText>
             </StatusBar>
             
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <SectionTitle>Active Gigs</SectionTitle>
-              <AddButton 
-                onClick={openAddJobModal}
+            <TitleRow>
+              <SectionTitle>
+                ACTIVE GIGS
+              </SectionTitle>
+              <AddButton
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={openAddJobModal}
               >
-                NEW JOB
+                + NEW JOB
               </AddButton>
-            </div>
+            </TitleRow>
             
-            <FilterBar>
+            <FilterContainer>
               <FilterButton 
                 active={filter === 'all'} 
                 onClick={() => setFilter('all')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -3 }}
+                whileTap={{ y: 0 }}
               >
-                All Gigs
+                ALL JOBS
               </FilterButton>
               <FilterButton 
                 active={filter === 'easy'} 
                 onClick={() => setFilter('easy')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -3 }}
+                whileTap={{ y: 0 }}
+                color="#10823A"
               >
-                Easy
+                EASY
               </FilterButton>
               <FilterButton 
                 active={filter === 'medium'} 
                 onClick={() => setFilter('medium')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -3 }}
+                whileTap={{ y: 0 }}
+                color="#FF8A15"
               >
-                Medium
+                MEDIUM
               </FilterButton>
               <FilterButton 
                 active={filter === 'hard'} 
                 onClick={() => setFilter('hard')}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ y: -3 }}
+                whileTap={{ y: 0 }}
+                color="#E93845"
               >
-                Hard
+                HARD
               </FilterButton>
-            </FilterBar>
+            </FilterContainer>
             
-            <AnimatePresence mode="popLayout">
-              <MissionGrid>
-                {filteredMissions.map((mission) => (
-                  <MissionCard 
-                    key={mission.id}
-                    whileHover={{ 
-                      scale: 1.03, 
-                      boxShadow: '0 0 15px rgba(255, 62, 136, 0.3)'
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                    onClick={() => handleMissionClick(mission)}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                  >
-                    <RewardTag>{mission.reward}</RewardTag>
-                    <MissionTitle className="mission-title">{mission.title}</MissionTitle>
-                    <DifficultyBadge level={mission.difficulty}>
-                      {mission.difficulty}
-                    </DifficultyBadge>
-                    <MissionDesc>{mission.description}</MissionDesc>
-                    <MissionMeta>
-                      <MetaItem>
-                        <MetaLabel>Fixer:</MetaLabel>
-                        <MetaValue>{mission.fixer}</MetaValue>
-                      </MetaItem>
-                      <MetaItem>
-                        <MetaLabel>Location:</MetaLabel>
-                        <MetaValue>{mission.location}</MetaValue>
-                      </MetaItem>
-                      <MetaItem>
-                        <MetaLabel>Deadline:</MetaLabel>
-                        <MetaValue>{mission.deadline}</MetaValue>
-                      </MetaItem>
-                    </MissionMeta>
-                  </MissionCard>
-                ))}
-              </MissionGrid>
-            </AnimatePresence>
+            <MissionGrid>
+              {filteredMissions.map(mission => (
+                <MissionCard 
+                  key={mission.id}
+                  onClick={() => handleMissionClick(mission)}
+                  whileHover={{ y: -5, boxShadow: '0 8px 30px rgba(0, 0, 0, 0.2)' }}
+                  whileTap={{ y: 0 }}
+                  difficulty={mission.difficulty}
+                  completed={mission.completed}
+                >
+                  <MissionHeader>
+                    <MissionTitle>{mission.title}</MissionTitle>
+                    <MissionId>ID: {mission.id}</MissionId>
+                  </MissionHeader>
+                  
+                  <MissionDetails>
+                    <MissionFixer>{mission.fixer}</MissionFixer>
+                    <MissionLocation>{mission.location}</MissionLocation>
+                  </MissionDetails>
+                  
+                  <MissionReward>{mission.reward}</MissionReward>
+                  
+                  {mission.completed ? (
+                    <CompletedBadge 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                      COMPLETED
+                    </CompletedBadge>
+                  ) : (
+                    <CompleteButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCompleteMission(mission.id);
+                      }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      COMPLETE
+                    </CompleteButton>
+                  )}
+                </MissionCard>
+              ))}
+            </MissionGrid>
           </MainContent>
           
-          {/* Modal for mission details */}
-          <MissionDetailModal 
-            mission={selectedMission} 
-            onClose={handleCloseModal} 
-          />
+          {/* Mission Detail Modal */}
+          <AnimatePresence>
+            {selectedMission && (
+              <MissionDetailModal 
+                mission={selectedMission} 
+                onClose={handleCloseModal}
+                onComplete={handleCompleteMission}
+              />
+            )}
+          </AnimatePresence>
           
           {/* New Job Form Modal */}
           <AnimatePresence>

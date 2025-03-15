@@ -12,11 +12,13 @@ interface Mission {
   fixer: string;
   location: string;
   deadline: string;
+  completed: boolean;
 }
 
 interface MissionDetailModalProps {
   mission: Mission | null;
   onClose: () => void;
+  onComplete: (missionId: string) => void;
 }
 
 // Styled components
@@ -214,6 +216,21 @@ const DifficultyBadge = styled.span<{ level: 'easy' | 'medium' | 'hard' }>`
   right: 4rem;
 `;
 
+const CompletedBadge = styled.div`
+  position: absolute;
+  top: 1.5rem;
+  right: 6rem;
+  background: rgba(35, 209, 139, 0.2);
+  color: #23d18b;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border: 1px solid #23d18b;
+`;
+
 const DecorativeLine = styled.div`
   height: 1px;
   background: linear-gradient(90deg, transparent, #ff3e88, transparent);
@@ -253,7 +270,7 @@ const modalVariants = {
   }
 };
 
-const MissionDetailModal: React.FC<MissionDetailModalProps> = ({ mission, onClose }) => {
+const MissionDetailModal: React.FC<MissionDetailModalProps> = ({ mission, onClose, onComplete }) => {
   if (!mission) return null;
 
   return (
@@ -277,6 +294,9 @@ const MissionDetailModal: React.FC<MissionDetailModalProps> = ({ mission, onClos
             <DifficultyBadge level={mission.difficulty}>
               {mission.difficulty}
             </DifficultyBadge>
+            {mission.completed && (
+              <CompletedBadge>Completed</CompletedBadge>
+            )}
             <CloseButton onClick={onClose} />
           </ModalHeader>
           
@@ -309,12 +329,30 @@ const MissionDetailModal: React.FC<MissionDetailModalProps> = ({ mission, onClos
               <RewardAmount>{mission.reward}</RewardAmount>
             </RewardSection>
             
-            <AcceptButton
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              Accept Mission
-            </AcceptButton>
+            {mission.completed ? (
+              <AcceptButton
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                style={{ 
+                  background: 'linear-gradient(90deg, #23d18b 0%, #1aa073 100%)',
+                  opacity: 0.8,
+                  cursor: 'default'
+                }}
+              >
+                MISSION COMPLETED
+              </AcceptButton>
+            ) : (
+              <AcceptButton
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => onComplete(mission.id)}
+                style={{
+                  background: 'linear-gradient(90deg, #23d18b 0%, #1aa073 100%)'
+                }}
+              >
+                COMPLETE MISSION
+              </AcceptButton>
+            )}
           </ModalContent>
         </ModalContainer>
       </Overlay>
