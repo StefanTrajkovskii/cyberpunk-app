@@ -434,20 +434,31 @@ const FilterBar = styled.div`
   align-items: center;
 `;
 
-const FilterButton = styled(motion.button)<{ active?: boolean }>`
+const FilterButton = styled(motion.button)<{ active?: boolean; isCompleted?: boolean }>`
   padding: 0.5rem 1rem;
-  background: ${({ active }) => active ? 'rgba(255, 62, 136, 0.2)' : 'rgba(15, 15, 35, 0.6)'};
-  border: 1px solid ${({ active }) => active ? '#ff3e88' : 'rgba(0, 246, 255, 0.3)'};
+  background: ${({ active, isCompleted }) => 
+    isCompleted && active ? 'rgba(35, 209, 139, 0.2)' :
+    active ? 'rgba(255, 62, 136, 0.2)' : 
+    'rgba(15, 15, 35, 0.6)'};
+  border: 1px solid ${({ active, isCompleted }) => 
+    isCompleted && active ? '#23d18b' :
+    active ? '#ff3e88' : 
+    'rgba(0, 246, 255, 0.3)'};
   border-radius: 4px;
-  color: ${({ active }) => active ? '#ff3e88' : '#e4f3ff'};
+  color: ${({ active, isCompleted }) => 
+    isCompleted && active ? '#23d18b' :
+    active ? '#ff3e88' : 
+    '#e4f3ff'};
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: #ff3e88;
-    background: rgba(255, 62, 136, 0.1);
+    border-color: ${({ isCompleted }) => isCompleted ? '#23d18b' : '#ff3e88'};
+    background: ${({ isCompleted }) => 
+      isCompleted ? 'rgba(35, 209, 139, 0.1)' : 
+      'rgba(255, 62, 136, 0.1)'};
   }
 `;
 
@@ -782,10 +793,47 @@ function App() {
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewJob(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    if (name === 'reward') {
+      // Remove any non-digit characters from the input
+      const numericValue = value.replace(/\D/g, '');
+      
+      if (numericValue === '') {
+        setNewJob(prev => ({
+          ...prev,
+          reward: ''
+        }));
+      } else {
+        // Convert to number and format with yen symbol and commas
+        const formattedValue = `¥${parseInt(numericValue).toLocaleString()}`;
+        setNewJob(prev => ({
+          ...prev,
+          reward: formattedValue
+        }));
+      }
+    } else if (name === 'deadline') {
+      // Remove any non-digit characters from the input
+      const numericValue = value.replace(/\D/g, '');
+      
+      if (numericValue === '') {
+        setNewJob(prev => ({
+          ...prev,
+          deadline: ''
+        }));
+      } else {
+        // Add "hours" after the number
+        const formattedValue = `${parseInt(numericValue)} hours`;
+        setNewJob(prev => ({
+          ...prev,
+          deadline: formattedValue
+        }));
+      }
+    } else {
+      setNewJob(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
   
   const handleAddJob = (e: FormEvent) => {
@@ -814,9 +862,11 @@ function App() {
     closeAddJobModal();
   };
 
-  const filteredMissions = filter === 'all' 
-    ? missions 
-    : missions.filter(mission => mission.difficulty === filter);
+  const filteredMissions = filter === 'completed' 
+    ? missions.filter(mission => mission.completed)
+    : filter === 'all' 
+      ? missions.filter(mission => !mission.completed)
+      : missions.filter(mission => mission.difficulty === filter && !mission.completed);
 
   // Render splash screen if active
   if (splashScreenActive) {
@@ -920,6 +970,15 @@ function App() {
               >
                 HARD
               </FilterButton>
+              <FilterButton 
+                active={filter === 'completed'} 
+                onClick={() => setFilter('completed')}
+                whileHover={{ y: -3 }}
+                whileTap={{ y: 0 }}
+                isCompleted={true}
+              >
+                COMPLETED
+              </FilterButton>
             </FilterContainer>
             
             <MissionGrid>
@@ -1020,7 +1079,7 @@ function App() {
                           name="reward" 
                           value={newJob.reward || ''} 
                           onChange={handleInputChange} 
-                          placeholder="¥5,000" 
+                          placeholder="Enter reward amount" 
                           required 
                         />
                       </FormGroup>
@@ -1060,7 +1119,7 @@ function App() {
                           name="deadline" 
                           value={newJob.deadline || ''} 
                           onChange={handleInputChange} 
-                          placeholder="24 hours" 
+                          placeholder="Enter hours (numbers only)" 
                           required 
                         />
                       </FormGroup>
