@@ -146,11 +146,26 @@ const GlitchingText = styled.h1`
   animation: ${glitchEffect} 5s infinite;
   letter-spacing: 3px;
   z-index: 10;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  @media (max-width: 768px) {
+    font-size: 3rem;
+    letter-spacing: 2px;
+    gap: 0.5rem;
+  }
   
   span {
     color: #ff3e88;
     position: relative;
-    display: inline-block;
+    display: inline;
+    
+    @media (max-width: 768px) {
+      font-size: 3rem;
+    }
   }
 `;
 
@@ -159,6 +174,10 @@ const PromptContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  
+  @media (max-width: 768px) {
+    margin-top: 3rem;
+  }
 `;
 
 const EnterPrompt = styled.div`
@@ -170,6 +189,11 @@ const EnterPrompt = styled.div`
   display: flex;
   align-items: center;
   font-family: 'Share Tech Mono', monospace;
+  
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
 `;
 
 const PressEnter = styled.div`
@@ -183,32 +207,22 @@ const PressEnter = styled.div`
   position: relative;
   overflow: hidden;
   
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    padding: 0.4rem 1.5rem;
+    margin-top: 0.3rem;
+  }
+  
   &::before {
     content: '>';
     position: absolute;
     left: 0.5rem;
     color: #ff3e88;
     animation: ${blink} 1s infinite;
-  }
-  
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent
-    );
-    transition: 0.5s;
-  }
-  
-  &:hover::after {
-    left: 100%;
+    
+    @media (max-width: 768px) {
+      left: 0.4rem;
+    }
   }
 `;
 
@@ -219,6 +233,12 @@ const VersionInfo = styled.div`
   color: rgba(228, 243, 255, 0.5);
   font-size: 0.8rem;
   font-family: 'Share Tech Mono', monospace;
+  
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    bottom: 0.5rem;
+    right: 0.5rem;
+  }
 `;
 
 const CornerDecoration = styled.div`
@@ -227,6 +247,11 @@ const CornerDecoration = styled.div`
   height: 100px;
   pointer-events: none;
   opacity: 0.6;
+  
+  @media (max-width: 768px) {
+    width: 60px;
+    height: 60px;
+  }
   
   &.top-left {
     top: 0;
@@ -269,6 +294,12 @@ const SoundToggle = styled.button`
   opacity: 0.7;
   transition: opacity 0.2s ease;
   z-index: 20;
+  
+  @media (max-width: 768px) {
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1rem;
+  }
   
   &:hover {
     opacity: 1;
@@ -420,7 +451,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <GlitchingText>
-          HELLO <span>NETRUNNER</span>
+          HELLO<span>NETRUNNER</span>
         </GlitchingText>
       </motion.div>
       

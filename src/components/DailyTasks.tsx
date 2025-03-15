@@ -114,6 +114,11 @@ const Container = styled.div`
   position: relative;
   background: rgba(0, 0, 0, 0.8);
   
+  @media (max-width: 768px) {
+    padding: 1rem 0.5rem;
+    width: 100%;
+  }
+  
   &::before {
     content: '';
     position: fixed;
@@ -143,6 +148,13 @@ const TaskTypeFilter = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   overflow: hidden;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
 
   &::before {
     content: '';
@@ -191,6 +203,14 @@ const FilterButton = styled.button<{ active: boolean; taskType: string }>`
   letter-spacing: 2px;
   transition: all 0.3s ease;
   z-index: 1;
+  min-width: 80px;
+
+  @media (max-width: 768px) {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    min-width: 60px;
+  }
 
   ${({ active }) => active && css`
     animation: ${pulse} 2s infinite;
@@ -239,6 +259,11 @@ const TaskGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 `;
 
 const getRiskColor = (risk: string) => {
