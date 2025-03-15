@@ -19,6 +19,11 @@ const FooterContainer = styled.footer`
     height: 1px;
     background: linear-gradient(90deg, transparent, #00f6ff, transparent);
   }
+
+  @media (max-width: 768px) {
+    padding: 1rem 0;
+    margin-top: 2rem;
+  }
 `;
 
 const FooterContent = styled.div`
@@ -31,8 +36,10 @@ const FooterContent = styled.div`
   gap: 2rem;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0 1rem;
   }
 `;
 
@@ -40,6 +47,10 @@ const FooterSection = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+
+  @media (max-width: 768px) {
+    gap: 0.5rem;
+  }
 `;
 
 const StatusIndicator = styled(motion.div)`
@@ -57,6 +68,10 @@ const FooterText = styled.p`
 
   span {
     color: #00f6ff;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
   }
 `;
 
