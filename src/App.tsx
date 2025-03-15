@@ -646,16 +646,15 @@ const AddButton = styled(motion.button)`
     background: rgba(35, 209, 139, 0.3);
     box-shadow: 0 0 15px rgba(35, 209, 139, 0.3);
   }
-  
-  &::before {
-    content: '+';
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
 `;
 
 function App() {
-  const [missions, setMissions] = useState<Mission[]>(SAMPLE_MISSIONS);
+  // Initialize state from localStorage or use default values if no saved data exists
+  const [missions, setMissions] = useState<Mission[]>(() => {
+    const savedMissions = localStorage.getItem('cyberpunk_missions');
+    return savedMissions ? JSON.parse(savedMissions) : SAMPLE_MISSIONS;
+  });
+  
   const [selectedMission, setSelectedMission] = useState<Mission | null>(null);
   const [dateTime] = useState<string>(new Date().toLocaleString('en-US', {
     year: 'numeric',
@@ -665,16 +664,40 @@ function App() {
     minute: '2-digit'
   }));
   const [filter, setFilter] = useState<string>('all');
-  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
+  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(() => {
+    // Only show splash screen if this is the first visit or it's been explicitly requested
+    const hasVisited = localStorage.getItem('cyberpunk_visited');
+    return !hasVisited;
+  });
   
-  // Currency system
-  const [currency, setCurrency] = useState<number>(0);
+  // Currency system - load from localStorage or start at 0
+  const [currency, setCurrency] = useState<number>(() => {
+    const savedCurrency = localStorage.getItem('cyberpunk_currency');
+    return savedCurrency ? parseInt(savedCurrency, 10) : 0;
+  });
   
   // New state for job form modal
   const [isAddJobModalOpen, setIsAddJobModalOpen] = useState<boolean>(false);
   const [newJob, setNewJob] = useState<Partial<Mission>>({
     difficulty: 'medium' // Default value
   });
+
+  // Save missions to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('cyberpunk_missions', JSON.stringify(missions));
+  }, [missions]);
+  
+  // Save currency to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cyberpunk_currency', currency.toString());
+  }, [currency]);
+  
+  // Mark that the user has visited the site when splash screen is closed
+  useEffect(() => {
+    if (!splashScreenActive) {
+      localStorage.setItem('cyberpunk_visited', 'true');
+    }
+  }, [splashScreenActive]);
 
   // Log component mount for debugging
   useEffect(() => {
@@ -685,7 +708,18 @@ function App() {
       // Ctrl+Shift+R to reset splash screen
       if (e.ctrlKey && e.shiftKey && e.key === 'R') {
         console.log('Debug key combination pressed - resetting splash screen');
+        localStorage.removeItem('cyberpunk_visited');
         setSplashScreenActive(true);
+        e.preventDefault();
+      }
+      
+      // Ctrl+Shift+C to clear all data (for testing)
+      if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        console.log('Debug key combination pressed - clearing all data');
+        localStorage.removeItem('cyberpunk_missions');
+        localStorage.removeItem('cyberpunk_currency');
+        setMissions(SAMPLE_MISSIONS);
+        setCurrency(0);
         e.preventDefault();
       }
     };

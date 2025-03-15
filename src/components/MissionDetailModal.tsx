@@ -219,7 +219,7 @@ const DifficultyBadge = styled.span<{ level: 'easy' | 'medium' | 'hard' }>`
 const CompletedBadge = styled.div`
   position: absolute;
   top: 1.5rem;
-  right: 6rem;
+  right: 9rem;
   background: rgba(35, 209, 139, 0.2);
   color: #23d18b;
   text-transform: uppercase;
