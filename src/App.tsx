@@ -866,12 +866,12 @@ function App() {
     {
       id: '1',
       title: 'FOOD TRACKER',
-      description: 'Prepare healthy meals for the day, including breakfast, lunch, and dinner.',
-      baseReward: 500,
+      description: 'Track your daily nutrition intake. Monitor calories and protein for each meal to maintain optimal cybernetic performance.',
+      baseReward: 0,
       riskLevel: 'MEDIUM',
       type: 'FOOD',
       completed: false,
-      difficulty: 6,
+      difficulty: 8,
       consecutiveCompletions: 0
     },
     {
@@ -1017,6 +1017,8 @@ function App() {
                   setCurrency(prev => prev + reward);
                 }}
                 onNavigateToFood={() => setShowFoodTracker(true)}
+                tasks={tasks}
+                setTasks={setTasks}
               />
             )}
             {currentView === 'daily' && showFoodTracker && (

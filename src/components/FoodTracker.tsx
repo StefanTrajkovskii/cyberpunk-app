@@ -226,18 +226,70 @@ const BackButton = styled(motion.button)`
   }
 `;
 
+const ViewToggle = styled(motion.button)`
+  background: rgba(0, 255, 157, 0.1);
+  border: 1px solid #00ff9d;
+  color: #00ff9d;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(0, 255, 157, 0.2);
+  }
+`;
+
+const HistoryContainer = styled.div`
+  margin-top: 20px;
+`;
+
+const DateSection = styled.div`
+  margin-bottom: 30px;
+  border: 1px solid rgba(0, 255, 157, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.3);
+`;
+
+const DateHeader = styled.h3`
+  color: #00ff9d;
+  margin-bottom: 15px;
+  font-family: 'Share Tech Mono', monospace;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const DailySummary = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(0, 255, 157, 0.1);
+  border-radius: 4px;
+`;
+
+const SummaryItem = styled.div`
+  color: #e4f3ff;
+  span {
+    color: #00ff9d;
+    margin-left: 5px;
+  }
+`;
+
 interface FoodTrackerProps {
   onBack: () => void;
 }
 
 const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
+  const [showHistory, setShowHistory] = useState(false);
   const [entries, setEntries] = useState<FoodEntry[]>(() => {
-    // Initialize state with saved entries from localStorage
     const savedEntries = localStorage.getItem('foodEntries');
     if (savedEntries) {
-      const parsedEntries = JSON.parse(savedEntries);
-      const today = new Date().toLocaleDateString();
-      return parsedEntries.filter((entry: FoodEntry) => entry.date === today);
+      return JSON.parse(savedEntries);
     }
     return [];
   });
@@ -254,8 +306,10 @@ const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
     localStorage.setItem('foodEntries', JSON.stringify(entries));
   }, [entries]);
 
-  const totalCalories = entries.reduce((sum, entry) => sum + entry.calories, 0);
-  const totalProtein = entries.reduce((sum, entry) => sum + entry.protein, 0);
+  const today = new Date().toLocaleDateString();
+  const todayEntries = entries.filter(entry => entry.date === today);
+  const totalCalories = todayEntries.reduce((sum, entry) => sum + entry.calories, 0);
+  const totalProtein = todayEntries.reduce((sum, entry) => sum + entry.protein, 0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -264,7 +318,7 @@ const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
       ...newEntry,
       calories: Number(newEntry.calories) || 0,
       protein: Number(newEntry.protein) || 0,
-      date: new Date().toLocaleDateString()
+      date: today
     };
     setEntries([...entries, entry]);
     setNewEntry({
@@ -290,6 +344,19 @@ const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
     setNewEntry(prev => ({ ...prev, [field]: numValue }));
   };
 
+  // Group entries by date for history view
+  const groupedEntries = React.useMemo(() => {
+    const groups: { [key: string]: FoodEntry[] } = {};
+    [...entries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .forEach(entry => {
+        if (!groups[entry.date]) {
+          groups[entry.date] = [];
+        }
+        groups[entry.date].push(entry);
+      });
+    return groups;
+  }, [entries]);
+
   return (
     <Container>
       <BackButton
@@ -304,97 +371,150 @@ const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
         <Title>Food Tracker</Title>
         <Stats>
           <StatBox>
-            <h3>Total Calories</h3>
+            <h3>Today's Calories</h3>
             <p>{totalCalories}</p>
           </StatBox>
           <StatBox>
-            <h3>Total Protein</h3>
+            <h3>Today's Protein</h3>
             <p>{totalProtein}g</p>
           </StatBox>
         </Stats>
       </Header>
 
-      <Form onSubmit={handleSubmit}>
-        <FormGrid>
-          <FormGroup>
-            <Label>Food Name</Label>
-            <Input
-              type="text"
-              value={newEntry.name}
-              onChange={e => setNewEntry({ ...newEntry, name: e.target.value })}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>Calories</Label>
-            <Input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={newEntry.calories}
-              onChange={e => handleNumberInput(e, 'calories')}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>Protein (g)</Label>
-            <Input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={newEntry.protein}
-              onChange={e => handleNumberInput(e, 'protein')}
-              required
-            />
-          </FormGroup>
-          <FormGroup>
-            <Label>Time of Day</Label>
-            <Select
-              value={newEntry.timeOfDay}
-              onChange={e => setNewEntry({ ...newEntry, timeOfDay: e.target.value as FoodEntry['timeOfDay'] })}
-            >
-              <option value="BREAKFAST">BREAKFAST</option>
-              <option value="LUNCH">LUNCH</option>
-              <option value="DINNER">DINNER</option>
-              <option value="SNACK">SNACK</option>
-            </Select>
-          </FormGroup>
-        </FormGrid>
-        <Button
-          type="submit"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          Add Entry
-        </Button>
-      </Form>
+      <ViewToggle
+        onClick={() => setShowHistory(!showHistory)}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+      >
+        {showHistory ? 'Show Today' : 'Show History'}
+      </ViewToggle>
 
-      <EntriesList>
-        <AnimatePresence>
-          {entries.map(entry => (
-            <Entry
-              key={entry.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+      {!showHistory ? (
+        <>
+          <Form onSubmit={handleSubmit}>
+            <FormGrid>
+              <FormGroup>
+                <Label>Food Name</Label>
+                <Input
+                  type="text"
+                  value={newEntry.name}
+                  onChange={e => setNewEntry({ ...newEntry, name: e.target.value })}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label>Calories</Label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={newEntry.calories}
+                  onChange={e => handleNumberInput(e, 'calories')}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label>Protein (g)</Label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={newEntry.protein}
+                  onChange={e => handleNumberInput(e, 'protein')}
+                  required
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label>Time of Day</Label>
+                <Select
+                  value={newEntry.timeOfDay}
+                  onChange={e => setNewEntry({ ...newEntry, timeOfDay: e.target.value as FoodEntry['timeOfDay'] })}
+                >
+                  <option value="BREAKFAST">BREAKFAST</option>
+                  <option value="LUNCH">LUNCH</option>
+                  <option value="DINNER">DINNER</option>
+                  <option value="SNACK">SNACK</option>
+                </Select>
+              </FormGroup>
+            </FormGrid>
+            <Button
+              type="submit"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <EntryText>{entry.name}</EntryText>
-              <EntryText>{entry.calories} cal</EntryText>
-              <EntryText>{entry.protein}g protein</EntryText>
-              <EntryText>{entry.timeOfDay}</EntryText>
-              <DeleteButton
-                onClick={() => handleDelete(entry.id)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Delete
-              </DeleteButton>
-            </Entry>
-          ))}
-        </AnimatePresence>
-      </EntriesList>
+              Add Entry
+            </Button>
+          </Form>
+
+          <EntriesList>
+            <AnimatePresence>
+              {todayEntries.map(entry => (
+                <Entry
+                  key={entry.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                >
+                  <EntryText>{entry.name}</EntryText>
+                  <EntryText>{entry.calories} cal</EntryText>
+                  <EntryText>{entry.protein}g protein</EntryText>
+                  <EntryText>{entry.timeOfDay}</EntryText>
+                  <DeleteButton
+                    onClick={() => handleDelete(entry.id)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Delete
+                  </DeleteButton>
+                </Entry>
+              ))}
+            </AnimatePresence>
+          </EntriesList>
+        </>
+      ) : (
+        <HistoryContainer>
+          {Object.entries(groupedEntries).map(([date, dateEntries]) => {
+            const dailyCalories = dateEntries.reduce((sum, entry) => sum + entry.calories, 0);
+            const dailyProtein = dateEntries.reduce((sum, entry) => sum + entry.protein, 0);
+            
+            return (
+              <DateSection key={date}>
+                <DateHeader>
+                  {date === today ? 'Today' : date}
+                </DateHeader>
+                <DailySummary>
+                  <SummaryItem>Total Calories: <span>{dailyCalories}</span></SummaryItem>
+                  <SummaryItem>Total Protein: <span>{dailyProtein}g</span></SummaryItem>
+                </DailySummary>
+                <EntriesList>
+                  {dateEntries.map(entry => (
+                    <Entry
+                      key={entry.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                    >
+                      <EntryText>{entry.name}</EntryText>
+                      <EntryText>{entry.calories} cal</EntryText>
+                      <EntryText>{entry.protein}g protein</EntryText>
+                      <EntryText>{entry.timeOfDay}</EntryText>
+                      <DeleteButton
+                        onClick={() => handleDelete(entry.id)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        Delete
+                      </DeleteButton>
+                    </Entry>
+                  ))}
+                </EntriesList>
+              </DateSection>
+            );
+          })}
+        </HistoryContainer>
+      )}
     </Container>
   );
 };
 
-export default FoodTracker; 
+export default FoodTracker;

@@ -17,6 +17,8 @@ interface DailyTask {
 interface DailyTasksProps {
   onComplete: (reward: number) => void;
   onNavigateToFood: () => void;
+  tasks: DailyTask[];
+  setTasks: React.Dispatch<React.SetStateAction<DailyTask[]>>;
 }
 
 const glitch = keyframes`
@@ -641,53 +643,7 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
   }
 `;
 
-const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood }) => {
-  const [tasks, setTasks] = useState<DailyTask[]>([
-    {
-      id: '1',
-      title: 'Meal Prep',
-      description: 'Prepare healthy meals for the day, including breakfast, lunch, and dinner.',
-      baseReward: 500,
-      riskLevel: 'MEDIUM',
-      type: 'FOOD',
-      completed: false,
-      difficulty: 6,
-      consecutiveCompletions: 0
-    },
-    {
-      id: '2',
-      title: 'Street Cleanup',
-      description: 'Clear out hostile gang members from the local district.',
-      baseReward: 750,
-      riskLevel: 'HIGH',
-      type: 'COMBAT',
-      completed: false,
-      difficulty: 8,
-      consecutiveCompletions: 0
-    },
-    {
-      id: '3',
-      title: 'Data Extraction',
-      description: 'Retrieve sensitive data from a heavily guarded server room.',
-      baseReward: 1000,
-      riskLevel: 'CRITICAL',
-      type: 'STEALTH',
-      completed: false,
-      difficulty: 9,
-      consecutiveCompletions: 0
-    },
-    {
-      id: '4',
-      title: 'Cyberware Maintenance',
-      description: "Perform routine maintenance on local clinic's medical equipment.",
-      baseReward: 300,
-      riskLevel: 'LOW',
-      type: 'TECH',
-      completed: false,
-      difficulty: 4,
-      consecutiveCompletions: 0
-    }
-  ]);
+const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, tasks, setTasks }) => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
 
   const handleCompleteTask = (taskId: string) => {
@@ -766,10 +722,12 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood })
                   <span>STREAK</span>
                   <span>{task.consecutiveCompletions}x</span>
                 </StatItem>
-                <StatItem type={task.type}>
-                  <span>REWARD</span>
-                  <span>¥{task.baseReward}</span>
-                </StatItem>
+                {task.type !== 'FOOD' && (
+                  <StatItem type={task.type}>
+                    <span>REWARD</span>
+                    <span>¥{task.baseReward}</span>
+                  </StatItem>
+                )}
               </TaskStats>
 
               <TaskDescription>{task.description}</TaskDescription>
@@ -777,20 +735,25 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood })
               <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
 
               <TaskFooter>
-                <RewardSection>
-                  <BaseReward type={task.type}>
-                    {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}
-                  </BaseReward>
-                  {task.consecutiveCompletions > 0 && (
-                    <StreakMultiplier>
-                      {task.consecutiveCompletions}x STREAK (+{task.consecutiveCompletions * 10}%)
-                    </StreakMultiplier>
-                  )}
-                </RewardSection>
+                {task.type !== 'FOOD' && (
+                  <RewardSection>
+                    <BaseReward type={task.type}>
+                      {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}
+                    </BaseReward>
+                    {task.consecutiveCompletions > 0 && (
+                      <StreakMultiplier>
+                        {task.consecutiveCompletions}x STREAK (+{task.consecutiveCompletions * 10}%)
+                      </StreakMultiplier>
+                    )}
+                  </RewardSection>
+                )}
 
                 <ExecuteButton
                   type={task.type}
-                  onClick={() => handleCompleteTask(task.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCompleteTask(task.id);
+                  }}
                   disabled={task.completed}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
