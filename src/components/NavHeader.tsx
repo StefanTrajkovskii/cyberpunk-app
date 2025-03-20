@@ -300,6 +300,23 @@ const CurrencyDisplay = styled.div`
     margin-right: 0.2rem;
     font-size: 1rem;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+    margin: 0;
+    margin-bottom: 1rem;
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+    background: rgba(10, 10, 18, 0.95);
+    border-width: 2px;
+    box-shadow: 0 0 15px rgba(35, 209, 139, 0.3);
+
+    &::before {
+      font-size: 1.2rem;
+      margin-right: 0.4rem;
+    }
+  }
 `;
 
 const UserPanel = styled.div`
@@ -476,6 +493,11 @@ const MobileUserSection = styled.div`
   margin-top: 2rem;
   padding-top: 2rem;
   border-top: 1px solid rgba(0, 246, 255, 0.3);
+  
+  ${CurrencyDisplay} {
+    margin-bottom: 1.5rem;
+    animation: ${pulseGlow} 3s infinite;
+  }
 `;
 
 const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange, userName }) => {
