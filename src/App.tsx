@@ -45,7 +45,26 @@ const glitch = keyframes`
   }
 `;
 
-
+const noise = keyframes`
+  0% {
+    clip-path: inset(40% 0 61% 0);
+  }
+  20% {
+    clip-path: inset(92% 0 1% 0);
+  }
+  40% {
+    clip-path: inset(43% 0 1% 0);
+  }
+  60% {
+    clip-path: inset(25% 0 58% 0);
+  }
+  80% {
+    clip-path: inset(54% 0 7% 0);
+  }
+  100% {
+    clip-path: inset(58% 0 43% 0);
+  }
+`;
 
 const scanlines = keyframes`
   0% {
@@ -553,21 +572,37 @@ const MainContent = styled.main`
 `;
 
 const StatusBar = styled.div`
-  background: rgba(10, 10, 18, 0.9);
-  padding: 0.75rem 1.5rem;
-  margin-bottom: 2rem;
-  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.7);
   border: 1px solid rgba(0, 246, 255, 0.3);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
 `;
 
 const StatusText = styled.div`
-  color: #b8c0c2;
-  font-size: 0.9rem;
+  color: #e4f3ff;
   font-family: 'Share Tech Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    gap: 0.3rem;
+    
+    > * {
+      margin: 0.1rem 0;
+    }
+  }
 `;
 
 const StatusHighlight = styled.span`
@@ -576,27 +611,25 @@ const StatusHighlight = styled.span`
 `;
 
 const GlitchText = styled(motion.span)`
+  color: #ff3e88;
   position: relative;
-  display: inline-block;
+  margin-right: 0.3rem;
   
-  &::before, &::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.8;
-  }
-  
-  &::before {
-    color: #ff3e88;
-    z-index: -1;
+  @media (max-width: 768px) {
+    margin-right: 0.2rem;
   }
   
   &::after {
-    color: #00f6ff;
-    z-index: -2;
+    content: attr(data-text);
+    position: absolute;
+    left: -2px;
+    text-shadow: -1px 0 #00f6ff;
+    top: 0;
+    color: #ff3e88;
+    background: #0a0a12;
+    overflow: hidden;
+    clip: rect(0, 900px, 0, 0);
+    animation: ${noise} 2s infinite linear alternate-reverse;
   }
 `;
 
@@ -1002,7 +1035,8 @@ function App() {
                         }}
                       >
                         SYSTEM:
-                      </GlitchText> Welcome, {userName || 'netrunner'}. <StatusHighlight>{tasks.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
+                      </GlitchText>
+                      <span>Welcome, {userName || 'netrunner'}. {tasks.length} gigs available.</span>
                     </StatusText>
                     <StatusText>
                       <GlitchText
@@ -1018,7 +1052,25 @@ function App() {
                         }}
                       >
                         STATUS:
-                      </GlitchText> {dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight>
+                      </GlitchText>
+                      <span>{dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight></span>
+                    </StatusText>
+                    <StatusText>
+                      <GlitchText
+                        data-text="BALANCE:"
+                        animate={{
+                          x: [0, -1, 0, 1, 0],
+                        }}
+                        transition={{
+                          duration: 0.3,
+                          repeat: Infinity,
+                          repeatType: "mirror",
+                          repeatDelay: 7
+                        }}
+                      >
+                        BALANCE:
+                      </GlitchText>
+                      <span><StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight></span>
                     </StatusText>
                   </StatusBar>
                   <AddJobButton

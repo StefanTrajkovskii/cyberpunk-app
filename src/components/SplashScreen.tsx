@@ -60,11 +60,6 @@ const scanlineEffect = keyframes`
   }
 `;
 
-const blink = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-`;
-
 const backgroundGlow = keyframes`
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -515,6 +510,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
                   handleNameSubmit();
                 }
               }}
+              maxLength={10}
               autoFocus
             />
             <motion.div
