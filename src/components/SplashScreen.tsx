@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import BootSequence from './BootSequence';
 
 interface SplashScreenProps {
-  onEnter: () => void;
+  onEnter: (name: string) => void;
 }
 
 // Animation keyframes
@@ -196,33 +196,50 @@ const EnterPrompt = styled.div`
   }
 `;
 
-const PressEnter = styled.div`
-  color: #ff3e88;
-  font-size: 1.8rem;
-  margin-top: 0.5rem;
-  font-weight: 600;
-  padding: 0.5rem 2rem;
-  border: 1px solid #ff3e88;
-  box-shadow: 0 0 10px rgba(255, 62, 136, 0.5);
-  position: relative;
-  overflow: hidden;
+const NameInput = styled.input`
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  padding: 0.75rem 1.5rem;
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  outline: none;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  text-align: center;
+  width: 200px;
   
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-    padding: 0.4rem 1.5rem;
-    margin-top: 0.3rem;
+  &:focus {
+    border-color: #00f6ff;
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
   }
   
-  &::before {
-    content: '>';
-    position: absolute;
-    left: 0.5rem;
-    color: #ff3e88;
-    animation: ${blink} 1s infinite;
-    
-    @media (max-width: 768px) {
-      left: 0.4rem;
-    }
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+`;
+
+const EnterButton = styled(motion.button)`
+  background: transparent;
+  border: 1px solid #00f6ff;
+  color: #00f6ff;
+  padding: 0.75rem 2rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(0, 246, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 246, 255, 0.2);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -315,6 +332,9 @@ const BUTTON_HOVER_SOUND_URL = '/sounds/button_hover.mp3';
 const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [bootComplete, setBootComplete] = useState(false);
+  const [name, setName] = useState('');
+  const [isEntering, setIsEntering] = useState(false);
+  const [nameEntered, setNameEntered] = useState(false);
   
   const ambientSoundRef = useRef<HTMLAudioElement | null>(null);
   const glitchSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -374,8 +394,12 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
     }
   };
   
-  const handleEnter = useCallback(() => {
-    console.log('handleEnter called, transitioning to main app');
+  const handleNameSubmit = useCallback(() => {
+    if (!name.trim()) return;
+    
+    console.log('Name submitted, showing main splash screen');
+    setNameEntered(true);
+    
     if (soundEnabled && accessGrantedSoundRef.current) {
       try {
         accessGrantedSoundRef.current.play().catch(err => console.warn('Could not play access granted sound:', err));
@@ -383,8 +407,26 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
         console.warn('Error playing access granted sound:', error);
       }
     }
-    onEnter();
-  }, [soundEnabled, onEnter]);
+  }, [soundEnabled, name]);
+  
+  const handleEnter = useCallback(() => {
+    if (!name.trim()) return;
+    
+    console.log('handleEnter called, transitioning to main app');
+    setIsEntering(true);
+    
+    if (soundEnabled && accessGrantedSoundRef.current) {
+      try {
+        accessGrantedSoundRef.current.play().catch(err => console.warn('Could not play access granted sound:', err));
+      } catch (error) {
+        console.warn('Error playing access granted sound:', error);
+      }
+    }
+    
+    setTimeout(() => {
+      onEnter(name.trim());
+    }, 1000);
+  }, [soundEnabled, onEnter, name]);
   
   const playHoverSound = () => {
     if (soundEnabled && buttonHoverSoundRef.current) {
@@ -429,7 +471,79 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
     return <BootSequence onComplete={handleBootComplete} />;
   }
   
-  // Otherwise show the splash screen
+  // If name hasn't been entered yet, show name input screen
+  if (!nameEntered) {
+    return (
+      <SplashContainer>
+        <SoundToggle onClick={(e) => {
+          e.stopPropagation();
+          toggleSound();
+        }}>
+          {soundEnabled ? '🔊' : '🔇'}
+        </SoundToggle>
+        
+        <Grid />
+        <CornerDecoration className="top-left" />
+        <CornerDecoration className="top-right" />
+        <CornerDecoration className="bottom-left" />
+        <CornerDecoration className="bottom-right" />
+        
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+        >
+          <GlitchingText>
+            IDENTIFY<span>YOURSELF</span>
+          </GlitchingText>
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        >
+          <PromptContainer>
+            <EnterPrompt>{`// ENTER YOUR NAME`}</EnterPrompt>
+            <NameInput
+              type="text"
+              placeholder="YOUR NAME"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleNameSubmit();
+                }
+              }}
+              autoFocus
+            />
+            <motion.div
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ 
+                repeat: Infinity, 
+                duration: 2,
+                repeatType: "reverse"
+              }}
+              onMouseEnter={playHoverSound}
+            >
+              <EnterButton
+                onClick={handleNameSubmit}
+                disabled={!name.trim() || isEntering}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {isEntering ? 'PROCESSING...' : 'CONFIRM'}
+              </EnterButton>
+            </motion.div>
+          </PromptContainer>
+        </motion.div>
+        
+        <VersionInfo>v1.0.0_ALPHA // NIGHT CITY SECURE ACCESS</VersionInfo>
+      </SplashContainer>
+    );
+  }
+  
+  // Show main splash screen with personalized greeting
   return (
     <SplashContainer onClick={handleEnter}>
       <SoundToggle onClick={(e) => {
@@ -451,7 +565,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <GlitchingText>
-          HELLO<span>NETRUNNER</span>
+          HELLO<span>{name.toUpperCase()}</span>
         </GlitchingText>
       </motion.div>
       
@@ -461,7 +575,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
         transition={{ duration: 0.8, delay: 0.8 }}
       >
         <PromptContainer>
-          <EnterPrompt>{`// ACCESS REQUIRED`}</EnterPrompt>
+          <EnterPrompt>{`// PRESS ENTER TO CONTINUE`}</EnterPrompt>
           <motion.div
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ 
@@ -471,7 +585,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onEnter }) => {
             }}
             onMouseEnter={playHoverSound}
           >
-            <PressEnter>PRESS ENTER</PressEnter>
+            <EnterButton
+              onClick={handleEnter}
+              disabled={isEntering}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isEntering ? 'ENTERING...' : 'ENTER'}
+            </EnterButton>
           </motion.div>
         </PromptContainer>
       </motion.div>

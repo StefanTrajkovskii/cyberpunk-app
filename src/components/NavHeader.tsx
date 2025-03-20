@@ -7,6 +7,7 @@ interface NavHeaderProps {
   currency: number;
   currentView: 'daily' | 'missions' | 'market' | 'messages';
   onViewChange: (view: 'daily' | 'missions' | 'market' | 'messages') => void;
+  userName: string;
 }
 
 // Animation keyframes
@@ -477,9 +478,9 @@ const MobileUserSection = styled.div`
   border-top: 1px solid rgba(0, 246, 255, 0.3);
 `;
 
-const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange }) => {
+const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange, userName }) => {
   const [currentUser] = useState({
-    name: 'V',
+    name: userName,
     status: 'Connected'
   });
   
@@ -539,7 +540,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
           </CurrencyDisplay>
           
           <UserPanel>
-            <Avatar>{currentUser.name}</Avatar>
+            <Avatar>{currentUser.name.charAt(0).toUpperCase()}</Avatar>
             <UserInfo>
               <Username>{currentUser.name}</Username>
               <UserStatus>{currentUser.status}</UserStatus>
@@ -611,7 +612,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   {currency.toLocaleString()}
                 </CurrencyDisplay>
                 <UserPanel>
-                  <Avatar>{currentUser.name}</Avatar>
+                  <Avatar>{currentUser.name.charAt(0).toUpperCase()}</Avatar>
                   <UserInfo>
                     <Username>{currentUser.name}</Username>
                     <UserStatus>{currentUser.status}</UserStatus>

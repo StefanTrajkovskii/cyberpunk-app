@@ -818,6 +818,7 @@ function App() {
   const [currentView, setCurrentView] = useState<ViewType>('daily');
   const [currency, setCurrency] = useState<number>(0);
   const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
+  const [userName, setUserName] = useState<string>('');
   const [dateTime] = useState<string>(new Date().toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -883,8 +884,9 @@ function App() {
     difficulty: 5
   });
 
-  const handleSplashEnter = () => {
+  const handleSplashEnter = (name: string) => {
     console.log('Splash screen complete, showing main app');
+    setUserName(name);
     setSplashScreenActive(false);
   };
 
@@ -970,6 +972,7 @@ function App() {
             currency={currency}
             currentView={currentView}
             onViewChange={setCurrentView}
+            userName={userName}
           />
           
           <MainContent>
@@ -996,7 +999,7 @@ function App() {
                         }}
                       >
                         SYSTEM:
-                      </GlitchText> Welcome, netrunner. <StatusHighlight>{tasks.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
+                      </GlitchText> Welcome, {userName || 'netrunner'}. <StatusHighlight>{tasks.length}</StatusHighlight> gigs available. Your balance: <StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight>
                     </StatusText>
                     <StatusText>
                       <GlitchText
