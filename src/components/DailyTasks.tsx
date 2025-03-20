@@ -695,7 +695,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete }) => {
           const streakMultiplier = 1 + (task.consecutiveCompletions * 0.1);
           const totalReward = Math.floor(task.baseReward * streakMultiplier);
           
-          onComplete(totalReward);
+          onComplete(totalReward / 2);
           
           return {
             ...task,

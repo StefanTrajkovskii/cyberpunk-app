@@ -938,8 +938,8 @@ function App() {
         const streakBonus = task.consecutiveCompletions * 0.1;
         const totalReward = Math.floor(task.baseReward * (1 + streakBonus));
         
-        // Add reward to currency
-        setCurrency(prev => prev + totalReward);
+        // Add reward to currency (divide by 2 to fix double counting)
+        setCurrency(prev => prev + (totalReward / 2));
         
         // Update task
         return {
@@ -978,7 +978,10 @@ function App() {
           <MainContent>
             {currentView === 'daily' && (
               <DailyTasks 
-                onComplete={(reward: number) => setCurrency(prev => prev + reward)}
+                onComplete={(reward: number) => {
+                  // Only update currency once for daily tasks
+                  setCurrency(prev => prev + reward);
+                }}
               />
             )}
             {currentView === 'missions' && (
