@@ -8,14 +8,15 @@ interface DailyTask {
   description: string;
   baseReward: number;
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  type: 'HACK' | 'COMBAT' | 'STEALTH' | 'TECH';
+  type: 'FOOD' | 'COMBAT' | 'STEALTH' | 'TECH';
   completed: boolean;
-  difficulty: number; // 1-10
+  difficulty: number;
   consecutiveCompletions: number;
 }
 
 interface DailyTasksProps {
   onComplete: (reward: number) => void;
+  onNavigateToFood: () => void;
 }
 
 const glitch = keyframes`
@@ -178,7 +179,7 @@ const FilterButton = styled.button<{ active: boolean; taskType: string }>`
   background: transparent;
   border: 1px solid ${({ taskType }) => {
     switch (taskType) {
-      case 'HACK': return '#00ff9d';
+      case 'FOOD': return '#00ff9d';
       case 'COMBAT': return '#ff3e3e';
       case 'STEALTH': return '#9d00ff';
       case 'TECH': return '#00a2ff';
@@ -187,7 +188,7 @@ const FilterButton = styled.button<{ active: boolean; taskType: string }>`
   }};
   color: ${({ taskType }) => {
     switch (taskType) {
-      case 'HACK': return '#00ff9d';
+      case 'FOOD': return '#00ff9d';
       case 'COMBAT': return '#ff3e3e';
       case 'STEALTH': return '#9d00ff';
       case 'TECH': return '#00a2ff';
@@ -278,7 +279,7 @@ const getRiskColor = (risk: string) => {
 
 const getTypeColor = (type: string) => {
   switch (type) {
-    case 'HACK': return '#00ff9d';
+    case 'FOOD': return '#00ff9d';
     case 'COMBAT': return '#ff3e3e';
     case 'STEALTH': return '#9d00ff';
     case 'TECH': return '#00a2ff';
@@ -293,9 +294,10 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(5px);
+  cursor: ${({ type }) => type === 'FOOD' ? 'pointer' : 'default'};
   box-shadow: 0 0 20px rgba(${({ type }) => {
     switch (type) {
-      case 'HACK': return '0, 255, 157';
+      case 'FOOD': return '0, 255, 157';
       case 'COMBAT': return '255, 62, 62';
       case 'STEALTH': return '157, 0, 255';
       case 'TECH': return '0, 162, 255';
@@ -320,7 +322,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
         transparent 50%,
         rgba(${({ type }) => {
           switch (type) {
-            case 'HACK': return '0, 255, 157';
+            case 'FOOD': return '0, 255, 157';
             case 'COMBAT': return '255, 62, 62';
             case 'STEALTH': return '157, 0, 255';
             case 'TECH': return '0, 162, 255';
@@ -339,7 +341,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
       transparent 0%,
       rgba(${({ type }) => {
         switch (type) {
-          case 'HACK': return '0, 255, 157';
+          case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
           case 'TECH': return '0, 162, 255';
@@ -360,7 +362,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
     box-shadow: 
       0 5px 30px rgba(${({ type }) => {
         switch (type) {
-          case 'HACK': return '0, 255, 157';
+          case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
           case 'TECH': return '0, 162, 255';
@@ -369,7 +371,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
       }}, 0.3),
       inset 0 0 20px rgba(${({ type }) => {
         switch (type) {
-          case 'HACK': return '0, 255, 157';
+          case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
           case 'TECH': return '0, 162, 255';
@@ -639,15 +641,15 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
   }
 `;
 
-const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete }) => {
+const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood }) => {
   const [tasks, setTasks] = useState<DailyTask[]>([
     {
       id: '1',
-      title: 'System Breach',
-      description: 'Infiltrate corporate security systems and disable primary firewalls.',
+      title: 'Meal Prep',
+      description: 'Prepare healthy meals for the day, including breakfast, lunch, and dinner.',
       baseReward: 500,
       riskLevel: 'MEDIUM',
-      type: 'HACK',
+      type: 'FOOD',
       completed: false,
       difficulty: 6,
       consecutiveCompletions: 0
@@ -712,10 +714,16 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete }) => {
     ? tasks.filter(task => task.type === selectedType)
     : tasks;
 
+  const handleCardClick = (type: string) => {
+    if (type === 'FOOD') {
+      onNavigateToFood();
+    }
+  };
+
   return (
     <Container>
       <TaskTypeFilter>
-        {['HACK', 'COMBAT', 'STEALTH', 'TECH'].map(type => (
+        {['FOOD', 'COMBAT', 'STEALTH', 'TECH'].map(type => (
           <FilterButton
             key={type}
             taskType={type}
@@ -738,6 +746,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
+              onClick={() => handleCardClick(task.type)}
             >
               <TaskHeader>
                 <TaskTitle type={task.type}>{task.title}</TaskTitle>

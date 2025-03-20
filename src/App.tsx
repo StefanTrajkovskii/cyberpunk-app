@@ -5,6 +5,7 @@ import NavHeader from './components/NavHeader';
 import CyberFooter from './components/CyberFooter';
 import SplashScreen from './components/SplashScreen';
 import DailyTasks from './components/DailyTasks';
+import FoodTracker from './components/FoodTracker';
 
 
 
@@ -15,7 +16,7 @@ interface Task {
   description: string;
   baseReward: number;
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  type: 'HACK' | 'COMBAT' | 'STEALTH' | 'TECH';
+  type: 'FOOD' | 'COMBAT' | 'STEALTH' | 'TECH';
   completed: boolean;
   difficulty: number;
   consecutiveCompletions: number;
@@ -126,7 +127,7 @@ const getRiskColor = (risk: string) => {
 
 const getTypeColor = (type: string) => {
   switch (type) {
-    case 'HACK': return '#00ff9d';
+    case 'FOOD': return '#00ff9d';
     case 'COMBAT': return '#ff3e3e';
     case 'STEALTH': return '#9d00ff';
     case 'TECH': return '#00a2ff';
@@ -187,7 +188,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
   backdrop-filter: blur(5px);
   box-shadow: 0 0 20px rgba(${({ type }) => {
     switch (type) {
-      case 'HACK': return '0, 255, 157';
+      case 'FOOD': return '0, 255, 157';
       case 'COMBAT': return '255, 62, 62';
       case 'STEALTH': return '157, 0, 255';
       case 'TECH': return '0, 162, 255';
@@ -212,7 +213,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
         transparent 50%,
         rgba(${({ type }) => {
           switch (type) {
-            case 'HACK': return '0, 255, 157';
+            case 'FOOD': return '0, 255, 157';
             case 'COMBAT': return '255, 62, 62';
             case 'STEALTH': return '157, 0, 255';
             case 'TECH': return '0, 162, 255';
@@ -231,7 +232,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
       transparent 0%,
       rgba(${({ type }) => {
         switch (type) {
-          case 'HACK': return '0, 255, 157';
+          case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
           case 'TECH': return '0, 162, 255';
@@ -252,7 +253,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
     box-shadow: 
       0 5px 30px rgba(${({ type }) => {
         switch (type) {
-          case 'HACK': return '0, 255, 157';
+          case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
           case 'TECH': return '0, 162, 255';
@@ -261,7 +262,7 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
       }}, 0.3),
       inset 0 0 20px rgba(${({ type }) => {
         switch (type) {
-          case 'HACK': return '0, 255, 157';
+          case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
           case 'TECH': return '0, 162, 255';
@@ -843,7 +844,7 @@ interface NewJob {
   description: string;
   baseReward: number;
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  type: 'HACK' | 'COMBAT' | 'STEALTH' | 'TECH';
+  type: 'FOOD' | 'COMBAT' | 'STEALTH' | 'TECH';
   difficulty: number;
 }
 
@@ -859,15 +860,16 @@ function App() {
     hour: '2-digit',
     minute: '2-digit'
   }));
+  const [showFoodTracker, setShowFoodTracker] = useState(false);
 
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
-      title: 'System Breach',
-      description: 'Infiltrate corporate security systems and disable primary firewalls.',
+      title: 'FOOD TRACKER',
+      description: 'Prepare healthy meals for the day, including breakfast, lunch, and dinner.',
       baseReward: 500,
       riskLevel: 'MEDIUM',
-      type: 'HACK',
+      type: 'FOOD',
       completed: false,
       difficulty: 6,
       consecutiveCompletions: 0
@@ -913,7 +915,7 @@ function App() {
     description: '',
     baseReward: 500,
     riskLevel: 'MEDIUM',
-    type: 'HACK',
+    type: 'FOOD',
     difficulty: 5
   });
 
@@ -948,7 +950,7 @@ function App() {
       description: '',
       baseReward: 500,
       riskLevel: 'MEDIUM',
-      type: 'HACK',
+      type: 'FOOD',
       difficulty: 5
     });
   };
@@ -1009,13 +1011,16 @@ function App() {
           />
           
           <MainContent>
-            {currentView === 'daily' && (
+            {currentView === 'daily' && !showFoodTracker && (
               <DailyTasks 
                 onComplete={(reward: number) => {
-                  // Only update currency once for daily tasks
                   setCurrency(prev => prev + reward);
                 }}
+                onNavigateToFood={() => setShowFoodTracker(true)}
               />
+            )}
+            {currentView === 'daily' && showFoodTracker && (
+              <FoodTracker onBack={() => setShowFoodTracker(false)} />
             )}
             {currentView === 'missions' && (
               <Container>
@@ -1223,7 +1228,7 @@ function App() {
                           onChange={handleInputChange}
                           required
                         >
-                          <option value="HACK">HACK</option>
+                          <option value="FOOD">FOOD</option>
                           <option value="COMBAT">COMBAT</option>
                           <option value="STEALTH">STEALTH</option>
                           <option value="TECH">TECH</option>
