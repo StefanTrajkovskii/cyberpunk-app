@@ -866,9 +866,9 @@ function App() {
     {
       id: '1',
       title: 'FOOD TRACKER',
-      description: 'Track your daily nutrition intake. Monitor calories and protein for each meal to maintain optimal cybernetic performance.',
+      description: 'Track your daily nutrition intake to optimize your cybernetic performance.',
       baseReward: 0,
-      riskLevel: 'MEDIUM',
+      riskLevel: 'HIGH',
       type: 'FOOD',
       completed: false,
       difficulty: 8,

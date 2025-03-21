@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -645,6 +645,37 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
 
 const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, tasks, setTasks }) => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [todaysCalories, setTodaysCalories] = useState<number>(0);
+  const [todaysProtein, setTodaysProtein] = useState<number>(0);
+
+  useEffect(() => {
+    const updateStats = () => {
+      const today = new Date().toLocaleDateString();
+      const storedEntries = localStorage.getItem('foodEntries');
+      if (storedEntries) {
+        const entries = JSON.parse(storedEntries);
+        const todayEntries = entries.filter((entry: any) => entry.date === today);
+        const totalCalories = todayEntries.reduce((sum: number, entry: { calories: number }) => 
+          sum + Number(entry.calories), 0
+        );
+        const totalProtein = todayEntries.reduce((sum: number, entry: { protein: number }) => 
+          sum + Number(entry.protein), 0
+        );
+        setTodaysCalories(totalCalories);
+        setTodaysProtein(totalProtein);
+      }
+    };
+
+    // Initial load
+    updateStats();
+
+    // Set up an interval to check for updates
+    const interval = setInterval(updateStats, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleCompleteTask = (taskId: string) => {
     setTasks(prevTasks => 
@@ -722,6 +753,18 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, t
                   <span>STREAK</span>
                   <span>{task.consecutiveCompletions}x</span>
                 </StatItem>
+                {task.type === 'FOOD' && (
+                  <>
+                    <StatItem type={task.type}>
+                      <span>CALORIES</span>
+                      <span>{todaysCalories}</span>
+                    </StatItem>
+                    <StatItem type={task.type}>
+                      <span>PROTEIN</span>
+                      <span>{todaysProtein}g</span>
+                    </StatItem>
+                  </>
+                )}
                 {task.type !== 'FOOD' && (
                   <StatItem type={task.type}>
                     <span>REWARD</span>

@@ -318,7 +318,7 @@ const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
       ...newEntry,
       calories: Number(newEntry.calories) || 0,
       protein: Number(newEntry.protein) || 0,
-      date: today
+      date: new Date().toLocaleDateString()
     };
     setEntries([...entries, entry]);
     setNewEntry({
