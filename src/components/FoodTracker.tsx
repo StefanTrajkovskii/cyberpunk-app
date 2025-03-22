@@ -16,11 +16,64 @@ const scanlines = keyframes`
   100% { background-position: 0 15px; }
 `;
 
+const glitch = keyframes`
+  0% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(0);
+  }
+  1% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(-2px, 1px);
+  }
+  2% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(2px, -1px);
+  }
+  3% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(0);
+  }
+  100% {
+    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
+    transform: translate(0);
+  }
+`;
+
+const dataStream = keyframes`
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 -1000px;
+  }
+`;
+
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   color: #e4f3ff;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.95)),
+      repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 1px,
+        rgba(0, 255, 157, 0.1) 2px,
+        rgba(0, 255, 157, 0.1) 3px
+      );
+    pointer-events: none;
+    z-index: -1;
+  }
   
   @media (max-width: 768px) {
     padding: 1rem;
@@ -34,6 +87,7 @@ const Header = styled.div`
   margin-bottom: 2rem;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
   
   &::before {
     content: '';
@@ -42,15 +96,27 @@ const Header = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 255, 157, 0.1) 0px,
-      rgba(0, 255, 157, 0.1) 1px,
-      transparent 1px,
-      transparent 2px
-    );
+    background: 
+      linear-gradient(90deg, transparent 50%, rgba(0, 255, 157, 0.1)),
+      url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='none' stroke='%2300ff9d' stroke-width='0.25'/%3E%3C/svg%3E");
     pointer-events: none;
-    animation: ${scanlines} 0.5s linear infinite;
+    opacity: 0.1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    background: linear-gradient(
+      0deg,
+      transparent 0%,
+      rgba(0, 255, 157, 0.1) 50%,
+      transparent 100%
+    );
+    animation: ${dataStream} 20s linear infinite;
   }
 `;
 
@@ -62,6 +128,28 @@ const Title = styled.h1`
   text-transform: uppercase;
   letter-spacing: 2px;
   text-shadow: 0 0 10px #00ff9d;
+  position: relative;
+  display: inline-block;
+  
+  &::before {
+    content: 'NUTRITION_OS v2.0';
+    position: absolute;
+    top: -1rem;
+    left: 0;
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #00ff9d;
+    box-shadow: 0 0 10px #00ff9d;
+  }
 `;
 
 const Stats = styled.div`
@@ -76,6 +164,24 @@ const StatBox = styled.div`
   border: 1px solid #00ff9d;
   padding: 1rem;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 157, 0.1),
+      transparent
+    );
+    animation: ${dataStream} 3s linear infinite;
+  }
   
   h3 {
     color: #00ff9d;
@@ -83,6 +189,19 @@ const StatBox = styled.div`
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 1px;
+    position: relative;
+    
+    &::before {
+      content: '[';
+      margin-right: 0.5rem;
+      opacity: 0.7;
+    }
+    
+    &::after {
+      content: ']';
+      margin-left: 0.5rem;
+      opacity: 0.7;
+    }
   }
   
   p {
@@ -90,6 +209,7 @@ const StatBox = styled.div`
     font-size: 1.5rem;
     margin: 0.5rem 0 0;
     font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 10px rgba(0, 255, 157, 0.5);
   }
 `;
 
@@ -98,6 +218,20 @@ const Form = styled.form`
   border: 1px solid #00ff9d;
   padding: 1.5rem;
   margin-bottom: 2rem;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+  
+  &::before {
+    content: 'NEW_ENTRY';
+    position: absolute;
+    top: -0.8rem;
+    left: 1rem;
+    background: #000;
+    padding: 0 0.5rem;
+    color: #00ff9d;
+    font-size: 0.8rem;
+    font-family: 'Share Tech Mono', monospace;
+  }
 `;
 
 const FormGrid = styled.div`
@@ -126,10 +260,16 @@ const Input = styled.input`
   padding: 0.75rem;
   color: #fff;
   font-family: 'Share Tech Mono', monospace;
+  transition: all 0.3s ease;
   
   &:focus {
     outline: none;
-    box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+    border-color: #fff;
+  }
+
+  &::placeholder {
+    color: rgba(0, 255, 157, 0.5);
   }
 `;
 
@@ -140,14 +280,17 @@ const Select = styled.select`
   padding: 0.75rem;
   color: #fff;
   font-family: 'Share Tech Mono', monospace;
-  
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
-  }
+  cursor: pointer;
   
   option {
     background: #000;
+    color: #00ff9d;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+    border-color: #fff;
   }
 `;
 
@@ -183,6 +326,25 @@ const Entry = styled(motion.div)`
   grid-template-columns: 1fr auto auto auto auto;
   gap: 1rem;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 157, 0.05),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: ${dataStream} 2s linear infinite;
+  }
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -193,6 +355,16 @@ const Entry = styled(motion.div)`
 const EntryText = styled.span`
   color: #fff;
   font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  padding-left: 1rem;
+  
+  &::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #00ff9d;
+    opacity: 0.7;
+  }
 `;
 
 const DeleteButton = styled(motion.button)`
@@ -202,10 +374,26 @@ const DeleteButton = styled(motion.button)`
   padding: 0.5rem;
   cursor: pointer;
   font-family: 'Share Tech Mono', monospace;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 62, 136, 0.2);
+    transition: 0.3s;
+  }
   
   &:hover {
-    background: rgba(255, 62, 136, 0.1);
-    box-shadow: 0 0 10px rgba(255, 62, 136, 0.2);
+    box-shadow: 0 0 15px rgba(255, 62, 136, 0.3);
+    
+    &::before {
+      left: 0;
+    }
   }
 `;
 
@@ -219,10 +407,26 @@ const BackButton = styled(motion.button)`
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 255, 157, 0.2);
+    transition: 0.3s;
+  }
   
   &:hover {
-    background: rgba(0, 255, 157, 0.1);
-    box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+    box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
+    
+    &::before {
+      left: 0;
+    }
   }
 `;
 
@@ -231,14 +435,36 @@ const ViewToggle = styled(motion.button)`
   border: 1px solid #00ff9d;
   color: #00ff9d;
   padding: 8px 16px;
-  border-radius: 4px;
   cursor: pointer;
   font-family: 'Share Tech Mono', monospace;
   margin-bottom: 20px;
-  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 157, 0.2),
+      transparent
+    );
+    transition: 0.5s;
+  }
 
   &:hover {
-    background: rgba(0, 255, 157, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+    
+    &::before {
+      left: 100%;
+    }
   }
 `;
 
@@ -248,10 +474,26 @@ const HistoryContainer = styled.div`
 
 const DateSection = styled.div`
   margin-bottom: 30px;
-  border: 1px solid rgba(0, 255, 157, 0.3);
-  border-radius: 8px;
+  border: 1px solid #00ff9d;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 50%,
+      rgba(0, 255, 157, 0.05)
+    );
+    pointer-events: none;
+  }
 `;
 
 const DateHeader = styled.h3`
@@ -261,6 +503,20 @@ const DateHeader = styled.h3`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  &::before {
+    content: '[';
+    margin-right: 0.5rem;
+    opacity: 0.7;
+  }
+  
+  &::after {
+    content: ']';
+    margin-left: 0.5rem;
+    opacity: 0.7;
+  }
 `;
 
 const DailySummary = styled.div`
@@ -269,14 +525,35 @@ const DailySummary = styled.div`
   margin-bottom: 15px;
   padding: 10px;
   background: rgba(0, 255, 157, 0.1);
-  border-radius: 4px;
+  border: 1px solid rgba(0, 255, 157, 0.3);
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(0, 255, 157, 0.1),
+      transparent
+    );
+    animation: ${dataStream} 2s linear infinite;
+  }
 `;
 
 const SummaryItem = styled.div`
   color: #e4f3ff;
+  font-family: 'Share Tech Mono', monospace;
+  
   span {
     color: #00ff9d;
     margin-left: 5px;
+    text-shadow: 0 0 5px rgba(0, 255, 157, 0.5);
   }
 `;
 
