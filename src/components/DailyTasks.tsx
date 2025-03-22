@@ -17,6 +17,7 @@ interface DailyTask {
 interface DailyTasksProps {
   onComplete: (reward: number) => void;
   onNavigateToFood: () => void;
+  onNavigateToGym: () => void;
   tasks: DailyTask[];
   setTasks: React.Dispatch<React.SetStateAction<DailyTask[]>>;
 }
@@ -643,7 +644,7 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
   }
 `;
 
-const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, tasks, setTasks }) => {
+const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, onNavigateToGym, tasks, setTasks }) => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [todaysCalories, setTodaysCalories] = useState<number>(0);
   const [todaysProtein, setTodaysProtein] = useState<number>(0);
@@ -701,9 +702,11 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, t
     ? tasks.filter(task => task.type === selectedType)
     : tasks;
 
-  const handleCardClick = (type: string) => {
-    if (type === 'FOOD') {
+  const handleCardClick = (task: DailyTask) => {
+    if (task.type === 'FOOD') {
       onNavigateToFood();
+    } else if (task.type === 'COMBAT') {
+      onNavigateToGym();
     }
   };
 
@@ -717,7 +720,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, t
             active={selectedType === type}
             onClick={() => setSelectedType(selectedType === type ? null : type)}
           >
-            {type}
+            {type === 'COMBAT' ? 'GYM' : type}
           </FilterButton>
         ))}
       </TaskTypeFilter>
@@ -733,10 +736,12 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, t
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
-              onClick={() => handleCardClick(task.type)}
+              onClick={() => handleCardClick(task)}
             >
               <TaskHeader>
-                <TaskTitle type={task.type}>{task.title}</TaskTitle>
+                <TaskTitle type={task.type}>
+                  {task.title}
+                </TaskTitle>
                 <RiskBadge risk={task.riskLevel}>{task.riskLevel}</RiskBadge>
               </TaskHeader>
 

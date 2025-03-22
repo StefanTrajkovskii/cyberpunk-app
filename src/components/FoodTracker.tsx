@@ -11,33 +11,6 @@ interface FoodEntry {
   date: string;
 }
 
-const scanlines = keyframes`
-  0% { background-position: 0 0; }
-  100% { background-position: 0 15px; }
-`;
-
-const glitch = keyframes`
-  0% {
-    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
-    transform: translate(0);
-  }
-  1% {
-    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
-    transform: translate(-2px, 1px);
-  }
-  2% {
-    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
-    transform: translate(2px, -1px);
-  }
-  3% {
-    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
-    transform: translate(0);
-  }
-  100% {
-    text-shadow: 2px 0 0 red, -2px 0 0 #0ff;
-    transform: translate(0);
-  }
-`;
 
 const dataStream = keyframes`
   0% {

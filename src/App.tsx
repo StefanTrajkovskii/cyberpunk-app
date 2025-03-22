@@ -6,6 +6,7 @@ import CyberFooter from './components/CyberFooter';
 import SplashScreen from './components/SplashScreen';
 import DailyTasks from './components/DailyTasks';
 import FoodTracker from './components/FoodTracker';
+import GymTracker from './components/GymTracker';
 
 
 
@@ -861,6 +862,7 @@ function App() {
     minute: '2-digit'
   }));
   const [showFoodTracker, setShowFoodTracker] = useState(false);
+  const [showGymTracker, setShowGymTracker] = useState(false);
 
   const [tasks, setTasks] = useState<Task[]>([
     {
@@ -876,9 +878,9 @@ function App() {
     },
     {
       id: '2',
-      title: 'Street Cleanup',
-      description: 'Clear out hostile gang members from the local district.',
-      baseReward: 750,
+      title: 'GYM TRACKER',
+      description: 'Monitor your physical training progress and maintain peak physical condition.',
+      baseReward: 0,
       riskLevel: 'HIGH',
       type: 'COMBAT',
       completed: false,
@@ -987,6 +989,14 @@ function App() {
     }));
   };
 
+  const handleCardClick = (task: Task) => {
+    if (task.type === 'FOOD') {
+      setShowFoodTracker(true);
+    } else if (task.type === 'COMBAT') {
+      setShowGymTracker(true);
+    }
+  };
+
   // Render splash screen if active
   if (splashScreenActive) {
     return <SplashScreen onEnter={handleSplashEnter} />;
@@ -1011,18 +1021,22 @@ function App() {
           />
           
           <MainContent>
-            {currentView === 'daily' && !showFoodTracker && (
+            {currentView === 'daily' && !showFoodTracker && !showGymTracker && (
               <DailyTasks 
                 onComplete={(reward: number) => {
                   setCurrency(prev => prev + reward);
                 }}
                 onNavigateToFood={() => setShowFoodTracker(true)}
+                onNavigateToGym={() => setShowGymTracker(true)}
                 tasks={tasks}
                 setTasks={setTasks}
               />
             )}
             {currentView === 'daily' && showFoodTracker && (
               <FoodTracker onBack={() => setShowFoodTracker(false)} />
+            )}
+            {currentView === 'daily' && showGymTracker && (
+              <GymTracker onBack={() => setShowGymTracker(false)} />
             )}
             {currentView === 'missions' && (
               <Container>
