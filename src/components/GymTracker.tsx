@@ -2,6 +2,13 @@ import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
+interface Exercise {
+  name: string;
+  sets: number;
+  muscleGroup: string;
+  image?: string;
+}
+
 // Animations
 const glitch = keyframes`
   0% {
@@ -213,17 +220,7 @@ const ExerciseList = styled.div`
   margin-top: 1.5rem;
 `;
 
-const Exercise = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.8rem;
-  border-bottom: 1px solid rgba(255, 62, 62, 0.2);
 
-  &:last-child {
-    border-bottom: none;
-  }
-`;
 
 const ExerciseName = styled.div`
   color: #ff3e3e;
@@ -259,24 +256,6 @@ const CloseButton = styled.button`
   }
 `;
 
-interface Exercise {
-  name: string;
-  sets: number;
-  muscleGroup: string;
-  image?: string;
-}
-
-interface WorkoutDay {
-  day: string;
-  focus: string;
-  exercises: Exercise[];
-  isRest?: boolean;
-}
-
-interface GymTrackerProps {
-  onBack: () => void;
-}
-
 const ExerciseImage = styled.img`
   width: 100%;
   max-width: 400px;
@@ -292,6 +271,17 @@ const ExerciseImage = styled.img`
     box-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
   }
 `;
+
+interface WorkoutDay {
+  day: string;
+  focus: string;
+  exercises: Exercise[];
+  isRest?: boolean;
+}
+
+interface GymTrackerProps {
+  onBack: () => void;
+}
 
 const ImageModal = styled(motion.div)`
   position: fixed;
