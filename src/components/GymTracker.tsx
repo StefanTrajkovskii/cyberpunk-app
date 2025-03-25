@@ -78,6 +78,15 @@ const Header = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   position: relative;
+  padding: 1rem;
+
+  @media (max-width: 768px) {
+    background: rgba(20, 0, 0, 0.95);
+    border: 1px solid rgba(255, 62, 62, 0.3);
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    min-height: 60px;
+  }
 `;
 
 const Title = styled.h1`
@@ -89,6 +98,11 @@ const Title = styled.h1`
   letter-spacing: 2px;
   text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
   animation: ${glitch} 3s infinite;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+  }
 `;
 
 const Subtitle = styled.div`
@@ -97,6 +111,12 @@ const Subtitle = styled.div`
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 0.6rem;
+    color: rgba(255, 62, 62, 0.4);
+    letter-spacing: 0.5px;
+  }
 `;
 
 const BackButton = styled(motion.button)`
@@ -131,6 +151,13 @@ const BackButton = styled(motion.button)`
       left: 100%;
     }
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border: 1px solid rgba(255, 62, 62, 0.3);
+    margin-left: auto;
+  }
 `;
 
 const WorkoutSchedule = styled.div`
@@ -156,6 +183,16 @@ const DaySchedule = styled.div<{ isRest: boolean }>`
     background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.2)'};
     border-color: rgba(255, 62, 62, 0.5);
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    padding: 1rem;
+    background: rgba(20, 0, 0, 0.95);
+    border: 1px solid rgba(255, 62, 62, 0.3);
+    margin-bottom: 0.25rem;
+  }
 `;
 
 const DayName = styled.div`
@@ -167,7 +204,9 @@ const DayName = styled.div`
   text-shadow: 0 0 10px rgba(255, 62, 62, 0.3);
 
   @media (max-width: 768px) {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin-bottom: 0;
+    letter-spacing: 1px;
   }
 `;
 
@@ -179,7 +218,9 @@ const WorkoutType = styled.div`
   letter-spacing: 1px;
 
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.8rem;
+    color: rgba(255, 62, 62, 0.5);
+    letter-spacing: 0.5px;
   }
 `;
 
@@ -274,6 +315,19 @@ const ExerciseRow = styled.div<{ completed: boolean }>`
       opacity: 1;
     }
   }
+
+  @media (max-width: 768px) {
+    background: rgba(20, 0, 0, 0.95);
+    border: 1px solid rgba(255, 62, 62, 0.3);
+    border-radius: 0;
+    margin-bottom: 1px;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(255, 62, 62, 0.3);
+    }
+  }
 `;
 
 const ExerciseContent = styled.div`
@@ -285,6 +339,9 @@ const ExerciseContent = styled.div`
 
   @media (max-width: 768px) {
     flex-direction: column;
+    padding: 1rem;
+    min-height: unset;
+    gap: 0.5rem;
   }
 `;
 
@@ -295,6 +352,11 @@ const ExerciseDetails = styled.div`
   flex: 1;
   position: relative;
   padding-bottom: 4rem;
+
+  @media (max-width: 768px) {
+    padding-bottom: 0;
+    gap: 0.75rem;
+  }
 `;
 
 const ExerciseImageContainer = styled.div`
@@ -319,6 +381,10 @@ const ExerciseHeader = styled.div`
   gap: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(255, 62, 62, 0.2);
+
+  @media (max-width: 768px) {
+    padding-bottom: 0.25rem;
+  }
 `;
 
 const ExerciseName = styled.div<{ completed: boolean }>`
@@ -328,7 +394,7 @@ const ExerciseName = styled.div<{ completed: boolean }>`
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
 
   @media (max-width: 768px) {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -339,6 +405,11 @@ const ExerciseInfo = styled.div`
   color: rgba(255, 62, 62, 0.8);
   font-family: 'Share Tech Mono', monospace;
   font-size: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    gap: 0.75rem;
+  }
 `;
 
 const ExerciseSets = styled.div`
@@ -347,6 +418,11 @@ const ExerciseSets = styled.div`
   border-radius: 20px;
   border: 1px solid rgba(255, 62, 62, 0.3);
   font-weight: bold;
+
+  @media (max-width: 768px) {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+  }
 `;
 
 const MuscleGroup = styled.div`
@@ -356,6 +432,12 @@ const MuscleGroup = styled.div`
   padding: 0.4rem 1rem;
   border-radius: 20px;
   border: 1px solid rgba(255, 62, 62, 0.2);
+
+  @media (max-width: 768px) {
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    letter-spacing: 0.5px;
+  }
 `;
 
 const CompleteButtonContainer = styled.div`
@@ -365,6 +447,13 @@ const CompleteButtonContainer = styled.div`
   width: 100%;
   padding: 1rem 0;
   border-top: 1px solid rgba(255, 62, 62, 0.2);
+
+  @media (max-width: 768px) {
+    position: static;
+    order: 3;
+    padding: 0.75rem 0 0 0;
+    margin-top: 0.5rem;
+  }
 `;
 
 const CompleteButton = styled.button<{ completed: boolean }>`
@@ -384,6 +473,12 @@ const CompleteButton = styled.button<{ completed: boolean }>`
   &:hover {
     background: rgba(255, 62, 62, 0.1);
     border-color: rgba(255, 62, 62, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    padding: 0.6rem;
+    letter-spacing: 0.5px;
   }
 `;
 
@@ -456,9 +551,26 @@ const FullImage = styled.img`
   object-fit: contain;
 `;
 
+const useMediaQuery = (query: string) => {
+  const [matches, setMatches] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addListener(listener);
+    return () => media.removeListener(listener);
+  }, [matches, query]);
+
+  return matches;
+};
+
 const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
   const [selectedDay, setSelectedDay] = useState<WorkoutDay | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Add scroll lock effect
   useEffect(() => {
@@ -645,6 +757,37 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                           <ExerciseSets>{exercise.sets}x</ExerciseSets>
                           <MuscleGroup>{exercise.muscleGroup}</MuscleGroup>
                         </ExerciseInfo>
+                        {!isMobile && (
+                          <CompleteButtonContainer>
+                            <CompleteButton
+                              completed={exercise.completed || false}
+                              onClick={() => {
+                                const updatedExercises = [...selectedDay.exercises];
+                                updatedExercises[index] = {
+                                  ...exercise,
+                                  completed: !exercise.completed
+                                };
+                                setSelectedDay({
+                                  ...selectedDay,
+                                  exercises: updatedExercises
+                                });
+                              }}
+                            >
+                              {exercise.completed ? 'Completed' : 'Complete'}
+                            </CompleteButton>
+                          </CompleteButtonContainer>
+                        )}
+                      </ExerciseDetails>
+                      {exercise.image && (
+                        <ExerciseImageContainer>
+                          <ExerciseImage
+                            src={exercise.image}
+                            alt={exercise.name}
+                            onClick={() => exercise.image && setSelectedImage(exercise.image)}
+                          />
+                        </ExerciseImageContainer>
+                      )}
+                      {isMobile && (
                         <CompleteButtonContainer>
                           <CompleteButton
                             completed={exercise.completed || false}
@@ -663,15 +806,6 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                             {exercise.completed ? 'Completed' : 'Complete'}
                           </CompleteButton>
                         </CompleteButtonContainer>
-                      </ExerciseDetails>
-                      {exercise.image && (
-                        <ExerciseImageContainer>
-                          <ExerciseImage
-                            src={exercise.image}
-                            alt={exercise.name}
-                            onClick={() => exercise.image && setSelectedImage(exercise.image)}
-                          />
-                        </ExerciseImageContainer>
                       )}
                     </ExerciseContent>
                   </ExerciseRow>
