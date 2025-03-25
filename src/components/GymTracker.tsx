@@ -189,9 +189,16 @@ const DaySchedule = styled.div<{ isRest: boolean }>`
     align-items: flex-start;
     gap: 0.25rem;
     padding: 1rem;
-    background: rgba(20, 0, 0, 0.95);
+    background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)'};
     border: 1px solid rgba(255, 62, 62, 0.3);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.75rem;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(255, 62, 62, 0.3);
+      background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)'};
+    }
   }
 `;
 
