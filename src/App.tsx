@@ -850,6 +850,349 @@ interface NewJob {
   difficulty: number;
 }
 
+// Add Missions component
+const Missions = ({ tasks, setTasks, currency, setCurrency, userName }: { 
+  tasks: Task[], 
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>,
+  currency: number,
+  setCurrency: React.Dispatch<React.SetStateAction<number>>,
+  userName: string 
+}) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newJob, setNewJob] = useState<NewJob>({
+    title: '',
+    description: '',
+    baseReward: 500,
+    riskLevel: 'MEDIUM',
+    type: 'FOOD',
+    difficulty: 5
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === 'baseReward') {
+      // Remove all non-numeric characters and parse as integer
+      const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0;
+      setNewJob(prev => ({
+        ...prev,
+        baseReward: numericValue
+      }));
+    } else {
+      setNewJob(prev => ({
+        ...prev,
+        [name]: name === 'difficulty' ? Number(value) : value
+      }));
+    }
+  };
+
+  const handleAddJob = () => {
+    setIsModalOpen(true);
+    setNewJob({
+      title: '',
+      description: '',
+      baseReward: 500,
+      riskLevel: 'MEDIUM',
+      type: 'FOOD',
+      difficulty: 5
+    });
+  };
+
+  const handleSubmitJob = () => {
+    const task: Task = {
+      id: (tasks.length + 1).toString(),
+      ...newJob,
+      completed: false,
+      consecutiveCompletions: 0
+    };
+    setTasks([...tasks, task]);
+    setIsModalOpen(false);
+  };
+
+  const handleExecuteTask = (taskId: string) => {
+    setTasks(prevTasks => prevTasks.map(task => {
+      if (task.id === taskId && !task.completed) {
+        const streakBonus = task.consecutiveCompletions * 0.1;
+        const totalReward = Math.floor(task.baseReward * (1 + streakBonus));
+        setCurrency(prev => prev + (totalReward / 2));
+        return {
+          ...task,
+          completed: true,
+          consecutiveCompletions: task.consecutiveCompletions + 1
+        };
+      }
+      return task;
+    }));
+  };
+
+  return (
+    <Container>
+      <HeaderSection>
+        <StatusBar>
+          <StatusText>
+            <GlitchText
+              data-text="SYSTEM:"
+              animate={{
+                x: [0, -2, 0, 2, 0],
+              }}
+              transition={{
+                duration: 0.5,
+                repeat: Infinity,
+                repeatType: "mirror",
+                repeatDelay: 5
+              }}
+            >
+              SYSTEM:
+            </GlitchText>
+            <span>Welcome, {userName || 'netrunner'}. {tasks.length} gigs available.</span>
+          </StatusText>
+          <StatusText>
+            <GlitchText
+              data-text="STATUS:"
+              animate={{
+                x: [0, -1, 0, 1, 0],
+              }}
+              transition={{
+                duration: 0.3,
+                repeat: Infinity,
+                repeatType: "mirror",
+                repeatDelay: 7
+              }}
+            >
+              STATUS:
+            </GlitchText>
+            <span>{new Date().toLocaleString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })} | Network: <StatusHighlight>SECURE</StatusHighlight></span>
+          </StatusText>
+          <StatusText>
+            <GlitchText
+              data-text="BALANCE:"
+              animate={{
+                x: [0, -1, 0, 1, 0],
+              }}
+              transition={{
+                duration: 0.3,
+                repeat: Infinity,
+                repeatType: "mirror",
+                repeatDelay: 7
+              }}
+            >
+              BALANCE:
+            </GlitchText>
+            <span><StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight></span>
+          </StatusText>
+        </StatusBar>
+        <AddJobButton
+          onClick={handleAddJob}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          NEW JOB
+        </AddJobButton>
+      </HeaderSection>
+
+      <TaskGrid>
+        <AnimatePresence>
+          {tasks.map(task => (
+            <TaskCard
+              key={task.id}
+              type={task.type}
+              riskLevel={task.riskLevel}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <TaskHeader>
+                <TaskTitle type={task.type}>{task.title}</TaskTitle>
+                <RiskBadge risk={task.riskLevel}>{task.riskLevel}</RiskBadge>
+              </TaskHeader>
+
+              <DifficultyMeter>
+                <DifficultyFill difficulty={task.difficulty} type={task.type} />
+              </DifficultyMeter>
+
+              <TaskStats>
+                <StatItem type={task.type}>
+                  <span>DIFFICULTY</span>
+                  <span>{task.difficulty}/10</span>
+                </StatItem>
+                <StatItem type={task.type}>
+                  <span>STREAK</span>
+                  <span>{task.consecutiveCompletions}x</span>
+                </StatItem>
+                <StatItem type={task.type}>
+                  <span>REWARD</span>
+                  <span>¥{task.baseReward}</span>
+                </StatItem>
+              </TaskStats>
+
+              <TaskDescription>{task.description}</TaskDescription>
+
+              <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
+
+              <TaskFooter>
+                <RewardSection>
+                  <BaseReward type={task.type}>
+                    {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}
+                  </BaseReward>
+                  {task.consecutiveCompletions > 0 && (
+                    <StreakMultiplier>
+                      {task.consecutiveCompletions}x STREAK (+{task.consecutiveCompletions * 10}%)
+                    </StreakMultiplier>
+                  )}
+                </RewardSection>
+
+                <ExecuteButton
+                  type={task.type}
+                  onClick={() => handleExecuteTask(task.id)}
+                  disabled={task.completed}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {task.completed ? 'COMPLETED' : 'EXECUTE'}
+                </ExecuteButton>
+              </TaskFooter>
+            </TaskCard>
+          ))}
+        </AnimatePresence>
+      </TaskGrid>
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <ModalOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsModalOpen(false)}
+          >
+            <ModalContent
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <FormTitle>CREATE NEW JOB</FormTitle>
+              <form onSubmit={e => { e.preventDefault(); handleSubmitJob(); }}>
+                <FormGrid>
+                  <FormGroup>
+                    <Label htmlFor="title">Job Title</Label>
+                    <Input
+                      type="text"
+                      id="title"
+                      name="title"
+                      value={newJob.title}
+                      onChange={handleInputChange}
+                      placeholder="Enter job title"
+                      required
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="baseReward">Reward</Label>
+                    <Input
+                      type="text"
+                      id="baseReward"
+                      name="baseReward"
+                      value={`¥${newJob.baseReward.toLocaleString()}`}
+                      onChange={handleInputChange}
+                      placeholder="¥1,000"
+                      required
+                    />
+                  </FormGroup>
+
+                  <FormGroup className="full-width">
+                    <Label htmlFor="description">Description</Label>
+                    <TextArea
+                      id="description"
+                      name="description"
+                      value={newJob.description}
+                      onChange={handleInputChange}
+                      placeholder="Describe the job in detail"
+                      required
+                    />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="type">Job Type</Label>
+                    <Select
+                      id="type"
+                      name="type"
+                      value={newJob.type}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="FOOD">FOOD</option>
+                      <option value="COMBAT">COMBAT</option>
+                      <option value="STEALTH">STEALTH</option>
+                      <option value="TECH">TECH</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="riskLevel">Risk Level</Label>
+                    <Select
+                      id="riskLevel"
+                      name="riskLevel"
+                      value={newJob.riskLevel}
+                      onChange={handleInputChange}
+                      required
+                    >
+                      <option value="LOW">LOW</option>
+                      <option value="MEDIUM">MEDIUM</option>
+                      <option value="HIGH">HIGH</option>
+                      <option value="CRITICAL">CRITICAL</option>
+                    </Select>
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="difficulty">Difficulty (1-10)</Label>
+                    <Input
+                      type="number"
+                      id="difficulty"
+                      name="difficulty"
+                      value={newJob.difficulty}
+                      onChange={handleInputChange}
+                      min="1"
+                      max="10"
+                      required
+                    />
+                  </FormGroup>
+                </FormGrid>
+
+                <ButtonGroup>
+                  <Button
+                    className="cancel"
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    CANCEL
+                  </Button>
+                  <Button
+                    type="submit"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    CREATE JOB
+                  </Button>
+                </ButtonGroup>
+              </form>
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
+    </Container>
+  );
+};
+
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -857,15 +1200,6 @@ function AppContent() {
   const [currency, setCurrency] = useState<number>(0);
   const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
   const [userName, setUserName] = useState<string>('');
-  const [dateTime] = useState<string>(new Date().toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }));
-
-
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -913,39 +1247,29 @@ function AppContent() {
     }
   ]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newJob, setNewJob] = useState<NewJob>({
-    title: '',
-    description: '',
-    baseReward: 500,
-    riskLevel: 'MEDIUM',
-    type: 'FOOD',
-    difficulty: 5
-  });
-
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (isModalOpen) {
-          setIsModalOpen(false);
-          return;
-        }
-
         // Handle navigation based on current path
-        if (location.pathname === '/food-tracker' || location.pathname === '/gym-tracker') {
+        if (location.pathname !== '/') {
           navigate('/');
-          return;
-        }
-
-        if (currentView !== 'daily') {
-          setCurrentView('daily');
+          if (currentView !== 'daily') {
+            setCurrentView('daily');
+          }
         }
       }
     };
 
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
-  }, [isModalOpen, currentView, navigate, location]);
+  }, [currentView, navigate, location]);
+
+  // Update currentView when location changes
+  useEffect(() => {
+    if (location.pathname === '/missions') {
+      setCurrentView('missions');
+    }
+  }, [location.pathname]);
 
   const handleSplashEnter = (name: string) => {
     console.log('Splash screen complete, showing main app');
@@ -953,70 +1277,6 @@ function AppContent() {
     setSplashScreenActive(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === 'baseReward') {
-      // Remove all non-numeric characters and parse as integer
-      const numericValue = parseInt(value.replace(/[^0-9]/g, '')) || 0;
-      setNewJob(prev => ({
-        ...prev,
-        baseReward: numericValue
-      }));
-    } else {
-      setNewJob(prev => ({
-        ...prev,
-        [name]: name === 'difficulty' ? Number(value) : value
-      }));
-    }
-  };
-
-  const handleAddJob = () => {
-    setIsModalOpen(true);
-    setNewJob({
-      title: '',
-      description: '',
-      baseReward: 500,
-      riskLevel: 'MEDIUM',
-      type: 'FOOD',
-      difficulty: 5
-    });
-  };
-
-  const handleSubmitJob = () => {
-    const task: Task = {
-      id: (tasks.length + 1).toString(),
-      ...newJob,
-      completed: false,
-      consecutiveCompletions: 0
-    };
-    setTasks([...tasks, task]);
-    setIsModalOpen(false);
-  };
-
-  const handleExecuteTask = (taskId: string) => {
-    setTasks(prevTasks => prevTasks.map(task => {
-      if (task.id === taskId && !task.completed) {
-        // Calculate reward with streak bonus
-        const streakBonus = task.consecutiveCompletions * 0.1;
-        const totalReward = Math.floor(task.baseReward * (1 + streakBonus));
-        
-        // Add reward to currency (divide by 2 to fix double counting)
-        setCurrency(prev => prev + (totalReward / 2));
-        
-        // Update task
-        return {
-          ...task,
-          completed: true,
-          consecutiveCompletions: task.consecutiveCompletions + 1
-        };
-      }
-      return task;
-    }));
-  };
-
-
-  // Render splash screen if active
   if (splashScreenActive) {
     return <SplashScreen onEnter={handleSplashEnter} />;
   }
@@ -1033,296 +1293,51 @@ function AppContent() {
           missionCount={0}
           currency={currency}
           currentView={currentView}
-          onViewChange={setCurrentView}
+          onViewChange={(view) => {
+            setCurrentView(view);
+            if (view === 'missions') {
+              navigate('/missions');
+            } else if (view === 'daily') {
+              navigate('/');
+            }
+          }}
           userName={userName}
         />
         
         <MainContent>
           <Routes>
             <Route path="/" element={
-              currentView === 'daily' ? (
-                <DailyTasks 
-                  onComplete={(reward: number) => {
-                    setCurrency(prev => prev + reward);
-                  }}
-                  onNavigateToFood={() => navigate('/food-tracker')}
-                  onNavigateToGym={() => navigate('/gym-tracker')}
-                  tasks={tasks}
-                  setTasks={setTasks}
-                />
-              ) : currentView === 'missions' ? (
-                <Container>
-                  <HeaderSection>
-                    <StatusBar>
-                      <StatusText>
-                        <GlitchText
-                          data-text="SYSTEM:"
-                          animate={{
-                            x: [0, -2, 0, 2, 0],
-                          }}
-                          transition={{
-                            duration: 0.5,
-                            repeat: Infinity,
-                            repeatType: "mirror",
-                            repeatDelay: 5
-                          }}
-                        >
-                          SYSTEM:
-                        </GlitchText>
-                        <span>Welcome, {userName || 'netrunner'}. {tasks.length} gigs available.</span>
-                      </StatusText>
-                      <StatusText>
-                        <GlitchText
-                          data-text="STATUS:"
-                          animate={{
-                            x: [0, -1, 0, 1, 0],
-                          }}
-                          transition={{
-                            duration: 0.3,
-                            repeat: Infinity,
-                            repeatType: "mirror",
-                            repeatDelay: 7
-                          }}
-                        >
-                          STATUS:
-                        </GlitchText>
-                        <span>{dateTime} | Network: <StatusHighlight>SECURE</StatusHighlight></span>
-                      </StatusText>
-                      <StatusText>
-                        <GlitchText
-                          data-text="BALANCE:"
-                          animate={{
-                            x: [0, -1, 0, 1, 0],
-                          }}
-                          transition={{
-                            duration: 0.3,
-                            repeat: Infinity,
-                            repeatType: "mirror",
-                            repeatDelay: 7
-                          }}
-                        >
-                          BALANCE:
-                        </GlitchText>
-                        <span><StatusHighlight>¥{currency.toLocaleString()}</StatusHighlight></span>
-                      </StatusText>
-                    </StatusBar>
-                    <AddJobButton
-                      onClick={handleAddJob}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      NEW JOB
-                    </AddJobButton>
-                  </HeaderSection>
-
-                  <TaskGrid>
-                    <AnimatePresence>
-                      {tasks.map(task => (
-                        <TaskCard
-                          key={task.id}
-                          type={task.type}
-                          riskLevel={task.riskLevel}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <TaskHeader>
-                            <TaskTitle type={task.type}>{task.title}</TaskTitle>
-                            <RiskBadge risk={task.riskLevel}>{task.riskLevel}</RiskBadge>
-                          </TaskHeader>
-
-                          <DifficultyMeter>
-                            <DifficultyFill difficulty={task.difficulty} type={task.type} />
-                          </DifficultyMeter>
-
-                          <TaskStats>
-                            <StatItem type={task.type}>
-                              <span>DIFFICULTY</span>
-                              <span>{task.difficulty}/10</span>
-                            </StatItem>
-                            <StatItem type={task.type}>
-                              <span>STREAK</span>
-                              <span>{task.consecutiveCompletions}x</span>
-                            </StatItem>
-                            <StatItem type={task.type}>
-                              <span>REWARD</span>
-                              <span>¥{task.baseReward}</span>
-                            </StatItem>
-                          </TaskStats>
-
-                          <TaskDescription>{task.description}</TaskDescription>
-
-                          <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
-
-                          <TaskFooter>
-                            <RewardSection>
-                              <BaseReward type={task.type}>
-                                {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}
-                              </BaseReward>
-                              {task.consecutiveCompletions > 0 && (
-                                <StreakMultiplier>
-                                  {task.consecutiveCompletions}x STREAK (+{task.consecutiveCompletions * 10}%)
-                                </StreakMultiplier>
-                              )}
-                            </RewardSection>
-
-                            <ExecuteButton
-                              type={task.type}
-                              onClick={() => handleExecuteTask(task.id)}
-                              disabled={task.completed}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                            >
-                              {task.completed ? 'COMPLETED' : 'EXECUTE'}
-                            </ExecuteButton>
-                          </TaskFooter>
-                        </TaskCard>
-                      ))}
-                    </AnimatePresence>
-                  </TaskGrid>
-                </Container>
-              ) : (
-                <div>{currentView} coming soon...</div>
-              )
+              <DailyTasks 
+                onComplete={(reward: number) => {
+                  setCurrency(prev => prev + reward);
+                }}
+                onNavigateToFood={() => navigate('/food-tracker')}
+                onNavigateToGym={() => navigate('/gym-tracker')}
+                tasks={tasks}
+                setTasks={setTasks}
+              />
             } />
             <Route path="/food-tracker" element={<FoodTracker onBack={() => navigate('/')} />} />
             <Route path="/gym-tracker" element={<GymTracker onBack={() => navigate('/')} />} />
+            <Route path="/missions" element={
+              <Missions 
+                tasks={tasks} 
+                setTasks={setTasks} 
+                currency={currency} 
+                setCurrency={setCurrency}
+                userName={userName}
+              />
+            } />
           </Routes>
         </MainContent>
-        
-        <AnimatePresence>
-          {isModalOpen && (
-            <ModalOverlay
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsModalOpen(false)}
-            >
-              <ModalContent
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                onClick={e => e.stopPropagation()}
-              >
-                <FormTitle>CREATE NEW JOB</FormTitle>
-                <form onSubmit={e => { e.preventDefault(); handleSubmitJob(); }}>
-                  <FormGrid>
-                    <FormGroup>
-                      <Label htmlFor="title">Job Title</Label>
-                      <Input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={newJob.title}
-                        onChange={handleInputChange}
-                        placeholder="Enter job title"
-                        required
-                      />
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Label htmlFor="baseReward">Reward</Label>
-                      <Input
-                        type="text"
-                        id="baseReward"
-                        name="baseReward"
-                        value={`¥${newJob.baseReward.toLocaleString()}`}
-                        onChange={handleInputChange}
-                        placeholder="¥1,000"
-                        required
-                      />
-                    </FormGroup>
-
-                    <FormGroup className="full-width">
-                      <Label htmlFor="description">Description</Label>
-                      <TextArea
-                        id="description"
-                        name="description"
-                        value={newJob.description}
-                        onChange={handleInputChange}
-                        placeholder="Describe the job in detail"
-                        required
-                      />
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Label htmlFor="type">Job Type</Label>
-                      <Select
-                        id="type"
-                        name="type"
-                        value={newJob.type}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        <option value="FOOD">FOOD</option>
-                        <option value="COMBAT">COMBAT</option>
-                        <option value="STEALTH">STEALTH</option>
-                        <option value="TECH">TECH</option>
-                      </Select>
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Label htmlFor="riskLevel">Risk Level</Label>
-                      <Select
-                        id="riskLevel"
-                        name="riskLevel"
-                        value={newJob.riskLevel}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        <option value="LOW">LOW</option>
-                        <option value="MEDIUM">MEDIUM</option>
-                        <option value="HIGH">HIGH</option>
-                        <option value="CRITICAL">CRITICAL</option>
-                      </Select>
-                    </FormGroup>
-
-                    <FormGroup>
-                      <Label htmlFor="difficulty">Difficulty (1-10)</Label>
-                      <Input
-                        type="number"
-                        id="difficulty"
-                        name="difficulty"
-                        value={newJob.difficulty}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="10"
-                        required
-                      />
-                    </FormGroup>
-                  </FormGrid>
-
-                  <ButtonGroup>
-                    <Button
-                      className="cancel"
-                      type="button"
-                      onClick={() => setIsModalOpen(false)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      CANCEL
-                    </Button>
-                    <Button
-                      type="submit"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      CREATE JOB
-                    </Button>
-                  </ButtonGroup>
-                </form>
-              </ModalContent>
-            </ModalOverlay>
-          )}
-        </AnimatePresence>
 
         <CyberFooter />
       </AppContainer>
     </FadeIn>
   );
 }
+
+export { AppContent };
 
 function App() {
   return (
