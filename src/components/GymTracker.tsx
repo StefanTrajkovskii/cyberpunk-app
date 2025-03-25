@@ -75,6 +75,33 @@ const glitchComplete = keyframes`
   }
 `;
 
+const glitchFail = keyframes`
+  0% {
+    transform: translate(0);
+    text-shadow: none;
+  }
+  20% {
+    transform: translate(-4px, 4px);
+    text-shadow: 2px 0 0 #ff0000, -2px 0 0 #00ff00;
+  }
+  40% {
+    transform: translate(-4px, -4px);
+    text-shadow: 4px 0 0 #ff0000, -4px 0 0 #00ff00;
+  }
+  60% {
+    transform: translate(4px, 4px);
+    text-shadow: -4px 0 0 #ff0000, 4px 0 0 #00ff00;
+  }
+  80% {
+    transform: translate(4px, -4px);
+    text-shadow: -2px 0 0 #ff0000, 2px 0 0 #00ff00;
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: none;
+  }
+`;
+
 // Styled Components
 const Container = styled.div`
   max-width: 800px;
@@ -202,17 +229,22 @@ const WorkoutSchedule = styled.div`
   position: relative;
 `;
 
-const DaySchedule = styled.div<{ isRest: boolean; isCompleted?: boolean }>`
+const DaySchedule = styled.div<{ isRest: boolean; isCompleted?: boolean; isFailed?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   margin-bottom: 0.5rem;
   background: ${props => {
-    if (props.isCompleted) return 'rgba(255, 62, 62, 0.15)';
+    if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
+    if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
     return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.1)';
   }};
-  border: 1px solid ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.3)'};
+  border: 1px solid ${props => {
+    if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
+    if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
+    return 'rgba(255, 62, 62, 0.3)';
+  }};
   cursor: ${props => props.isRest ? 'default' : 'pointer'};
   transition: all 0.3s ease;
   position: relative;
@@ -228,18 +260,39 @@ const DaySchedule = styled.div<{ isRest: boolean; isCompleted?: boolean }>`
       left: 0;
       width: 100%;
       height: 2px;
-      background: rgba(255, 62, 62, 0.7);
-      box-shadow: 0 0 8px rgba(255, 62, 62, 0.7);
+      background: rgba(0, 255, 0, 0.7);
+      box-shadow: 0 0 8px rgba(0, 255, 0, 0.7);
+      animation: ${strikeThrough} 0.5s ease-in-out forwards;
+    }
+  `}
+
+  ${props => props.isFailed && !props.isRest && css`
+    animation: ${glitchFail} 0.5s linear;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 0, 0, 0.7);
+      box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
       animation: ${strikeThrough} 0.5s ease-in-out forwards;
     }
   `}
 
   &:hover {
     background: ${props => {
-      if (props.isCompleted) return 'rgba(255, 62, 62, 0.2)';
+      if (props.isFailed) return 'rgba(255, 0, 0, 0.15)';
+      if (props.isCompleted) return 'rgba(0, 255, 0, 0.1)';
       return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.2)';
     }};
-    border-color: rgba(255, 62, 62, 0.5);
+    border-color: ${props => {
+      if (props.isFailed) return 'rgba(255, 0, 0, 0.6)';
+      if (props.isCompleted) return 'rgba(0, 255, 0, 0.6)';
+      return 'rgba(255, 62, 62, 0.5)';
+    }};
   }
 
   @media (max-width: 768px) {
@@ -248,18 +301,28 @@ const DaySchedule = styled.div<{ isRest: boolean; isCompleted?: boolean }>`
     gap: 0.25rem;
     padding: 1rem;
     background: ${props => {
-      if (props.isCompleted) return 'rgba(255, 62, 62, 0.15)';
+      if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
+      if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
       return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
     }};
-    border: 1px solid ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.3)'};
+    border: 1px solid ${props => {
+      if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
+      if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
+      return 'rgba(255, 62, 62, 0.3)';
+    }};
     margin-bottom: 0.75rem;
 
     &:hover {
       transform: none;
       box-shadow: none;
-      border-color: ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.3)'};
+      border-color: ${props => {
+        if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
+        if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
+        return 'rgba(255, 62, 62, 0.3)';
+      }};
       background: ${props => {
-        if (props.isCompleted) return 'rgba(255, 62, 62, 0.15)';
+        if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
+        if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
         return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
       }};
     }
@@ -598,6 +661,7 @@ interface WorkoutDay {
   exercises: Exercise[];
   isRest?: boolean;
   isCompleted?: boolean;
+  isFailed?: boolean;
 }
 
 interface GymTrackerProps {
@@ -752,10 +816,25 @@ const DayHeader = styled.div`
   gap: 1rem;
 `;
 
-const CompletionButton = styled.button<{ isCompleted: boolean }>`
-  background: ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.2)' : 'transparent'};
-  border: 1px solid ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)'};
-  color: ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+`;
+
+const CompletionButton = styled.button<{ isCompleted: boolean; isFailed?: boolean }>`
+  background: ${props => {
+    if (props.isFailed) return 'rgba(255, 0, 0, 0.2)';
+    return props.isCompleted ? 'rgba(255, 62, 62, 0.2)' : 'transparent';
+  }};
+  border: 1px solid ${props => {
+    if (props.isFailed) return 'rgba(255, 0, 0, 0.6)';
+    return props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)';
+  }};
+  color: ${props => {
+    if (props.isFailed) return 'rgba(255, 0, 0, 0.8)';
+    return props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e';
+  }};
   padding: 0.4rem;
   width: 30px;
   height: 30px;
@@ -767,14 +846,19 @@ const CompletionButton = styled.button<{ isCompleted: boolean }>`
   border-radius: 4px;
   position: relative;
   overflow: hidden;
+  font-weight: bold;
 
   ${props => props.isCompleted && css`
     animation: ${glitchComplete} 0.3s linear;
   `}
 
+  ${props => props.isFailed && css`
+    animation: ${glitchFail} 0.5s linear;
+  `}
+
   &:hover {
-    background: rgba(255, 62, 62, 0.1);
-    border-color: rgba(255, 62, 62, 0.5);
+    background: ${props => props.isFailed ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 62, 62, 0.1)'};
+    border-color: ${props => props.isFailed ? 'rgba(255, 0, 0, 0.5)' : 'rgba(255, 62, 62, 0.5)'};
   }
 
   @media (max-width: 768px) {
@@ -811,12 +895,13 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
     };
   }, [selectedDay, selectedImage]);
 
-  const handleDayCompletion = (dayIndex: number, event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDayCompletion = (dayIndex: number, event: React.MouseEvent<HTMLButtonElement>, type: 'complete' | 'fail') => {
     event.stopPropagation();
     const newSchedule = [...schedule];
     newSchedule[dayIndex] = {
       ...newSchedule[dayIndex],
-      isCompleted: !newSchedule[dayIndex].isCompleted
+      isCompleted: type === 'complete' ? !newSchedule[dayIndex].isCompleted : false,
+      isFailed: type === 'fail' ? !newSchedule[dayIndex].isFailed : false
     };
     setSchedule(newSchedule);
   };
@@ -883,17 +968,27 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
             key={day.day}
             isRest={!!day.isRest}
             isCompleted={day.isCompleted}
+            isFailed={day.isFailed}
             onClick={() => !day.isRest && setSelectedDay(schedule[index])}
           >
             <DayHeader>
               <DayName>{day.day}</DayName>
               {!day.isRest && (
-                <CompletionButton
-                  isCompleted={!!day.isCompleted}
-                  onClick={(e) => handleDayCompletion(index, e)}
-                >
-                  ✓
-                </CompletionButton>
+                <ButtonGroup>
+                  <CompletionButton
+                    isCompleted={!!day.isCompleted}
+                    onClick={(e) => handleDayCompletion(index, e, 'complete')}
+                  >
+                    ✓
+                  </CompletionButton>
+                  <CompletionButton
+                    isCompleted={false}
+                    isFailed={!!day.isFailed}
+                    onClick={(e) => handleDayCompletion(index, e, 'fail')}
+                  >
+                    ✕
+                  </CompletionButton>
+                </ButtonGroup>
               )}
             </DayHeader>
             <WorkoutType>{day.focus}</WorkoutType>
