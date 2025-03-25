@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,6 +7,7 @@ interface Exercise {
   sets: number;
   muscleGroup: string;
   image?: string;
+  completed?: boolean;
 }
 
 // Animations
@@ -160,17 +161,26 @@ const DaySchedule = styled.div<{ isRest: boolean }>`
 const DayName = styled.div`
   color: #ff3e3e;
   font-family: 'Share Tech Mono', monospace;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 62, 62, 0.3);
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const WorkoutType = styled.div`
   color: rgba(255, 62, 62, 0.8);
   font-family: 'Share Tech Mono', monospace;
-  font-size: 1rem;
+  font-size: 1.1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+  }
 `;
 
 const Modal = styled(motion.div)`
@@ -178,32 +188,40 @@ const Modal = styled(motion.div)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) !important;
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
+  width: 95%;
+  max-width: 800px;
+  max-height: 90vh;
   overflow-y: auto;
   background: rgba(0, 0, 0, 0.95);
-  border: 1px solid rgba(255, 62, 62, 0.3);
+  border: 2px solid rgba(255, 62, 62, 0.3);
   padding: 2rem;
   z-index: 1000;
   box-shadow: 0 0 50px rgba(255, 62, 62, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 
-  &::-webkit-scrollbar {
-    width: 8px;
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    padding: 1rem;
   }
+`;
 
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 62, 62, 0.1);
-  }
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 62, 62, 0.3);
+`;
 
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 62, 62, 0.3);
-    border-radius: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 62, 62, 0.5);
-  }
+const ModalTitle = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
 const Overlay = styled(motion.div)`
@@ -217,58 +235,192 @@ const Overlay = styled(motion.div)`
 `;
 
 const ExerciseList = styled.div`
+  display: grid;
+  gap: 1.5rem;
   margin-top: 1.5rem;
 `;
 
+const ExerciseRow = styled.div<{ completed: boolean }>`
+  background: ${props => props.completed ? 'rgba(255, 62, 62, 0.1)' : 'rgba(0, 0, 0, 0.3)'};
+  border: 1px solid ${props => props.completed ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.2)'};
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
 
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      transparent 0%,
+      rgba(255, 62, 62, 0.1) 50%,
+      transparent 100%
+    );
+    opacity: ${props => props.completed ? '1' : '0'};
+    transition: opacity 0.3s ease;
+  }
 
-const ExerciseName = styled.div`
-  color: #ff3e3e;
-  font-family: 'Share Tech Mono', monospace;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 62, 62, 0.2);
+    border-color: rgba(255, 62, 62, 0.4);
+
+    &::before {
+      opacity: 1;
+    }
+  }
+`;
+
+const ExerciseContent = styled.div`
+  display: flex;
+  gap: 2rem;
+  padding: 1.5rem;
+  position: relative;
+  min-height: 200px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const ExerciseDetails = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   flex: 1;
+  position: relative;
+  padding-bottom: 4rem;
+`;
+
+const ExerciseImageContainer = styled.div`
+  width: 300px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 62, 62, 0.2);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 250px;
+  }
+`;
+
+const ExerciseHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 62, 62, 0.2);
+`;
+
+const ExerciseName = styled.div<{ completed: boolean }>`
+  color: ${props => props.completed ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  text-decoration: ${props => props.completed ? 'line-through' : 'none'};
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+  }
+`;
+
+const ExerciseInfo = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  color: rgba(255, 62, 62, 0.8);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
 `;
 
 const ExerciseSets = styled.div`
-  color: rgba(255, 62, 62, 0.8);
-  margin: 0 1rem;
+  background: rgba(255, 62, 62, 0.1);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 62, 62, 0.3);
+  font-weight: bold;
 `;
 
 const MuscleGroup = styled.div`
-  color: rgba(255, 62, 62, 0.6);
-  font-size: 0.9rem;
-  text-align: right;
-  width: 100px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255, 62, 62, 0.05);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 62, 62, 0.2);
 `;
 
-const CloseButton = styled.button`
+const CompleteButtonContainer = styled.div`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: 1px solid #ff3e3e;
-  color: #ff3e3e;
-  padding: 0.5rem;
-  cursor: pointer;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 62, 62, 0.2);
+`;
+
+const CompleteButton = styled.button<{ completed: boolean }>`
+  width: 100%;
+  background: ${props => props.completed ? 'rgba(255, 62, 62, 0.2)' : 'transparent'};
+  border: 1px solid ${props => props.completed ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)'};
+  color: ${props => props.completed ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
+  padding: 0.8rem;
   font-family: 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   
   &:hover {
     background: rgba(255, 62, 62, 0.1);
+    border-color: rgba(255, 62, 62, 0.5);
+  }
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: 1px solid #ff3e3e;
+  color: #ff3e3e;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  
+  &:hover {
+    background: rgba(255, 62, 62, 0.1);
+    box-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.4rem 0.8rem;
+    font-size: 1rem;
   }
 `;
 
 const ExerciseImage = styled.img`
   width: 100%;
-  max-width: 400px;
-  height: auto;
-  margin: 1rem auto;
-  border: 1px solid rgba(255, 62, 62, 0.3);
-  border-radius: 4px;
-  cursor: pointer;
+  height: 100%;
+  object-fit: cover;
   transition: all 0.3s ease;
+  opacity: 0.9;
+  border-radius: 0;
+  border: none;
 
   &:hover {
-    border-color: rgba(255, 62, 62, 0.8);
-    box-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
+    opacity: 1;
+    transform: scale(1.05);
   }
 `;
 
@@ -300,29 +452,27 @@ const ImageModal = styled(motion.div)`
 const FullImage = styled.img`
   width: 100%;
   height: auto;
-`;
-
-const ExerciseRow = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  border-bottom: 1px solid rgba(255, 62, 62, 0.2);
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-const ExerciseDetails = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  max-height: 80vh;
+  object-fit: contain;
 `;
 
 const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
   const [selectedDay, setSelectedDay] = useState<WorkoutDay | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  // Add scroll lock effect
+  useEffect(() => {
+    if (selectedDay || selectedImage) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to ensure scroll is restored when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedDay, selectedImage]);
 
   const workoutSchedule: WorkoutDay[] = [
     {
@@ -474,24 +624,56 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 50 }}
             >
-              <CloseButton onClick={() => setSelectedDay(null)}>X</CloseButton>
-              <DayName>{selectedDay.day}</DayName>
-              <WorkoutType>{selectedDay.focus}</WorkoutType>
+              <ModalHeader>
+                <ModalTitle>
+                  <DayName>{selectedDay.day}</DayName>
+                  <WorkoutType>{selectedDay.focus}</WorkoutType>
+                </ModalTitle>
+                <CloseButton onClick={() => setSelectedDay(null)}>X</CloseButton>
+              </ModalHeader>
               <ExerciseList>
                 {selectedDay.exercises.map((exercise, index) => (
-                  <ExerciseRow key={index}>
-                    <ExerciseDetails>
-                      <ExerciseName>{exercise.name}</ExerciseName>
-                      <ExerciseSets>{exercise.sets}x</ExerciseSets>
-                      <MuscleGroup>{exercise.muscleGroup}</MuscleGroup>
-                    </ExerciseDetails>
-                    {exercise.image && (
-                      <ExerciseImage
-                        src={exercise.image}
-                        alt={exercise.name}
-                        onClick={() => exercise.image && setSelectedImage(exercise.image)}
-                      />
-                    )}
+                  <ExerciseRow key={index} completed={exercise.completed || false}>
+                    <ExerciseContent>
+                      <ExerciseDetails>
+                        <ExerciseHeader>
+                          <ExerciseName completed={exercise.completed || false}>
+                            {exercise.name}
+                          </ExerciseName>
+                        </ExerciseHeader>
+                        <ExerciseInfo>
+                          <ExerciseSets>{exercise.sets}x</ExerciseSets>
+                          <MuscleGroup>{exercise.muscleGroup}</MuscleGroup>
+                        </ExerciseInfo>
+                        <CompleteButtonContainer>
+                          <CompleteButton
+                            completed={exercise.completed || false}
+                            onClick={() => {
+                              const updatedExercises = [...selectedDay.exercises];
+                              updatedExercises[index] = {
+                                ...exercise,
+                                completed: !exercise.completed
+                              };
+                              setSelectedDay({
+                                ...selectedDay,
+                                exercises: updatedExercises
+                              });
+                            }}
+                          >
+                            {exercise.completed ? 'Completed' : 'Complete'}
+                          </CompleteButton>
+                        </CompleteButtonContainer>
+                      </ExerciseDetails>
+                      {exercise.image && (
+                        <ExerciseImageContainer>
+                          <ExerciseImage
+                            src={exercise.image}
+                            alt={exercise.name}
+                            onClick={() => exercise.image && setSelectedImage(exercise.image)}
+                          />
+                        </ExerciseImageContainer>
+                      )}
+                    </ExerciseContent>
                   </ExerciseRow>
                 ))}
               </ExerciseList>
