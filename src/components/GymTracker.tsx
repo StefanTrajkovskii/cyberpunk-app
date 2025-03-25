@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Exercise {
@@ -40,6 +40,38 @@ const dataStream = keyframes`
   }
   100% {
     transform: translateY(100%);
+  }
+`;
+
+const strikeThrough = keyframes`
+  0% {
+    width: 0;
+    left: 0;
+  }
+  100% {
+    width: 100%;
+    left: 0;
+  }
+`;
+
+const glitchComplete = keyframes`
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
   }
 `;
 
@@ -123,14 +155,15 @@ const BackButton = styled(motion.button)`
   background: transparent;
   border: 1px solid #ff3e3e;
   color: #ff3e3e;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   font-family: 'Share Tech Mono', monospace;
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  font-size: 1.1rem;
 
   &::before {
     content: '';
@@ -157,6 +190,7 @@ const BackButton = styled(motion.button)`
     padding: 0.2rem 0.4rem;
     border: 1px solid rgba(255, 62, 62, 0.3);
     margin-left: auto;
+    letter-spacing: 1px;
   }
 `;
 
@@ -168,19 +202,43 @@ const WorkoutSchedule = styled.div`
   position: relative;
 `;
 
-const DaySchedule = styled.div<{ isRest: boolean }>`
+const DaySchedule = styled.div<{ isRest: boolean; isCompleted?: boolean }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
   margin-bottom: 0.5rem;
-  background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.1)'};
-  border: 1px solid rgba(255, 62, 62, 0.3);
+  background: ${props => {
+    if (props.isCompleted) return 'rgba(255, 62, 62, 0.15)';
+    return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.1)';
+  }};
+  border: 1px solid ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.3)'};
   cursor: ${props => props.isRest ? 'default' : 'pointer'};
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  ${props => props.isCompleted && !props.isRest && css`
+    animation: ${glitchComplete} 0.3s linear;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 62, 62, 0.7);
+      box-shadow: 0 0 8px rgba(255, 62, 62, 0.7);
+      animation: ${strikeThrough} 0.5s ease-in-out forwards;
+    }
+  `}
 
   &:hover {
-    background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.2)'};
+    background: ${props => {
+      if (props.isCompleted) return 'rgba(255, 62, 62, 0.2)';
+      return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.2)';
+    }};
     border-color: rgba(255, 62, 62, 0.5);
   }
 
@@ -189,15 +247,21 @@ const DaySchedule = styled.div<{ isRest: boolean }>`
     align-items: flex-start;
     gap: 0.25rem;
     padding: 1rem;
-    background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)'};
-    border: 1px solid rgba(255, 62, 62, 0.3);
+    background: ${props => {
+      if (props.isCompleted) return 'rgba(255, 62, 62, 0.15)';
+      return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
+    }};
+    border: 1px solid ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.3)'};
     margin-bottom: 0.75rem;
 
     &:hover {
       transform: none;
       box-shadow: none;
-      border-color: rgba(255, 62, 62, 0.3);
-      background: ${props => props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)'};
+      border-color: ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.3)'};
+      background: ${props => {
+        if (props.isCompleted) return 'rgba(255, 62, 62, 0.15)';
+        return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
+      }};
     }
   }
 `;
@@ -399,6 +463,8 @@ const ExerciseName = styled.div<{ completed: boolean }>`
   font-family: 'Share Tech Mono', monospace;
   font-size: 1.2rem;
   text-decoration: ${props => props.completed ? 'line-through' : 'none'};
+  opacity: ${props => props.completed ? 0.7 : 1};
+  transition: all 0.3s ease;
 
   @media (max-width: 768px) {
     font-size: 0.9rem;
@@ -531,6 +597,7 @@ interface WorkoutDay {
   focus: string;
   exercises: Exercise[];
   isRest?: boolean;
+  isCompleted?: boolean;
 }
 
 interface GymTrackerProps {
@@ -574,10 +641,162 @@ const useMediaQuery = (query: string) => {
   return matches;
 };
 
+const workoutSchedule: WorkoutDay[] = [
+  {
+    day: 'DAY 1',
+    focus: 'CHEST/BICEPS/SHOULDERS',
+    exercises: [
+      { 
+        name: 'Reverse Fly (Cable)', 
+        sets: 2, 
+        muscleGroup: 'shoulders',
+        image: '/assets/exercises/cable-reverse-fly.jpg'
+      },
+      { 
+        name: 'Incline Bench Press (Smith)', 
+        sets: 2, 
+        muscleGroup: 'chest',
+        image: '/assets/exercises/incline-bench-press.png'
+      },
+      { name: 'Incline Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/incline-chest-press-machine.png' },
+      { name: 'Chest Fly', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-fly.png' },
+      { name: 'Lateral Raise (Dumbbell)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/dumbbell-lateral-raise.png' },
+      { name: 'Biceps Curl (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/cable-bicep-curl.png' },
+      { name: 'Hammer Curl (Dumbbell)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/Hammer-Curl-dumbbell.png' },
+      { name: 'Forearm', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/forearm-curl.png' }
+    ]
+  },
+  {
+    day: 'DAY 2',
+    focus: 'LEGS 1',
+    exercises: [
+      { name: 'Calf Press on Seated Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png' },
+      { name: 'Squat (Smith Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/smith-machine-squat.png' },
+      { name: 'Seated Leg Curl (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/seated-leg-curl-machine.png' },
+      { name: 'Single Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/single-leg-press.png' },
+      { name: 'Leg Extension (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/leg-extension-machine.png' },
+      { name: 'Hanging Raises', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Hanging_Leg_Raises.png' }
+    ]
+  },
+  {
+    day: 'DAY 3',
+    focus: 'BACK/TRICEPS/SHOULDERS',
+    exercises: [
+      { name: 'Lateral Raise (Machine)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/machine-lateral-raise.png' },
+      { name: 'Iso-Lateral Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/iso-lateral-row-machine.png' },
+      { name: 'Lat Pulldown (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/lat-pulldown-machine.png' },
+      { name: 'Seated Row (Cable)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/seated-row-cable.png' },
+      { name: 'Reverse Fly (Machine)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/machine-reverse-fly.png' },
+      { name: 'Triceps Pushdown (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/straight-bar-tricep-pushdown.png' },
+      { name: 'Triceps Extension (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/triceps-extension-cable.png' },
+      { name: 'Forearm', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/forearm-curl.png' }
+    ]
+  },
+  {
+    day: 'DAY 4',
+    focus: 'REST DAY',
+    exercises: [],
+    isRest: true
+  },
+  {
+    day: 'DAY 5',
+    focus: 'SHOULDER/ARMS',
+    exercises: [
+      { name: 'Overhead Press (Dumbbell)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/overhead-press-dumbbell.png' },
+      { name: 'Lateral Raise (Cable)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/cable-lateral-raise.png' },
+      { name: 'Lateral Raise (Machine)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/machine-lateral-raise.png' },
+      { name: 'Reverse Fly (Machine)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/machine-reverse-fly.png' },
+      { name: 'Biceps Curl (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/cable-bicep-curl.png' },
+      { name: 'Incline Curl (Dumbbell)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/incline-curl-dumbbell.png' },
+      { name: 'Triceps Pushdown (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/straight-bar-tricep-pushdown.png' },
+      { name: 'Triceps Extension (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/triceps-extension-cable.png' }
+    ]
+  },
+  {
+    day: 'DAY 6',
+    focus: 'LEGS 2',
+    exercises: [
+      { name: 'Calf Press on Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png' },
+      { name: 'Hack Squat', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/smith-machine-squat.png' },
+      { name: 'Seated Leg Curl (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/seated-leg-curl-machine.png' },
+      { name: 'Single Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/single-leg-press.png' },
+      { name: 'Leg Extensions (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/leg-extension-machine.png' },
+      { name: 'Hanging Raises', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Hanging_Leg_Raises.png' }
+    ]
+  },
+  {
+    day: 'DAY 7',
+    focus: 'CHEST/BACK',
+    exercises: [
+      { name: 'Iso-Lateral Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/iso-lateral-row-machine.png' },
+      { name: 'Incline Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/incline-chest-press-machine.png' },
+      { name: 'Lat Pulldown (Cable)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/lat-pulldown-machine.png' },
+      { name: 'Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-press-machine.png' },
+      { name: 'Seated Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/seated-row-cable.png' },
+      { name: 'Chest Fly (Cable)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-fly.png' },
+      { name: 'Pull Up', sets: 1, muscleGroup: 'back', image: '/assets/exercises/pull-up.png' },
+      { name: 'Push Up', sets: 1, muscleGroup: 'chest', image: '/assets/exercises/push-up.png' }
+    ]
+  },
+  {
+    day: 'DAY 8',
+    focus: 'REST DAY',
+    exercises: [],
+    isRest: true
+  }
+];
+
+const DayHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const CompletionButton = styled.button<{ isCompleted: boolean }>`
+  background: ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.2)' : 'transparent'};
+  border: 1px solid ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)'};
+  color: ${props => props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
+  padding: 0.4rem;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+
+  ${props => props.isCompleted && css`
+    animation: ${glitchComplete} 0.3s linear;
+  `}
+
+  &:hover {
+    background: rgba(255, 62, 62, 0.1);
+    border-color: rgba(255, 62, 62, 0.5);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.3rem;
+    width: 24px;
+    height: 24px;
+  }
+`;
+
 const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
   const [selectedDay, setSelectedDay] = useState<WorkoutDay | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
+  const [schedule, setSchedule] = useState<WorkoutDay[]>(() => {
+    const savedSchedule = localStorage.getItem('workoutSchedule');
+    return savedSchedule ? JSON.parse(savedSchedule) : workoutSchedule;
+  });
+
+  // Save schedule to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('workoutSchedule', JSON.stringify(schedule));
+  }, [schedule]);
 
   // Add scroll lock effect
   useEffect(() => {
@@ -587,116 +806,60 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
       document.body.style.overflow = 'unset';
     }
 
-    // Cleanup function to ensure scroll is restored when component unmounts
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [selectedDay, selectedImage]);
 
-  const workoutSchedule: WorkoutDay[] = [
-    {
-      day: 'DAY 1',
-      focus: 'CHEST/BICEPS/SHOULDERS',
-      exercises: [
-        { 
-          name: 'Reverse Fly (Cable)', 
-          sets: 2, 
-          muscleGroup: 'shoulders',
-          image: '/assets/exercises/cable-reverse-fly.jpg'
-        },
-        { 
-          name: 'Incline Bench Press (Smith)', 
-          sets: 2, 
-          muscleGroup: 'chest',
-          image: '/assets/exercises/incline-bench-press.png'
-        },
-        { name: 'Incline Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/incline-chest-press-machine.png' },
-        { name: 'Chest Fly', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-fly.png' },
-        { name: 'Lateral Raise (Dumbbell)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/dumbbell-lateral-raise.png' },
-        { name: 'Biceps Curl (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/cable-bicep-curl.png' },
-        { name: 'Hammer Curl (Dumbbell)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/Hammer-Curl-dumbbell.png' },
-        { name: 'Forearm', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/forearm-curl.png' }
-      ]
-    },
-    {
-      day: 'DAY 2',
-      focus: 'LEGS 1',
-      exercises: [
-        { name: 'Calf Press on Seated Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png' },
-        { name: 'Squat (Smith Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/smith-machine-squat.png' },
-        { name: 'Seated Leg Curl (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/seated-leg-curl-machine.png' },
-        { name: 'Single Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/single-leg-press.png' },
-        { name: 'Leg Extension (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/leg-extension-machine.png' },
-        { name: 'Hanging Raises', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Hanging_Leg_Raises.png' }
-      ]
-    },
-    {
-      day: 'DAY 3',
-      focus: 'BACK/TRICEPS/SHOULDERS',
-      exercises: [
-        { name: 'Lateral Raise (Machine)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/machine-lateral-raise.png' },
-        { name: 'Iso-Lateral Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/iso-lateral-row-machine.png' },
-        { name: 'Lat Pulldown (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/lat-pulldown-machine.png' },
-        { name: 'Seated Row (Cable)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/seated-row-cable.png' },
-        { name: 'Reverse Fly (Machine)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/machine-reverse-fly.png' },
-        { name: 'Triceps Pushdown (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/straight-bar-tricep-pushdown.png' },
-        { name: 'Triceps Extension (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/triceps-extension-cable.png' },
-        { name: 'Forearm', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/forearm-curl.png' }
-      ]
-    },
-    {
-      day: 'DAY 4',
-      focus: 'REST DAY',
-      exercises: [],
-      isRest: true
-    },
-    {
-      day: 'DAY 5',
-      focus: 'SHOULDER/ARMS',
-      exercises: [
-        { name: 'Overhead Press (Dumbbell)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/overhead-press-dumbbell.png' },
-        { name: 'Lateral Raise (Cable)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/cable-lateral-raise.png' },
-        { name: 'Lateral Raise (Machine)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/machine-lateral-raise.png' },
-        { name: 'Reverse Fly (Machine)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/machine-reverse-fly.png' },
-        { name: 'Biceps Curl (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/cable-bicep-curl.png' },
-        { name: 'Incline Curl (Dumbbell)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/incline-curl-dumbbell.png' },
-        { name: 'Triceps Pushdown (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/straight-bar-tricep-pushdown.png' },
-        { name: 'Triceps Extension (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/triceps-extension-cable.png' }
-      ]
-    },
-    {
-      day: 'DAY 6',
-      focus: 'LEGS 2',
-      exercises: [
-        { name: 'Calf Press on Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png' },
-        { name: 'Hack Squat', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/smith-machine-squat.png' },
-        { name: 'Seated Leg Curl (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/seated-leg-curl-machine.png' },
-        { name: 'Single Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/single-leg-press.png' },
-        { name: 'Leg Extensions (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/leg-extension-machine.png' },
-        { name: 'Hanging Raises', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Hanging_Leg_Raises.png' }
-      ]
-    },
-    {
-      day: 'DAY 7',
-      focus: 'CHEST/BACK',
-      exercises: [
-        { name: 'Iso-Lateral Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/iso-lateral-row-machine.png' },
-        { name: 'Incline Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/incline-chest-press-machine.png' },
-        { name: 'Lat Pulldown (Cable)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/lat-pulldown-machine.png' },
-        { name: 'Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-press-machine.png' },
-        { name: 'Seated Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/seated-row-cable.png' },
-        { name: 'Chest Fly (Cable)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-fly.png' },
-        { name: 'Pull Up', sets: 1, muscleGroup: 'back', image: '/assets/exercises/pull-up.png' },
-        { name: 'Push Up', sets: 1, muscleGroup: 'chest', image: '/assets/exercises/push-up.png' }
-      ]
-    },
-    {
-      day: 'DAY 8',
-      focus: 'REST DAY',
-      exercises: [],
-      isRest: true
+  const handleDayCompletion = (dayIndex: number, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const newSchedule = [...schedule];
+    newSchedule[dayIndex] = {
+      ...newSchedule[dayIndex],
+      isCompleted: !newSchedule[dayIndex].isCompleted
+    };
+    setSchedule(newSchedule);
+  };
+
+  const handleExerciseCompletion = (dayIndex: number, exerciseIndex: number) => {
+    const newSchedule = [...schedule];
+    const updatedExercises = [...newSchedule[dayIndex].exercises];
+    updatedExercises[exerciseIndex] = {
+      ...updatedExercises[exerciseIndex],
+      completed: !updatedExercises[exerciseIndex].completed
+    };
+    newSchedule[dayIndex] = {
+      ...newSchedule[dayIndex],
+      exercises: updatedExercises
+    };
+    setSchedule(newSchedule);
+
+    // Update selectedDay to reflect changes
+    if (selectedDay) {
+      setSelectedDay({
+        ...selectedDay,
+        exercises: updatedExercises
+      });
     }
-  ];
+  };
+
+  const handleCloseModal = () => {
+    if (selectedDay) {
+      const dayIndex = schedule.findIndex(day => day.day === selectedDay.day);
+      if (dayIndex !== -1) {
+        const allExercisesCompleted = selectedDay.exercises.every(ex => ex.completed);
+        if (allExercisesCompleted) {
+          const newSchedule = [...schedule];
+          newSchedule[dayIndex] = {
+            ...newSchedule[dayIndex],
+            isCompleted: true
+          };
+          setSchedule(newSchedule);
+        }
+      }
+    }
+    setSelectedDay(null);
+  };
 
   return (
     <Container>
@@ -715,13 +878,24 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
       </Header>
 
       <WorkoutSchedule>
-        {workoutSchedule.map((day) => (
+        {schedule.map((day: WorkoutDay, index: number) => (
           <DaySchedule
             key={day.day}
             isRest={!!day.isRest}
-            onClick={() => !day.isRest && setSelectedDay(day)}
+            isCompleted={day.isCompleted}
+            onClick={() => !day.isRest && setSelectedDay(schedule[index])}
           >
-            <DayName>{day.day}</DayName>
+            <DayHeader>
+              <DayName>{day.day}</DayName>
+              {!day.isRest && (
+                <CompletionButton
+                  isCompleted={!!day.isCompleted}
+                  onClick={(e) => handleDayCompletion(index, e)}
+                >
+                  ✓
+                </CompletionButton>
+              )}
+            </DayHeader>
             <WorkoutType>{day.focus}</WorkoutType>
           </DaySchedule>
         ))}
@@ -735,7 +909,7 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => {
-                if (!selectedImage) setSelectedDay(null);
+                if (!selectedImage) handleCloseModal();
               }}
             />
             <Modal
@@ -748,7 +922,7 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                   <DayName>{selectedDay.day}</DayName>
                   <WorkoutType>{selectedDay.focus}</WorkoutType>
                 </ModalTitle>
-                <CloseButton onClick={() => setSelectedDay(null)}>X</CloseButton>
+                <CloseButton onClick={handleCloseModal}>X</CloseButton>
               </ModalHeader>
               <ExerciseList>
                 {selectedDay.exercises.map((exercise, index) => (
@@ -769,15 +943,8 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                             <CompleteButton
                               completed={exercise.completed || false}
                               onClick={() => {
-                                const updatedExercises = [...selectedDay.exercises];
-                                updatedExercises[index] = {
-                                  ...exercise,
-                                  completed: !exercise.completed
-                                };
-                                setSelectedDay({
-                                  ...selectedDay,
-                                  exercises: updatedExercises
-                                });
+                                const dayIndex = schedule.findIndex(day => day.day === selectedDay.day);
+                                handleExerciseCompletion(dayIndex, index);
                               }}
                             >
                               {exercise.completed ? 'Completed' : 'Complete'}
@@ -799,15 +966,8 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                           <CompleteButton
                             completed={exercise.completed || false}
                             onClick={() => {
-                              const updatedExercises = [...selectedDay.exercises];
-                              updatedExercises[index] = {
-                                ...exercise,
-                                completed: !exercise.completed
-                              };
-                              setSelectedDay({
-                                ...selectedDay,
-                                exercises: updatedExercises
-                              });
+                              const dayIndex = schedule.findIndex(day => day.day === selectedDay.day);
+                              handleExerciseCompletion(dayIndex, index);
                             }}
                           >
                             {exercise.completed ? 'Completed' : 'Complete'}
