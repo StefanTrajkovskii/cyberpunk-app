@@ -754,10 +754,12 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
                   <span>DIFFICULTY</span>
                   <span>{task.difficulty}/10</span>
                 </StatItem>
-                <StatItem type={task.type}>
-                  <span>STREAK</span>
-                  <span>{task.consecutiveCompletions}x</span>
-                </StatItem>
+                {task.type !== 'COMBAT' && (
+                  <StatItem type={task.type}>
+                    <span>STREAK</span>
+                    <span>{task.consecutiveCompletions}x</span>
+                  </StatItem>
+                )}
                 {task.type === 'FOOD' && (
                   <>
                     <StatItem type={task.type}>
