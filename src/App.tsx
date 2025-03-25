@@ -864,8 +864,7 @@ function AppContent() {
     hour: '2-digit',
     minute: '2-digit'
   }));
-  const [showFoodTracker, setShowFoodTracker] = useState(false);
-  const [showGymTracker, setShowGymTracker] = useState(false);
+
 
   const [tasks, setTasks] = useState<Task[]>([
     {
@@ -1016,13 +1015,6 @@ function AppContent() {
     }));
   };
 
-  const handleCardClick = (taskItem: Task) => {
-    if (taskItem.type === 'FOOD') {
-      navigate('/food-tracker');
-    } else if (taskItem.type === 'COMBAT') {
-      navigate('/gym-tracker');
-    }
-  };
 
   // Render splash screen if active
   if (splashScreenActive) {
