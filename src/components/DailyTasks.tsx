@@ -648,6 +648,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [todaysCalories, setTodaysCalories] = useState<number>(0);
   const [todaysProtein, setTodaysProtein] = useState<number>(0);
+  const [nextWorkout, setNextWorkout] = useState<string>('');
 
   useEffect(() => {
     const updateStats = () => {
@@ -676,6 +677,33 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
     return () => {
       clearInterval(interval);
     };
+  }, []);
+
+  useEffect(() => {
+    // Get workout schedule from localStorage
+    const updateNextWorkout = () => {
+      const savedSchedule = localStorage.getItem('workoutSchedule');
+      if (savedSchedule) {
+        const schedule = JSON.parse(savedSchedule);
+        // Find the first non-completed and non-failed, non-rest day
+        const next = schedule.find((day: any) => !day.isCompleted && !day.isFailed && !day.isRest);
+        if (next) {
+          setNextWorkout(next.focus);
+        } else {
+          // If all days are completed/failed, find the first non-rest day
+          const firstWorkoutDay = schedule.find((day: any) => !day.isRest);
+          if (firstWorkoutDay) {
+            setNextWorkout(`RESTART: ${firstWorkoutDay.focus}`);
+          }
+        }
+      }
+    };
+
+    updateNextWorkout();
+    // Update every second to keep in sync with GymTracker
+    const interval = setInterval(updateNextWorkout, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleCompleteTask = (taskId: string) => {
@@ -754,6 +782,12 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
                   <span>DIFFICULTY</span>
                   <span>{task.difficulty}/10</span>
                 </StatItem>
+                {task.type === 'COMBAT' && (
+                  <StatItem type={task.type}>
+                    <span>NEXT</span>
+                    <span>{nextWorkout || 'LOADING...'}</span>
+                  </StatItem>
+                )}
                 {task.type !== 'COMBAT' && (
                   <StatItem type={task.type}>
                     <span>STREAK</span>
