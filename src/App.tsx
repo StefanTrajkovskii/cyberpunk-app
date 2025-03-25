@@ -1199,7 +1199,10 @@ function AppContent() {
   const [currentView, setCurrentView] = useState<ViewType>('daily');
   const [currency, setCurrency] = useState<number>(0);
   const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
-  const [userName, setUserName] = useState<string>('');
+  const [userName, setUserName] = useState<string>(() => {
+    const savedUser = localStorage.getItem('cyberpunk_user');
+    return savedUser || '';
+  });
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -1247,6 +1250,16 @@ function AppContent() {
     }
   ]);
 
+  // Check if user exists in localStorage on mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('cyberpunk_user');
+    if (savedUser) {
+      setUserName(savedUser);
+      setSplashScreenActive(false);
+    }
+  }, []);
+
+  // Handle escape key
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -1274,7 +1287,15 @@ function AppContent() {
   const handleSplashEnter = (name: string) => {
     console.log('Splash screen complete, showing main app');
     setUserName(name);
+    localStorage.setItem('cyberpunk_user', name);
     setSplashScreenActive(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('cyberpunk_user');
+    setUserName('');
+    setSplashScreenActive(true);
+    navigate('/');
   };
 
   if (splashScreenActive) {
@@ -1302,6 +1323,7 @@ function AppContent() {
             }
           }}
           userName={userName}
+          onLogout={handleLogout}
         />
         
         <MainContent>

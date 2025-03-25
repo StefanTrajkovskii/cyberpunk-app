@@ -8,6 +8,7 @@ interface NavHeaderProps {
   currentView: 'daily' | 'missions' | 'market' | 'messages';
   onViewChange: (view: 'daily' | 'missions' | 'market' | 'messages') => void;
   userName: string;
+  onLogout: () => void;
 }
 
 // Animation keyframes
@@ -500,13 +501,92 @@ const MobileUserSection = styled.div`
   }
 `;
 
-const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange, userName }) => {
+const MobileLogoutButton = styled.button`
+  width: 100%;
+  background: rgba(255, 62, 88, 0.1);
+  border: 1px solid rgba(255, 62, 88, 0.3);
+  color: #ff3e88;
+  padding: 0.8rem;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Share Tech Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  
+  &:hover {
+    background: rgba(255, 62, 88, 0.2);
+    border-color: #ff3e88;
+    box-shadow: 0 0 15px rgba(255, 62, 88, 0.3);
+  }
+
+  &::before {
+    content: '>';
+    margin-right: 0.5rem;
+    opacity: 0.7;
+  }
+`;
+
+const UserDropdown = styled(motion.div)`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: rgba(10, 10, 18, 0.95);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  padding: 0.5rem;
+  min-width: 150px;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+`;
+
+const DropdownItem = styled.button`
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  color: #e4f3ff;
+  font-family: 'Share Tech Mono', monospace;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    background: rgba(255, 62, 88, 0.1);
+    color: #ff3e88;
+  }
+
+  &::before {
+    content: '>';
+    color: #ff3e88;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover::before {
+    opacity: 1;
+  }
+`;
+
+const UserPanelContainer = styled.div`
+  position: relative;
+  cursor: pointer;
+`;
+
+const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange, userName, onLogout }) => {
   const [currentUser] = useState({
     name: userName,
     status: 'Connected'
   });
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
   return (
     <HeaderContainer>
@@ -561,13 +641,34 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
             {currency.toLocaleString()}
           </CurrencyDisplay>
           
-          <UserPanel>
-            <Avatar>{currentUser.name.charAt(0).toUpperCase()}</Avatar>
-            <UserInfo>
-              <Username>{currentUser.name}</Username>
-              <UserStatus>{currentUser.status}</UserStatus>
-            </UserInfo>
-          </UserPanel>
+          <UserPanelContainer onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}>
+            <UserPanel>
+              <Avatar>{currentUser.name.charAt(0).toUpperCase()}</Avatar>
+              <UserInfo>
+                <Username>{currentUser.name}</Username>
+                <UserStatus>{currentUser.status}</UserStatus>
+              </UserInfo>
+            </UserPanel>
+            
+            <AnimatePresence>
+              {isUserDropdownOpen && (
+                <UserDropdown
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <DropdownItem onClick={(e) => {
+                    e.stopPropagation();
+                    onLogout();
+                    setIsUserDropdownOpen(false);
+                  }}>
+                    LOGOUT
+                  </DropdownItem>
+                </UserDropdown>
+              )}
+            </AnimatePresence>
+          </UserPanelContainer>
         </NavContainer>
 
         <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -640,6 +741,12 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                     <UserStatus>{currentUser.status}</UserStatus>
                   </UserInfo>
                 </UserPanel>
+                <MobileLogoutButton onClick={() => {
+                  onLogout();
+                  setIsMobileMenuOpen(false);
+                }}>
+                  Logout
+                </MobileLogoutButton>
               </MobileUserSection>
             </MobileMenu>
           )}

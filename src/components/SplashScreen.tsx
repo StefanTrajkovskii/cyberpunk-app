@@ -148,9 +148,11 @@ const GlitchingText = styled.h1`
   gap: 1rem;
   
   @media (max-width: 768px) {
-    font-size: 3rem;
+    font-size: 2.5rem;
     letter-spacing: 2px;
     gap: 0.5rem;
+    flex-direction: column;
+    text-align: center;
   }
   
   span {
@@ -159,7 +161,7 @@ const GlitchingText = styled.h1`
     display: inline;
     
     @media (max-width: 768px) {
-      font-size: 3rem;
+      font-size: 2.5rem;
     }
   }
 `;
