@@ -229,26 +229,26 @@ const WorkoutSchedule = styled.div`
   position: relative;
 `;
 
-const DaySchedule = styled.div<{ isRest: boolean; isCompleted?: boolean; isFailed?: boolean }>`
+const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFailed?: boolean }>`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
+  justify-content: space-between;
+  padding: 1.5rem;
   background: ${props => {
     if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
     if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
-    return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.1)';
+    return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(0, 0, 0, 0.3)';
   }};
   border: 1px solid ${props => {
     if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
     if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
     return 'rgba(255, 62, 62, 0.3)';
   }};
-  cursor: ${props => props.isRest ? 'default' : 'pointer'};
+  margin-bottom: 1rem;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 
   ${props => props.isCompleted && !props.isRest && css`
     animation: ${glitchComplete} 0.3s linear;
