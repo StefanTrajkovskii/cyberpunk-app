@@ -501,9 +501,9 @@ const TaskDescription = styled.p`
   line-height: 1.6;
 `;
 
-const TaskFooter = styled.div`
+const TaskFooter = styled.div<{ type: string }>`
   display: flex;
-  justify-content: space-between;
+  justify-content: ${props => props.type === 'FOOD' || props.type === 'COMBAT' ? 'flex-start' : 'space-between'};
   align-items: center;
   margin-top: 1.5rem;
   padding-top: 1rem;
@@ -770,7 +770,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
                     </StatItem>
                   </>
                 )}
-                {task.type !== 'FOOD' && (
+                {task.type !== 'FOOD' && task.type !== 'COMBAT' && (
                   <StatItem type={task.type}>
                     <span>REWARD</span>
                     <span>¥{task.baseReward}</span>
@@ -782,8 +782,8 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
 
               <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
 
-              <TaskFooter>
-                {task.type !== 'FOOD' && (
+              <TaskFooter type={task.type}>
+                {task.type !== 'FOOD' && task.type !== 'COMBAT' && (
                   <RewardSection>
                     <BaseReward type={task.type}>
                       {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}

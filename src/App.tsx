@@ -881,10 +881,10 @@ function App() {
       title: 'GYM TRACKER',
       description: 'Monitor your physical training progress and maintain peak physical condition.',
       baseReward: 0,
-      riskLevel: 'HIGH',
+      riskLevel: 'CRITICAL',
       type: 'COMBAT',
       completed: false,
-      difficulty: 8,
+      difficulty: 10,
       consecutiveCompletions: 0
     },
     {
