@@ -51,6 +51,7 @@ const LoginContainer = styled.div`
   background-color: #0a0a12;
   z-index: 1000;
   overflow: hidden;
+  padding: 1rem;
   background: linear-gradient(45deg, 
     rgba(10, 10, 18, 0.9) 0%, 
     rgba(19, 19, 42, 0.9) 33%, 
@@ -85,6 +86,12 @@ const LoginContainer = styled.div`
     animation: ${scanlineEffect} 10s linear infinite;
     opacity: 0.3;
     pointer-events: none;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    justify-content: flex-start;
+    padding-top: 4rem;
   }
 `;
 
@@ -153,12 +160,18 @@ const GlitchingText = styled(motion.div)`
     display: block;
     color: #ff3e88;
     margin-top: 0.5rem;
+    font-size: 2.5rem;
   }
   
   @media (max-width: 768px) {
     font-size: 2rem;
     letter-spacing: 2px;
-    text-align: center;
+    margin-bottom: 1.5rem;
+    
+    span {
+      font-size: 1.75rem;
+      margin-top: 0.25rem;
+    }
   }
 `;
 
@@ -176,8 +189,9 @@ const LoginForm = styled(motion.form)`
   box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
   
   @media (max-width: 768px) {
-    padding: 1.5rem;
-    margin: 0 1rem;
+    padding: 1.25rem;
+    gap: 1rem;
+    max-width: 320px;
   }
 `;
 
@@ -185,6 +199,10 @@ const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    gap: 0.25rem;
+  }
 `;
 
 const Label = styled.label`
@@ -192,6 +210,10 @@ const Label = styled.label`
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const Input = styled.input`
@@ -206,6 +228,11 @@ const Input = styled.input`
   &:focus {
     border-color: #00f6ff;
     box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -245,6 +272,12 @@ const LoginButton = styled(motion.button)`
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    margin-top: 0.75rem;
+  }
 `;
 
 const RegisterLink = styled(motion.a)`
@@ -255,9 +288,15 @@ const RegisterLink = styled(motion.a)`
   letter-spacing: 1px;
   margin-top: 1rem;
   cursor: pointer;
+  text-align: center;
   
   &:hover {
     text-shadow: 0 0 10px rgba(255, 62, 136, 0.7);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
   }
 `;
 
@@ -268,6 +307,10 @@ const ErrorMessage = styled.div`
   letter-spacing: 1px;
   font-size: 0.9rem;
   text-align: center;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const Login: React.FC = () => {
@@ -321,6 +364,7 @@ const Login: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            maxLength={20}
           />
         </FormGroup>
         
@@ -332,6 +376,7 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={6}
           />
         </FormGroup>
         
