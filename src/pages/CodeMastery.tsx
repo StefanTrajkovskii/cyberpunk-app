@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
 import { IconType } from 'react-icons';
@@ -19,6 +19,26 @@ import {
   SiAmazon
 } from 'react-icons/si';
 import BackButton from '../components/BackButton';
+
+// Function to get the icon component based on badge ID
+const getIconComponent = (badgeId: string): IconType => {
+  switch (badgeId) {
+    case 'html': return SiHtml5;
+    case 'css': return SiCss3;
+    case 'tailwind': return SiTailwindcss;
+    case 'javascript': return SiJavascript;
+    case 'react': return SiReact;
+    case 'nextjs': return SiNextdotjs;
+    case 'nodejs': return SiNodedotjs;
+    case 'express': return SiExpress;
+    case 'mongodb': return SiMongodb;
+    case 'sql': return SiPostgresql;
+    case 'git': return SiGit;
+    case 'docker': return SiDocker;
+    case 'aws': return SiAmazon;
+    default: return SiHtml5;
+  }
+};
 
 const glitch = keyframes`
   0% {
@@ -630,208 +650,238 @@ const SelectedCount = styled.div`
 `;
 
 const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
-  const [tracks, setTracks] = useState<Track[]>([
-    {
-      id: 'frontend',
-      title: 'Frontend Mastery',
-      badges: [
-        {
-          id: 'html',
-          name: 'HTML',
-          currentTier: 'BRONZE',
-          icon: SiHtml5,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 5,
-            GOLD: 8,
-            PLATINUM: 12
-          },
-          projects: []
-        },
-        {
-          id: 'css',
-          name: 'CSS',
-          currentTier: 'BRONZE',
-          icon: SiCss3,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 5,
-            GOLD: 8,
-            PLATINUM: 12
-          },
-          projects: []
-        },
-        {
-          id: 'tailwind',
-          name: 'Tailwind',
-          currentTier: 'BRONZE',
-          icon: SiTailwindcss,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        },
-        {
-          id: 'javascript',
-          name: 'JavaScript',
-          currentTier: 'BRONZE',
-          icon: SiJavascript,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 3,
-            SILVER: 6,
-            GOLD: 9,
-            PLATINUM: 15
-          },
-          projects: []
-        },
-        {
-          id: 'react',
-          name: 'React',
-          currentTier: 'BRONZE',
-          icon: SiReact,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 5,
-            GOLD: 8,
-            PLATINUM: 12
-          },
-          projects: []
-        },
-        {
-          id: 'nextjs',
-          name: 'Next.js',
-          currentTier: 'BRONZE',
-          icon: SiNextdotjs,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        }
-      ]
-    },
-    {
-      id: 'backend',
-      title: 'Backend Mastery',
-      badges: [
-        {
-          id: 'nodejs',
-          name: 'Node.js',
-          currentTier: 'BRONZE',
-          icon: SiNodedotjs,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 5,
-            GOLD: 8,
-            PLATINUM: 12
-          },
-          projects: []
-        },
-        {
-          id: 'express',
-          name: 'Express',
-          currentTier: 'BRONZE',
-          icon: SiExpress,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        },
-        {
-          id: 'mongodb',
-          name: 'MongoDB',
-          currentTier: 'BRONZE',
-          icon: SiMongodb,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        },
-        {
-          id: 'sql',
-          name: 'SQL',
-          currentTier: 'BRONZE',
-          icon: SiPostgresql,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        }
-      ]
-    },
-    {
-      id: 'devops',
-      title: 'DevOps Mastery',
-      badges: [
-        {
-          id: 'git',
-          name: 'Git',
-          currentTier: 'BRONZE',
-          icon: SiGit,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        },
-        {
-          id: 'docker',
-          name: 'Docker',
-          currentTier: 'BRONZE',
-          icon: SiDocker,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        },
-        {
-          id: 'aws',
-          name: 'AWS',
-          currentTier: 'BRONZE',
-          icon: SiAmazon,
-          projectsCompleted: 0,
-          tierRequirements: {
-            BRONZE: 2,
-            SILVER: 4,
-            GOLD: 6,
-            PLATINUM: 10
-          },
-          projects: []
-        }
-      ]
+  const [tracks, setTracks] = useState<Track[]>(() => {
+    // Try to load tracks from localStorage
+    const savedTracks = localStorage.getItem('codeMasteryTracks');
+    if (savedTracks) {
+      const parsedTracks = JSON.parse(savedTracks);
+      // Reattach icon components since they can't be serialized
+      return parsedTracks.map((track: Track) => ({
+        ...track,
+        badges: track.badges.map((badge: Badge) => ({
+          ...badge,
+          icon: getIconComponent(badge.id)
+        }))
+      }));
     }
-  ]);
+
+    // Return initial tracks if no saved data exists
+    return [
+      {
+        id: 'frontend',
+        title: 'Frontend Mastery',
+        badges: [
+          {
+            id: 'html',
+            name: 'HTML',
+            currentTier: 'BRONZE',
+            icon: SiHtml5,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 5,
+              GOLD: 8,
+              PLATINUM: 12
+            },
+            projects: []
+          },
+          {
+            id: 'css',
+            name: 'CSS',
+            currentTier: 'BRONZE',
+            icon: SiCss3,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 5,
+              GOLD: 8,
+              PLATINUM: 12
+            },
+            projects: []
+          },
+          {
+            id: 'tailwind',
+            name: 'Tailwind',
+            currentTier: 'BRONZE',
+            icon: SiTailwindcss,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          },
+          {
+            id: 'javascript',
+            name: 'JavaScript',
+            currentTier: 'BRONZE',
+            icon: SiJavascript,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 3,
+              SILVER: 6,
+              GOLD: 9,
+              PLATINUM: 15
+            },
+            projects: []
+          },
+          {
+            id: 'react',
+            name: 'React',
+            currentTier: 'BRONZE',
+            icon: SiReact,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 5,
+              GOLD: 8,
+              PLATINUM: 12
+            },
+            projects: []
+          },
+          {
+            id: 'nextjs',
+            name: 'Next.js',
+            currentTier: 'BRONZE',
+            icon: SiNextdotjs,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          }
+        ]
+      },
+      {
+        id: 'backend',
+        title: 'Backend Mastery',
+        badges: [
+          {
+            id: 'nodejs',
+            name: 'Node.js',
+            currentTier: 'BRONZE',
+            icon: SiNodedotjs,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 5,
+              GOLD: 8,
+              PLATINUM: 12
+            },
+            projects: []
+          },
+          {
+            id: 'express',
+            name: 'Express',
+            currentTier: 'BRONZE',
+            icon: SiExpress,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          },
+          {
+            id: 'mongodb',
+            name: 'MongoDB',
+            currentTier: 'BRONZE',
+            icon: SiMongodb,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          },
+          {
+            id: 'sql',
+            name: 'SQL',
+            currentTier: 'BRONZE',
+            icon: SiPostgresql,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          }
+        ]
+      },
+      {
+        id: 'devops',
+        title: 'DevOps Mastery',
+        badges: [
+          {
+            id: 'git',
+            name: 'Git',
+            currentTier: 'BRONZE',
+            icon: SiGit,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          },
+          {
+            id: 'docker',
+            name: 'Docker',
+            currentTier: 'BRONZE',
+            icon: SiDocker,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          },
+          {
+            id: 'aws',
+            name: 'AWS',
+            currentTier: 'BRONZE',
+            icon: SiAmazon,
+            projectsCompleted: 0,
+            tierRequirements: {
+              BRONZE: 2,
+              SILVER: 4,
+              GOLD: 6,
+              PLATINUM: 10
+            },
+            projects: []
+          }
+        ]
+      }
+    ];
+  });
+
+  // Save tracks to localStorage whenever they change
+  useEffect(() => {
+    // Create a copy of tracks with icons removed (they can't be serialized)
+    const tracksToSave = tracks.map(track => ({
+      ...track,
+      badges: track.badges.map((badge: Badge) => ({
+        ...badge,
+        icon: undefined // Remove icon before saving
+      }))
+    }));
+    localStorage.setItem('codeMasteryTracks', JSON.stringify(tracksToSave));
+  }, [tracks]);
 
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
   const [showModal, setShowModal] = useState(false);
