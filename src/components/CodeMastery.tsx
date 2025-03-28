@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
 
@@ -332,14 +332,6 @@ const Input = styled.input`
   border-radius: 4px;
 `;
 
-const Select = styled.select`
-  background: rgba(0, 162, 255, 0.1);
-  border: 1px solid #00a2ff;
-  color: #00a2ff;
-  padding: 0.5rem;
-  font-family: 'Share Tech Mono', monospace;
-  border-radius: 4px;
-`;
 
 const SubmitButton = styled(motion.button)`
   background: #00a2ff;
