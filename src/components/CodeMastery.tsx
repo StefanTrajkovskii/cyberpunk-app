@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
+import { IconType } from 'react-icons';
+import { IconBaseProps } from 'react-icons';
 import { 
   SiHtml5, 
   SiCss3, 
@@ -167,7 +169,7 @@ interface Badge {
   id: string;
   name: string;
   currentTier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
-  icon: React.ReactNode;
+  icon: IconType;
   projectsCompleted: number;
   tierRequirements: TierRequirement;
   projects: Project[];
@@ -263,7 +265,6 @@ const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'G
     height: 30px;
     color: ${props => {
       if (!props.unlocked) return '#666';
-      // Original brand colors
       switch (props.tier) {
         case 'BRONZE': return '#cd7f32';
         case 'SILVER': return '#c0c0c0';
@@ -566,7 +567,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'html',
           name: 'HTML',
           currentTier: 'BRONZE',
-          icon: <SiHtml5 />,
+          icon: SiHtml5,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -580,7 +581,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'css',
           name: 'CSS',
           currentTier: 'BRONZE',
-          icon: <SiCss3 />,
+          icon: SiCss3,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -594,7 +595,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'tailwind',
           name: 'Tailwind',
           currentTier: 'BRONZE',
-          icon: <SiTailwindcss />,
+          icon: SiTailwindcss,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -608,7 +609,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'javascript',
           name: 'JavaScript',
           currentTier: 'BRONZE',
-          icon: <SiJavascript />,
+          icon: SiJavascript,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 3,
@@ -622,7 +623,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'react',
           name: 'React',
           currentTier: 'BRONZE',
-          icon: <SiReact />,
+          icon: SiReact,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -636,7 +637,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'nextjs',
           name: 'Next.js',
           currentTier: 'BRONZE',
-          icon: <SiNextdotjs />,
+          icon: SiNextdotjs,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -656,7 +657,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'nodejs',
           name: 'Node.js',
           currentTier: 'BRONZE',
-          icon: <SiNodedotjs />,
+          icon: SiNodedotjs,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -670,7 +671,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'express',
           name: 'Express',
           currentTier: 'BRONZE',
-          icon: <SiExpress />,
+          icon: SiExpress,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -684,7 +685,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'mongodb',
           name: 'MongoDB',
           currentTier: 'BRONZE',
-          icon: <SiMongodb />,
+          icon: SiMongodb,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -698,7 +699,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'sql',
           name: 'SQL',
           currentTier: 'BRONZE',
-          icon: <SiPostgresql />,
+          icon: SiPostgresql,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -718,7 +719,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'git',
           name: 'Git',
           currentTier: 'BRONZE',
-          icon: <SiGit />,
+          icon: SiGit,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -732,7 +733,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'docker',
           name: 'Docker',
           currentTier: 'BRONZE',
-          icon: <SiDocker />,
+          icon: SiDocker,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -746,7 +747,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'aws',
           name: 'AWS',
           currentTier: 'BRONZE',
-          icon: <SiAmazon />,
+          icon: SiAmazon,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -870,7 +871,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
                     unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE} 
                     tier={badge.currentTier}
                   >
-                    {badge.icon}
+                    {React.createElement(badge.icon as React.ComponentType<IconBaseProps>, { size: 30 })}
                   </BadgeIcon>
                   <BadgeName unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE}>
                     {badge.name}
@@ -925,7 +926,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
                           </SelectedCount>
                         )}
                         <TechnologyIcon techId={badge.id}>
-                          {badge.icon}
+                          {React.createElement(badge.icon as React.ComponentType<IconBaseProps>, { size: 40 })}
                         </TechnologyIcon>
                         <TechnologyName>{badge.name}</TechnologyName>
                       </TechnologyCard>
@@ -975,7 +976,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
                 unlocked={selectedBadge.projectsCompleted >= selectedBadge.tierRequirements.BRONZE} 
                 tier={selectedBadge.currentTier}
               >
-                {selectedBadge.icon}
+                {React.createElement(selectedBadge.icon as React.ComponentType<IconBaseProps>, { size: 30 })}
               </BadgeIcon>
               <BadgeName unlocked={selectedBadge.projectsCompleted >= selectedBadge.tierRequirements.BRONZE}>
                 {selectedBadge.name}
