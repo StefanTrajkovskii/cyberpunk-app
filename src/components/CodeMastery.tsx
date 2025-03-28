@@ -1,6 +1,21 @@
 import React, { useState } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion } from 'framer-motion';
+import { 
+  SiHtml5, 
+  SiCss3, 
+  SiTailwindcss, 
+  SiJavascript, 
+  SiReact, 
+  SiNextdotjs,
+  SiNodedotjs,
+  SiExpress,
+  SiMongodb,
+  SiPostgresql,
+  SiGit,
+  SiDocker,
+  SiAmazon
+} from 'react-icons/si';
 
 const glitch = keyframes`
   0% {
@@ -152,7 +167,7 @@ interface Badge {
   id: string;
   name: string;
   currentTier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
-  icon: string;
+  icon: React.ReactNode;
   projectsCompleted: number;
   tierRequirements: TierRequirement;
   projects: Project[];
@@ -232,16 +247,6 @@ const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'G
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: ${props => {
-    if (!props.unlocked) return '#666';
-    switch (props.tier) {
-      case 'BRONZE': return '#cd7f32';
-      case 'SILVER': return '#c0c0c0';
-      case 'GOLD': return '#ffd700';
-      case 'PLATINUM': return '#e5e4e2';
-      default: return '#00a2ff';
-    }
-  }};
   border: 2px solid ${props => {
     if (!props.unlocked) return '#666';
     switch (props.tier) {
@@ -252,6 +257,22 @@ const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'G
       default: return '#00a2ff';
     }
   }};
+
+  svg {
+    width: 30px;
+    height: 30px;
+    color: ${props => {
+      if (!props.unlocked) return '#666';
+      // Original brand colors
+      switch (props.tier) {
+        case 'BRONZE': return '#cd7f32';
+        case 'SILVER': return '#c0c0c0';
+        case 'GOLD': return '#ffd700';
+        case 'PLATINUM': return '#e5e4e2';
+        default: return '#00a2ff';
+      }
+    }};
+  }
 `;
 
 const BadgeName = styled.h4<{ unlocked: boolean }>`
@@ -482,9 +503,34 @@ const TechnologyCard = styled(motion.div)<{ selected: boolean }>`
   }
 `;
 
-const TechnologyIcon = styled.div`
+const TechnologyIcon = styled.div<{ techId: string }>`
   font-size: 2rem;
   margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  svg {
+    width: 40px;
+    height: 40px;
+    color: ${props => {
+      switch (props.techId) {
+        case 'html': return '#E34F26'; // HTML5 orange
+        case 'css': return '#264DE4'; // CSS3 blue
+        case 'tailwind': return '#38B2AC'; // Tailwind teal
+        case 'javascript': return '#F7DF1E'; // JavaScript yellow
+        case 'react': return '#61DAFB'; // React blue
+        case 'nextjs': return '#000000'; // Next.js black
+        case 'nodejs': return '#339933'; // Node.js green
+        case 'express': return '#000000'; // Express black
+        case 'mongodb': return '#47A248'; // MongoDB green
+        case 'sql': return '#336791'; // PostgreSQL blue
+        case 'git': return '#F05032'; // Git orange
+        case 'docker': return '#2496ED'; // Docker blue
+        case 'aws': return '#FF9900'; // AWS orange
+        default: return '#00a2ff';
+      }
+    }};
+  }
 `;
 
 const TechnologyName = styled.div`
@@ -520,7 +566,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'html',
           name: 'HTML',
           currentTier: 'BRONZE',
-          icon: '🌐',
+          icon: <SiHtml5 />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -534,7 +580,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'css',
           name: 'CSS',
           currentTier: 'BRONZE',
-          icon: '🎨',
+          icon: <SiCss3 />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -548,7 +594,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'tailwind',
           name: 'Tailwind',
           currentTier: 'BRONZE',
-          icon: '💨',
+          icon: <SiTailwindcss />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -562,7 +608,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'javascript',
           name: 'JavaScript',
           currentTier: 'BRONZE',
-          icon: '⚡',
+          icon: <SiJavascript />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 3,
@@ -576,7 +622,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'react',
           name: 'React',
           currentTier: 'BRONZE',
-          icon: '⚛️',
+          icon: <SiReact />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -590,7 +636,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'nextjs',
           name: 'Next.js',
           currentTier: 'BRONZE',
-          icon: '🔄',
+          icon: <SiNextdotjs />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -610,7 +656,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'nodejs',
           name: 'Node.js',
           currentTier: 'BRONZE',
-          icon: '🟢',
+          icon: <SiNodedotjs />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -624,7 +670,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'express',
           name: 'Express',
           currentTier: 'BRONZE',
-          icon: '🚂',
+          icon: <SiExpress />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -638,7 +684,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'mongodb',
           name: 'MongoDB',
           currentTier: 'BRONZE',
-          icon: '🍃',
+          icon: <SiMongodb />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -652,7 +698,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'sql',
           name: 'SQL',
           currentTier: 'BRONZE',
-          icon: '📊',
+          icon: <SiPostgresql />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -672,7 +718,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'git',
           name: 'Git',
           currentTier: 'BRONZE',
-          icon: '📦',
+          icon: <SiGit />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -686,7 +732,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'docker',
           name: 'Docker',
           currentTier: 'BRONZE',
-          icon: '🐳',
+          icon: <SiDocker />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -700,7 +746,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
           id: 'aws',
           name: 'AWS',
           currentTier: 'BRONZE',
-          icon: '☁️',
+          icon: <SiAmazon />,
           projectsCompleted: 0,
           tierRequirements: {
             BRONZE: 2,
@@ -878,7 +924,9 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
                             {newProject.technologies.indexOf(badge.id) + 1}
                           </SelectedCount>
                         )}
-                        <TechnologyIcon>{badge.icon}</TechnologyIcon>
+                        <TechnologyIcon techId={badge.id}>
+                          {badge.icon}
+                        </TechnologyIcon>
                         <TechnologyName>{badge.name}</TechnologyName>
                       </TechnologyCard>
                     ))
