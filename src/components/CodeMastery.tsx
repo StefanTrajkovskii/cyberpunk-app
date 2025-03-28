@@ -78,6 +78,10 @@ const Container = styled.div`
   background: #000;
   color: #e4f3ff;
   font-family: 'Share Tech Mono', monospace;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
 const Header = styled.div`
@@ -85,6 +89,13 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
 `;
 
 const Title = styled.h1`
@@ -95,6 +106,10 @@ const Title = styled.h1`
   margin: 0;
   animation: ${glitch} 725ms infinite;
   text-shadow: 0 0 10px rgba(0, 162, 255, 0.5);
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
 `;
 
 const Subtitle = styled.h2`
@@ -103,6 +118,11 @@ const Subtitle = styled.h2`
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0.5rem 0 0 0;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin: 0.25rem 0 0 0;
+  }
 `;
 
 const AchievementTracks = styled.div`
@@ -110,6 +130,12 @@ const AchievementTracks = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
 `;
 
 const TrackCard = styled.div`
@@ -117,6 +143,10 @@ const TrackCard = styled.div`
   border: 1px solid rgba(0, 162, 255, 0.2);
   padding: 1.5rem;
   border-radius: 8px;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
 const TrackTitle = styled.h3`
@@ -133,6 +163,11 @@ const BadgeGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
 `;
 
 interface TierRequirement {
@@ -220,6 +255,14 @@ const BadgeCard = styled(motion.div)<{ unlocked: boolean; tier: 'BRONZE' | 'SILV
     transform: ${props => props.unlocked ? 'scale(1.05)' : 'none'};
     box-shadow: ${props => props.unlocked ? '0 0 20px rgba(0, 162, 255, 0.2)' : 'none'};
   }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    
+    &:hover {
+      transform: ${props => props.unlocked ? 'scale(1.02)' : 'none'};
+    }
+  }
 `;
 
 const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
@@ -257,6 +300,17 @@ const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'G
       }
     }};
   }
+
+  @media (max-width: 768px) {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 0.75rem;
+
+    svg {
+      width: 25px;
+      height: 25px;
+    }
+  }
 `;
 
 const BadgeName = styled.h4<{ unlocked: boolean }>`
@@ -265,6 +319,11 @@ const BadgeName = styled.h4<{ unlocked: boolean }>`
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+    margin: 0 0 0.25rem 0;
+  }
 `;
 
 const BadgeTier = styled.div<{ tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
@@ -286,6 +345,10 @@ const BadgeTier = styled.div<{ tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }
 const Progress = styled.div`
   font-size: 0.8rem;
   color: rgba(0, 162, 255, 0.7);
+
+  @media (max-width: 768px) {
+    font-size: 0.75rem;
+  }
 `;
 
 const Modal = styled(motion.div)`
@@ -299,6 +362,13 @@ const Modal = styled(motion.div)`
   justify-content: center;
   align-items: center;
   z-index: 1000;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    padding: 1rem;
+  }
 `;
 
 const ModalContent = styled.div`
@@ -337,7 +407,6 @@ const Input = styled.input`
   border-radius: 4px;
 `;
 
-
 const SubmitButton = styled(motion.button)`
   background: #00a2ff;
   border: none;
@@ -367,6 +436,12 @@ const AddProjectButton = styled(motion.button)`
 
   &:hover {
     background: rgba(0, 162, 255, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1rem;
   }
 `;
 
@@ -452,6 +527,11 @@ const TechnologyGrid = styled.div`
     background: #00a2ff;
     border-radius: 4px;
   }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
 `;
 
 const TechnologyCard = styled(motion.div)<{ selected: boolean }>`
@@ -484,6 +564,15 @@ const TechnologyCard = styled(motion.div)<{ selected: boolean }>`
       transparent
     );
     animation: ${shine} 2s linear infinite;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 6px rgba(0, 162, 255, 0.2);
+    }
   }
 `;
 
