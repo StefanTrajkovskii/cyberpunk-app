@@ -433,6 +433,91 @@ const BadgeDescription = styled.p`
   margin: 0.5rem 0;
 `;
 
+const TechnologyGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 162, 255, 0.1);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #00a2ff;
+    border-radius: 4px;
+  }
+`;
+
+const TechnologyCard = styled(motion.div)<{ selected: boolean }>`
+  background: ${props => props.selected ? 'rgba(0, 162, 255, 0.2)' : 'rgba(0, 162, 255, 0.05)'};
+  border: 2px solid ${props => props.selected ? '#00a2ff' : 'rgba(0, 162, 255, 0.2)'};
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 162, 255, 0.2);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      ${props => props.selected ? 'rgba(0, 162, 255, 0.1)' : 'transparent'},
+      transparent
+    );
+    animation: ${shine} 2s linear infinite;
+  }
+`;
+
+const TechnologyIcon = styled.div`
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+`;
+
+const TechnologyName = styled.div`
+  color: #00a2ff;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`;
+
+const SelectedCount = styled.div`
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: #00a2ff;
+  color: #000;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+`;
+
 const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
   const [tracks, setTracks] = useState<Track[]>([
     {
@@ -640,7 +725,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [newProject, setNewProject] = useState({
-    technology: '',
+    technologies: [] as string[],
     projectName: ''
   });
 
@@ -659,7 +744,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
       prevTracks.map(track => ({
         ...track,
         badges: track.badges.map(badge => {
-          if (badge.id === newProject.technology) {
+          if (newProject.technologies.includes(badge.id)) {
             const newProjectsCompleted = badge.projectsCompleted + 1;
             const projectToAdd: Project = {
               id: Date.now().toString(),
@@ -679,7 +764,16 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
     );
 
     setShowModal(false);
-    setNewProject({ technology: '', projectName: '' });
+    setNewProject({ technologies: [], projectName: '' });
+  };
+
+  const handleTechnologyClick = (techId: string) => {
+    setNewProject(prev => ({
+      ...prev,
+      technologies: prev.technologies.includes(techId)
+        ? prev.technologies.filter(id => id !== techId)
+        : [...prev.technologies, techId]
+    }));
   };
 
   const getNextTierRequirement = (badge: Badge) => {
@@ -773,20 +867,37 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
             <CloseButton onClick={() => setShowModal(false)}>×</CloseButton>
             <h3 style={{ color: '#00a2ff', marginBottom: '1rem' }}>Add New Project</h3>
             <Form onSubmit={handleAddProject}>
-              <Select
-                value={newProject.technology}
-                onChange={(e) => setNewProject(prev => ({ ...prev, technology: e.target.value }))}
-                required
-              >
-                <option value="">Select Technology</option>
-                {tracks.flatMap(track => 
-                  track.badges.map(badge => (
-                    <option key={badge.id} value={badge.id}>
-                      {badge.name}
-                    </option>
-                  ))
+              <div>
+                <label style={{ color: '#00a2ff', marginBottom: '0.5rem', display: 'block' }}>
+                  Select Technologies Used
+                </label>
+                <TechnologyGrid>
+                  {tracks.flatMap(track => 
+                    track.badges.map(badge => (
+                      <TechnologyCard
+                        key={badge.id}
+                        selected={newProject.technologies.includes(badge.id)}
+                        onClick={() => handleTechnologyClick(badge.id)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {newProject.technologies.includes(badge.id) && (
+                          <SelectedCount>
+                            {newProject.technologies.indexOf(badge.id) + 1}
+                          </SelectedCount>
+                        )}
+                        <TechnologyIcon>{badge.icon}</TechnologyIcon>
+                        <TechnologyName>{badge.name}</TechnologyName>
+                      </TechnologyCard>
+                    ))
+                  )}
+                </TechnologyGrid>
+                {newProject.technologies.length === 0 && (
+                  <div style={{ color: '#ff4444', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                    Please select at least one technology
+                  </div>
                 )}
-              </Select>
+              </div>
               <Input
                 type="text"
                 placeholder="Project Name"
@@ -798,6 +909,11 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
                 type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                disabled={newProject.technologies.length === 0}
+                style={{ 
+                  opacity: newProject.technologies.length === 0 ? 0.5 : 1,
+                  cursor: newProject.technologies.length === 0 ? 'not-allowed' : 'pointer'
+                }}
               >
                 Add Project
               </SubmitButton>
