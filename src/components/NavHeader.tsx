@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useUser } from '../contexts/UserContext';
 
 interface NavHeaderProps {
   missionCount: number;
@@ -580,6 +581,7 @@ const UserPanelContainer = styled.div`
 `;
 
 const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange, userName, onLogout }) => {
+  const { logout } = useUser();
   const [currentUser] = useState({
     name: userName,
     status: 'Connected'
@@ -587,6 +589,12 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    onLogout();
+    setIsUserDropdownOpen(false);
+  };
 
   return (
     <HeaderContainer>
@@ -658,11 +666,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <DropdownItem onClick={(e) => {
-                    e.stopPropagation();
-                    onLogout();
-                    setIsUserDropdownOpen(false);
-                  }}>
+                  <DropdownItem onClick={handleLogout}>
                     LOGOUT
                   </DropdownItem>
                 </UserDropdown>

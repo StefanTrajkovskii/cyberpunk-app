@@ -19,6 +19,8 @@ import {
   SiAmazon
 } from 'react-icons/si';
 import BackButton from '../components/BackButton';
+import { useUser } from '../contexts/UserContext';
+import { getUserData, setUserData } from '../utils/storage';
 
 // Function to get the icon component based on badge ID
 const getIconComponent = (badgeId: string): IconType => {
@@ -650,13 +652,15 @@ const SelectedCount = styled.div`
 `;
 
 const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
+  const { user } = useUser();
+  const username = user?.username || '';
+
   const [tracks, setTracks] = useState<Track[]>(() => {
-    // Try to load tracks from localStorage
-    const savedTracks = localStorage.getItem('codeMasteryTracks');
+    // Try to load tracks from user-specific storage
+    const savedTracks = getUserData(username, 'codeMasteryTracks');
     if (savedTracks) {
-      const parsedTracks = JSON.parse(savedTracks);
       // Reattach icon components since they can't be serialized
-      return parsedTracks.map((track: Track) => ({
+      return savedTracks.map((track: Track) => ({
         ...track,
         badges: track.badges.map((badge: Badge) => ({
           ...badge,
@@ -870,18 +874,20 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
     ];
   });
 
-  // Save tracks to localStorage whenever they change
+  // Save tracks to user-specific storage whenever they change
   useEffect(() => {
-    // Create a copy of tracks with icons removed (they can't be serialized)
-    const tracksToSave = tracks.map(track => ({
-      ...track,
-      badges: track.badges.map((badge: Badge) => ({
-        ...badge,
-        icon: undefined // Remove icon before saving
-      }))
-    }));
-    localStorage.setItem('codeMasteryTracks', JSON.stringify(tracksToSave));
-  }, [tracks]);
+    if (username) {
+      // Create a copy of tracks with icons removed (they can't be serialized)
+      const tracksToSave = tracks.map(track => ({
+        ...track,
+        badges: track.badges.map((badge: Badge) => ({
+          ...badge,
+          icon: undefined // Remove icon before saving
+        }))
+      }));
+      setUserData(username, 'codeMasteryTracks', tracksToSave);
+    }
+  }, [tracks, username]);
 
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
   const [showModal, setShowModal] = useState(false);

@@ -8,7 +8,9 @@ import DailyTasks from './pages/DailyTasks';
 import FoodTracker from './pages/FoodTracker';
 import GymTracker from './pages/GymTracker';
 import CodeMastery from './pages/CodeMastery';
-import SplashScreen from './pages/SplashScreen';
+import Login from './pages/Login';
+import { UserProvider, useUser } from './contexts/UserContext';
+import BootSequence from './pages/BootSequence';
 
 
 
@@ -1199,11 +1201,8 @@ function AppContent() {
   const location = useLocation();
   const [currentView, setCurrentView] = useState<ViewType>('daily');
   const [currency, setCurrency] = useState<number>(0);
-  const [splashScreenActive, setSplashScreenActive] = useState<boolean>(true);
-  const [userName, setUserName] = useState<string>(() => {
-    const savedUser = localStorage.getItem('cyberpunk_user');
-    return savedUser || '';
-  });
+  const { user } = useUser();
+  const [bootComplete, setBootComplete] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
@@ -1251,15 +1250,6 @@ function AppContent() {
     }
   ]);
 
-  // Check if user exists in localStorage on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('cyberpunk_user');
-    if (savedUser) {
-      setUserName(savedUser);
-      setSplashScreenActive(false);
-    }
-  }, []);
-
   // Handle escape key
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -1285,22 +1275,14 @@ function AppContent() {
     }
   }, [location.pathname]);
 
-  const handleSplashEnter = (name: string) => {
-    console.log('Splash screen complete, showing main app');
-    setUserName(name);
-    localStorage.setItem('cyberpunk_user', name);
-    setSplashScreenActive(false);
-  };
+  // If boot sequence is not complete, show boot sequence
+  if (!bootComplete) {
+    return <BootSequence onComplete={() => setBootComplete(true)} />;
+  }
 
-  const handleLogout = () => {
-    localStorage.removeItem('cyberpunk_user');
-    setUserName('');
-    setSplashScreenActive(true);
-    navigate('/');
-  };
-
-  if (splashScreenActive) {
-    return <SplashScreen onEnter={handleSplashEnter} />;
+  // If no user is logged in, show login page
+  if (!user) {
+    return <Login />;
   }
 
   return (
@@ -1323,8 +1305,8 @@ function AppContent() {
               navigate('/');
             }
           }}
-          userName={userName}
-          onLogout={handleLogout}
+          userName={user.username}
+          onLogout={() => navigate('/')}
         />
         
         <MainContent>
@@ -1350,7 +1332,7 @@ function AppContent() {
                 setTasks={setTasks} 
                 currency={currency} 
                 setCurrency={setCurrency}
-                userName={userName}
+                userName={user.username}
               />
             } />
           </Routes>
@@ -1362,13 +1344,13 @@ function AppContent() {
   );
 }
 
-export { AppContent };
-
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <UserProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </UserProvider>
   );
 }
 
