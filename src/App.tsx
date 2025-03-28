@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import NavHeader from './components/NavHeader';
 import CyberFooter from './components/CyberFooter';
 import DailyTasks from './pages/DailyTasks';
@@ -9,6 +9,7 @@ import FoodTracker from './pages/FoodTracker';
 import GymTracker from './pages/GymTracker';
 import CodeMastery from './pages/CodeMastery';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import { UserProvider, useUser } from './contexts/UserContext';
 import BootSequence from './pages/BootSequence';
 
@@ -1282,7 +1283,13 @@ function AppContent() {
 
   // If no user is logged in, show login page
   if (!user) {
-    return <Login />;
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
   }
 
   return (

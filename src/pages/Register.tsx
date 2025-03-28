@@ -38,7 +38,7 @@ const scanlineEffect = keyframes`
   100% { transform: translateY(100vh); }
 `;
 
-const LoginContainer = styled.div`
+const RegisterContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -162,7 +162,7 @@ const GlitchingText = styled(motion.div)`
   }
 `;
 
-const LoginForm = styled(motion.form)`
+const RegisterForm = styled(motion.form)`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -209,7 +209,7 @@ const Input = styled.input`
   }
 `;
 
-const LoginButton = styled(motion.button)`
+const RegisterButton = styled(motion.button)`
   background: transparent;
   border: 2px solid #00f6ff;
   color: #00f6ff;
@@ -247,7 +247,7 @@ const LoginButton = styled(motion.button)`
   }
 `;
 
-const RegisterLink = styled(motion.a)`
+const LoginLink = styled(motion.a)`
   color: #ff3e88;
   text-decoration: none;
   font-family: 'Share Tech Mono', monospace;
@@ -270,27 +270,38 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useUser();
+  const { register } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
     try {
-      await login(username, password);
+      await register(username, password);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      setError(err instanceof Error ? err.message : 'Registration failed');
     }
   };
 
   return (
-    <LoginContainer>
+    <RegisterContainer>
       <Grid />
       <CornerDecoration className="top-left" />
       <CornerDecoration className="top-right" />
@@ -303,11 +314,11 @@ const Login: React.FC = () => {
         transition={{ duration: 0.8, delay: 0.2 }}
       >
         <GlitchingText>
-          LOGIN<span>YOURSELF</span>
+          REGISTER<span>YOURSELF</span>
         </GlitchingText>
       </motion.div>
       
-      <LoginForm
+      <RegisterForm
         onSubmit={handleSubmit}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -321,6 +332,7 @@ const Login: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            maxLength={20}
           />
         </FormGroup>
         
@@ -332,30 +344,43 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={6}
+          />
+        </FormGroup>
+        
+        <FormGroup>
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            minLength={6}
           />
         </FormGroup>
         
         {error && <ErrorMessage>{error}</ErrorMessage>}
         
-        <LoginButton
+        <RegisterButton
           type="submit"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          disabled={!username || !password}
+          disabled={!username || !password || !confirmPassword}
         >
-          LOGIN
-        </LoginButton>
+          REGISTER
+        </RegisterButton>
         
-        <RegisterLink
-          onClick={() => navigate('/register')}
+        <LoginLink
+          onClick={() => navigate('/login')}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          Don't have an account? Register
-        </RegisterLink>
-      </LoginForm>
-    </LoginContainer>
+          Already have an account? Login
+        </LoginLink>
+      </RegisterForm>
+    </RegisterContainer>
   );
 };
 
-export default Login; 
+export default Register; 
