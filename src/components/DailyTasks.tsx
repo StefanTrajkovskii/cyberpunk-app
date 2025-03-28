@@ -18,6 +18,7 @@ interface DailyTasksProps {
   onComplete: (reward: number) => void;
   onNavigateToFood: () => void;
   onNavigateToGym: () => void;
+  onNavigateToCode: () => void;
   tasks: DailyTask[];
   setTasks: React.Dispatch<React.SetStateAction<DailyTask[]>>;
 }
@@ -503,7 +504,7 @@ const TaskDescription = styled.p`
 
 const TaskFooter = styled.div<{ type: string }>`
   display: flex;
-  justify-content: ${props => props.type === 'FOOD' || props.type === 'COMBAT' ? 'flex-start' : 'space-between'};
+  justify-content: ${props => props.type === 'FOOD' || props.type === 'COMBAT' || props.type === 'TECH' ? 'flex-start' : 'space-between'};
   align-items: center;
   margin-top: 1.5rem;
   padding-top: 1rem;
@@ -644,7 +645,7 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
   }
 `;
 
-const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, onNavigateToGym, tasks, setTasks }) => {
+const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, onNavigateToGym, onNavigateToCode, tasks, setTasks }) => {
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [todaysCalories, setTodaysCalories] = useState<number>(0);
   const [todaysProtein, setTodaysProtein] = useState<number>(0);
@@ -735,6 +736,8 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
       onNavigateToFood();
     } else if (task.type === 'COMBAT') {
       onNavigateToGym();
+    } else if (task.type === 'TECH') {
+      onNavigateToCode();
     }
   };
 
@@ -788,7 +791,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
                     <span>{nextWorkout || 'LOADING...'}</span>
                   </StatItem>
                 )}
-                {task.type !== 'COMBAT' && (
+                {task.type !== 'COMBAT' && task.type !== 'TECH' && (
                   <StatItem type={task.type}>
                     <span>STREAK</span>
                     <span>{task.consecutiveCompletions}x</span>
@@ -806,7 +809,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
                     </StatItem>
                   </>
                 )}
-                {task.type !== 'FOOD' && task.type !== 'COMBAT' && (
+                {task.type !== 'FOOD' && task.type !== 'COMBAT' && task.type !== 'TECH' && (
                   <StatItem type={task.type}>
                     <span>REWARD</span>
                     <span>¥{task.baseReward}</span>
@@ -819,7 +822,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
               <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
 
               <TaskFooter type={task.type}>
-                {task.type !== 'FOOD' && task.type !== 'COMBAT' && (
+                {task.type !== 'FOOD' && task.type !== 'COMBAT' && task.type !== 'TECH' && (
                   <RewardSection>
                     <BaseReward type={task.type}>
                       {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}

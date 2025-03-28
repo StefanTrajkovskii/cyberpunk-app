@@ -8,6 +8,7 @@ import SplashScreen from './components/SplashScreen';
 import DailyTasks from './components/DailyTasks';
 import FoodTracker from './components/FoodTracker';
 import GymTracker from './components/GymTracker';
+import CodeMastery from './components/CodeMastery';
 
 
 
@@ -1239,9 +1240,9 @@ function AppContent() {
     },
     {
       id: '4',
-      title: 'Cyberware Maintenance',
-      description: "Perform routine maintenance on local clinic's medical equipment.",
-      baseReward: 300,
+      title: 'CODE MASTERY',
+      description: "Enhance your programming skills through daily coding challenges and projects. Stay sharp in the digital frontier.",
+      baseReward: 0,
       riskLevel: 'LOW',
       type: 'TECH',
       completed: false,
@@ -1335,12 +1336,14 @@ function AppContent() {
                 }}
                 onNavigateToFood={() => navigate('/food-tracker')}
                 onNavigateToGym={() => navigate('/gym-tracker')}
+                onNavigateToCode={() => navigate('/code-mastery')}
                 tasks={tasks}
                 setTasks={setTasks}
               />
             } />
             <Route path="/food-tracker" element={<FoodTracker onBack={() => navigate('/')} />} />
             <Route path="/gym-tracker" element={<GymTracker onBack={() => navigate('/')} />} />
+            <Route path="/code-mastery" element={<CodeMastery onBack={() => navigate('/')} />} />
             <Route path="/missions" element={
               <Missions 
                 tasks={tasks} 
