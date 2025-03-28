@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import BackButton from './BackButton';
 
 interface FoodEntry {
   id: string;
@@ -370,39 +371,6 @@ const DeleteButton = styled(motion.button)`
   }
 `;
 
-const BackButton = styled(motion.button)`
-  background: transparent;
-  border: 2px solid #00ff9d;
-  color: #00ff9d;
-  padding: 0.75rem 1.5rem;
-  font-family: 'Share Tech Mono', monospace;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 2rem;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 255, 157, 0.2);
-    transition: 0.3s;
-  }
-  
-  &:hover {
-    box-shadow: 0 0 20px rgba(0, 255, 157, 0.3);
-    
-    &::before {
-      left: 0;
-    }
-  }
-`;
-
 const ViewToggle = styled(motion.button)`
   background: rgba(0, 255, 157, 0.1);
   border: 1px solid #00ff9d;
@@ -609,14 +577,7 @@ const FoodTracker: React.FC<FoodTrackerProps> = ({ onBack }) => {
 
   return (
     <Container>
-      <BackButton
-        onClick={onBack}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-      >
-        ← Back to Tasks
-      </BackButton>
-
+      <BackButton onClick={onBack} color="#00ff9d" />
       <Header>
         <Title>Food Tracker</Title>
         <Stats>

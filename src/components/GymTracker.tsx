@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import BackButton from './BackButton';
 
 interface Exercise {
   name: string;
@@ -175,49 +176,6 @@ const Subtitle = styled.div`
     font-size: 0.6rem;
     color: rgba(255, 62, 62, 0.4);
     letter-spacing: 0.5px;
-  }
-`;
-
-const BackButton = styled(motion.button)`
-  background: transparent;
-  border: 1px solid #ff3e3e;
-  color: #ff3e3e;
-  padding: 0.75rem 1.5rem;
-  font-family: 'Share Tech Mono', monospace;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  font-size: 1.1rem;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 62, 62, 0.1);
-    transition: 0.3s;
-  }
-
-  &:hover {
-    background: rgba(255, 62, 62, 0.1);
-    box-shadow: 0 0 20px rgba(255, 62, 62, 0.2);
-
-    &::before {
-      left: 100%;
-    }
-  }
-
-  @media (max-width: 768px) {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.4rem;
-    border: 1px solid rgba(255, 62, 62, 0.3);
-    margin-left: auto;
-    letter-spacing: 1px;
   }
 `;
 
@@ -948,18 +906,12 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
 
   return (
     <Container>
+      <BackButton onClick={onBack} color="#ff3e3e" />
       <Header>
         <div>
           <Title>GYM TRACKER</Title>
           <Subtitle>PHYSICAL_ENHANCEMENT_OS v1.0</Subtitle>
         </div>
-        <BackButton
-          onClick={onBack}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          BACK
-        </BackButton>
       </Header>
 
       <WorkoutSchedule>

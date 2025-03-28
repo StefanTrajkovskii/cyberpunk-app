@@ -18,6 +18,7 @@ import {
   SiDocker,
   SiAmazon
 } from 'react-icons/si';
+import BackButton from './BackButton';
 
 const glitch = keyframes`
   0% {
@@ -102,24 +103,6 @@ const Subtitle = styled.h2`
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0.5rem 0 0 0;
-`;
-
-const BackButton = styled(motion.button)`
-  background: transparent;
-  border: 1px solid #00a2ff;
-  color: #00a2ff;
-  padding: 0.5rem 1rem;
-  font-family: 'Share Tech Mono', monospace;
-  cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(0, 162, 255, 0.1);
-  }
 `;
 
 const AchievementTracks = styled.div`
@@ -830,18 +813,10 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
 
   return (
     <Container>
+      <BackButton onClick={onBack} color="#00ffff" />
       <Header>
-        <div>
-          <Title>Code Mastery</Title>
-          <Subtitle>SKILL_ENHANCEMENT_OS v1.0</Subtitle>
-        </div>
-        <BackButton
-          onClick={onBack}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Back to Tasks
-        </BackButton>
+        <Title>CODE MASTERY</Title>
+        <Subtitle>SKILL_ENHANCEMENT_OS v2.0</Subtitle>
       </Header>
 
       <AddProjectButton
