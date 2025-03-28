@@ -4,11 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import NavHeader from './components/NavHeader';
 import CyberFooter from './components/CyberFooter';
-import SplashScreen from './components/SplashScreen';
-import DailyTasks from './components/DailyTasks';
-import FoodTracker from './components/FoodTracker';
-import GymTracker from './components/GymTracker';
-import CodeMastery from './components/CodeMastery';
+import DailyTasks from './pages/DailyTasks';
+import FoodTracker from './pages/FoodTracker';
+import GymTracker from './pages/GymTracker';
+import CodeMastery from './pages/CodeMastery';
+import SplashScreen from './pages/SplashScreen';
 
 
 

@@ -18,7 +18,7 @@ import {
   SiDocker,
   SiAmazon
 } from 'react-icons/si';
-import BackButton from './BackButton';
+import BackButton from '../components/BackButton';
 
 const glitch = keyframes`
   0% {

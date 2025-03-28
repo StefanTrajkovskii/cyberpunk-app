@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
-import BackButton from './BackButton';
+import BackButton from '../components/BackButton';
 
 interface FoodEntry {
   id: string;
