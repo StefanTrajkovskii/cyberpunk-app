@@ -500,10 +500,10 @@ const EventCard = styled(motion.div)<{ category: string }>`
   background: rgba(0, 10, 20, 0.6);
   border: 1px solid ${props => {
     switch (props.category) {
-      case 'social': return '#ff3e88';
+      case 'social': return '#23d18b';
       case 'appointment': return '#00f6ff';
-      case 'task': return '#23d18b';
-      default: return '#ff3e88';
+      case 'task': return '#ff3e88';
+      default: return '#808080';
     }
   }};
   border-radius: 5px;
@@ -525,10 +525,10 @@ const EventCard = styled(motion.div)<{ category: string }>`
       transparent, 
       ${props => {
         switch (props.category) {
-          case 'social': return '#ff3e88';
+          case 'social': return '#23d18b';
           case 'appointment': return '#00f6ff';
-          case 'task': return '#23d18b';
-          default: return '#ff3e88';
+          case 'task': return '#ff3e88';
+          default: return '#808080';
         }
       }}, 
       transparent
@@ -547,10 +547,10 @@ const EventTitle = styled.h3<{ category: string }>`
   margin: 0;
   color: ${props => {
     switch (props.category) {
-      case 'social': return '#ff3e88';
+      case 'social': return '#23d18b';
       case 'appointment': return '#00f6ff';
-      case 'task': return '#23d18b';
-      default: return '#ff3e88';
+      case 'task': return '#ff3e88';
+      default: return '#808080';
     }
   }};
   font-size: 1.2rem;
@@ -562,18 +562,18 @@ const CategoryBadge = styled.span<{ category: string }>`
   padding: 0.25rem 0.75rem;
   background: ${props => {
     switch (props.category) {
-      case 'social': return 'rgba(255, 62, 136, 0.2)';
+      case 'social': return 'rgba(35, 209, 139, 0.2)';
       case 'appointment': return 'rgba(0, 246, 255, 0.2)';
-      case 'task': return 'rgba(35, 209, 139, 0.2)';
-      default: return 'rgba(255, 62, 136, 0.2)';
+      case 'task': return 'rgba(255, 62, 136, 0.2)';
+      default: return 'rgba(128, 128, 128, 0.2)';
     }
   }};
   color: ${props => {
     switch (props.category) {
-      case 'social': return '#ff3e88';
+      case 'social': return '#23d18b';
       case 'appointment': return '#00f6ff';
-      case 'task': return '#23d18b';
-      default: return '#ff3e88';
+      case 'task': return '#ff3e88';
+      default: return '#808080';
     }
   }};
   border-radius: 3px;
