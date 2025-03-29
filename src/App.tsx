@@ -92,7 +92,7 @@ function AppContent() {
     if (user) {
       setCurrency(user.currency);
     }
-  }, [user?.currency]);
+  }, [user]);
 
   const [tasks, setTasks] = useState<Task[]>([
     {
