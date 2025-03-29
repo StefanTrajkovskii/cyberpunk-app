@@ -126,6 +126,23 @@ const Missions: React.FC = () => {
               minute: '2-digit'
             })} | Network: <StatusHighlight>SECURE</StatusHighlight></span>
           </StatusText>
+          <StatusText>
+            <GlitchText
+              data-text="BALANCE:"
+              animate={{
+                x: [0, -1, 0, 1, 0],
+              }}
+              transition={{
+                duration: 0.3,
+                repeat: Infinity,
+                repeatType: "mirror",
+                repeatDelay: 6
+              }}
+            >
+              BALANCE:
+            </GlitchText>
+            <span>¥ {user?.currency?.toLocaleString() || '0'}</span>
+          </StatusText>
         </StatusBar>
       </HeaderSection>
 
@@ -222,8 +239,8 @@ const Missions: React.FC = () => {
                   <FormGroup>
                     <Label htmlFor="title">
                       Event Title
-                      <CharCount color={newEvent.title?.length === 20 ? '#ff3e88' : '#00f6ff'}>
-                        {newEvent.title?.length || 0}/20
+                      <CharCount color={newEvent.title?.length === 16 ? '#ff3e88' : '#00f6ff'}>
+                        {newEvent.title?.length || 0}/16
                       </CharCount>
                     </Label>
                     <Input
@@ -233,7 +250,7 @@ const Missions: React.FC = () => {
                       value={newEvent.title}
                       onChange={handleInputChange}
                       placeholder="Enter event title"
-                      maxLength={20}
+                      maxLength={16}
                       required
                     />
                   </FormGroup>
@@ -358,8 +375,8 @@ const HeaderSection = styled.div`
 
 const StatusBar = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
   padding: 1rem;
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 246, 255, 0.3);

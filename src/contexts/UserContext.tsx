@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
   username: string;
   isLoggedIn: boolean;
+  currency: number;
 }
 
 interface StoredUser {
@@ -10,6 +11,7 @@ interface StoredUser {
   username: string;
   password: string;
   createdAt?: string;
+  currency: number;
 }
 
 interface UserContextType {
@@ -58,11 +60,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Username already exists');
       }
 
-      // Create new user
+      // Create new user with initial currency of 0
       const newUser: StoredUser = {
         username,
         password,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        currency: 0
       };
       
       // Add to users array
@@ -82,7 +85,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Log the user in after successful registration
-      setUser({ username, isLoggedIn: true });
+      setUser({ username, isLoggedIn: true, currency: 0 });
       console.log('Registration successful and user logged in');
     } catch (error) {
       console.error('Registration error:', error);
@@ -117,8 +120,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Login successful for user:', username);
-      // Set the current user
-      setUser({ username, isLoggedIn: true });
+      // Set the current user with their currency
+      setUser({ username, isLoggedIn: true, currency: foundUser.currency });
     } catch (error) {
       console.error('Login error:', error);
       throw error;
