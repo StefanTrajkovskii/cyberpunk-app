@@ -437,6 +437,10 @@ const ActionBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
 `;
 
 const AddButton = styled(motion.button)`
@@ -457,6 +461,11 @@ const AddButton = styled(motion.button)`
     background: rgba(0, 246, 255, 0.1);
     box-shadow: 0 0 20px rgba(0, 246, 255, 0.3);
   }
+
+  @media (max-width: 768px) {
+    width: 80%;
+    justify-content: center;
+  }
 `;
 
 const AddIcon = styled.span`
@@ -468,6 +477,12 @@ const EventGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const EventCard = styled(motion.div)<{ category: string }>`
@@ -599,11 +614,25 @@ const EventFooter = styled.div`
   margin-top: auto;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    justify-content: center;
+
+    > button {
+      flex: 1;
+      max-width: 120px;
+    }
+  }
 `;
 
 const ActionButton = styled(motion.button)<{ completed?: boolean }>`
@@ -616,6 +645,7 @@ const ActionButton = styled(motion.button)<{ completed?: boolean }>`
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.3s ease;
+  min-width: 100px;
   
   &:hover {
     background: ${props => props.completed ? 'rgba(35, 209, 139, 0.2)' : 'rgba(0, 246, 255, 0.1)'};
@@ -638,6 +668,7 @@ const DeleteButton = styled(motion.button)`
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.3s ease;
+  min-width: 100px;
   
   &:hover {
     background: rgba(255, 62, 136, 0.1);
