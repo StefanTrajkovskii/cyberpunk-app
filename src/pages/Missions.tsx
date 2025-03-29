@@ -101,7 +101,7 @@ const Missions: React.FC = () => {
             >
               SYSTEM:
             </GlitchText>
-            <span>Welcome, {user?.username || 'netrunner'}. {events.length} events scheduled.</span>
+            <span>Welcome, {user?.username || 'netrunner'}. {events.length} events.</span>
           </StatusText>
           <StatusText>
             <GlitchText
@@ -123,8 +123,9 @@ const Missions: React.FC = () => {
               month: 'short',
               day: 'numeric',
               hour: '2-digit',
-              minute: '2-digit'
-            })} | Network: <StatusHighlight>SECURE</StatusHighlight></span>
+              minute: '2-digit',
+              hour12: false
+            })} | <StatusHighlight>SECURE</StatusHighlight></span>
           </StatusText>
           <StatusText>
             <GlitchText
@@ -141,7 +142,7 @@ const Missions: React.FC = () => {
             >
               BALANCE:
             </GlitchText>
-            <span>¥ {user?.currency?.toLocaleString() || '0'}</span>
+            <span>¥{user?.currency?.toLocaleString() || '0'}</span>
           </StatusText>
         </StatusBar>
       </HeaderSection>
@@ -381,6 +382,11 @@ const StatusBar = styled.div`
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(0, 246, 255, 0.3);
   border-radius: 5px;
+
+  @media (max-width: 768px) {
+    padding: 0.6rem;
+    gap: 0.25rem;
+  }
 `;
 
 const StatusText = styled.div`
@@ -388,16 +394,37 @@ const StatusText = styled.div`
   align-items: center;
   gap: 0.5rem;
   font-family: 'Share Tech Mono', monospace;
+
+  @media (max-width: 768px) {
+    gap: 0.25rem;
+    font-size: 0.7rem;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+  }
 `;
 
 const GlitchText = styled(motion.span)`
   color: #00f6ff;
   text-shadow: 0 0 5px rgba(0, 246, 255, 0.7);
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+    min-width: 60px;
+  }
 `;
 
 const StatusHighlight = styled.span`
   color: #23d18b;
   text-shadow: 0 0 5px rgba(35, 209, 139, 0.7);
+
+  @media (max-width: 768px) {
+    font-size: 0.7rem;
+  }
 `;
 
 const ContentSection = styled.div`
