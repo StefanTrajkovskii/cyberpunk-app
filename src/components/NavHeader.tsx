@@ -746,7 +746,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   </UserInfo>
                 </UserPanel>
                 <MobileLogoutButton onClick={() => {
-                  onLogout();
+                  handleLogout();
                   setIsMobileMenuOpen(false);
                 }}>
                   Logout

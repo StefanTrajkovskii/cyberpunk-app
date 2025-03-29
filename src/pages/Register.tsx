@@ -27,16 +27,6 @@ const glitch = keyframes`
   }
 `;
 
-const backgroundGlow = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
-
-const scanlineEffect = keyframes`
-  0% { transform: translateY(0); }
-  100% { transform: translateY(100vh); }
-`;
 
 const RegisterContainer = styled.div`
   position: fixed;
