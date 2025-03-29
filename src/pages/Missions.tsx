@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
@@ -17,7 +17,11 @@ interface Event {
 
 const Missions: React.FC = () => {
   const { user } = useUser();
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>(() => {
+    // Initialize events from localStorage if they exist for this user
+    const savedEvents = localStorage.getItem(`${user?.username}_events`);
+    return savedEvents ? JSON.parse(savedEvents) : [];
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newEvent, setNewEvent] = useState<Partial<Event>>({
     title: '',
@@ -29,6 +33,13 @@ const Missions: React.FC = () => {
     category: 'other',
     completed: false
   });
+
+  // Save events to localStorage whenever they change
+  useEffect(() => {
+    if (user?.username) {
+      localStorage.setItem(`${user.username}_events`, JSON.stringify(events));
+    }
+  }, [events, user?.username]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
