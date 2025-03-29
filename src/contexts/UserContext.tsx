@@ -19,6 +19,7 @@ interface UserContextType {
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string) => Promise<void>;
   logout: () => void;
+  updateCurrency: (newAmount: number) => void;
 }
 
 // Define project-specific storage keys
@@ -136,8 +137,25 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
   };
 
+  const updateCurrency = (newAmount: number) => {
+    if (!user) return;
+
+    // Update the current user's currency
+    setUser({ ...user, currency: newAmount });
+
+    // Update the stored user's currency in the users array
+    const usersStr = localStorage.getItem(STORAGE_KEYS.USERS);
+    if (usersStr) {
+      const users: StoredUser[] = JSON.parse(usersStr);
+      const updatedUsers = users.map(u => 
+        u.username === user.username ? { ...u, currency: newAmount } : u
+      );
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updatedUsers));
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, login, register, logout }}>
+    <UserContext.Provider value={{ user, login, register, logout, updateCurrency }}>
       {children}
     </UserContext.Provider>
   );

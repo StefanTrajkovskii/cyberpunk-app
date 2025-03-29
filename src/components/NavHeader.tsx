@@ -580,8 +580,148 @@ const UserPanelContainer = styled.div`
   cursor: pointer;
 `;
 
+const ModalOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+`;
+
+const ModalContent = styled(motion.div)`
+  background: rgba(15, 15, 35, 0.95);
+  border: 2px solid #00f6ff;
+  border-radius: 5px;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
+  color: #e4f3ff;
+  width: 90%;
+  max-width: 400px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00f6ff, transparent);
+  }
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+`;
+
+const ModalTitle = styled.h2`
+  color: #00f6ff;
+  margin: 0;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-family: 'Share Tech Mono', monospace;
+`;
+
+const CloseButton = styled.button`
+  background: transparent;
+  border: none;
+  color: #e4f3ff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    color: #ff3e88;
+    transform: scale(1.1);
+  }
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 1.5rem;
+  position: relative;
+`;
+
+const Label = styled.label`
+  color: #00f6ff;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: 'Share Tech Mono', monospace;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 246, 255, 0.3);
+  padding: 0.8rem;
+  color: #fff;
+  font-family: 'Share Tech Mono', monospace;
+  outline: none;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: #00f6ff;
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+  }
+
+  &::placeholder {
+    color: rgba(228, 243, 255, 0.5);
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+`;
+
+const Button = styled(motion.button)`
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 2px solid #00f6ff;
+  color: #00f6ff;
+  font-family: 'Share Tech Mono', monospace;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(0, 246, 255, 0.1);
+    box-shadow: 0 0 20px rgba(0, 246, 255, 0.3);
+  }
+  
+  &.cancel {
+    border-color: #ff3e88;
+    color: #ff3e88;
+    
+    &:hover {
+      background: rgba(255, 62, 136, 0.1);
+      box-shadow: 0 0 20px rgba(255, 62, 136, 0.3);
+    }
+  }
+`;
+
 const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentView, onViewChange, userName, onLogout }) => {
-  const { logout } = useUser();
+  const { logout, updateCurrency } = useUser();
   const [currentUser] = useState({
     name: userName,
     status: 'Connected'
@@ -589,11 +729,34 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
+  const [newCurrency, setNewCurrency] = useState(currency.toLocaleString());
 
   const handleLogout = () => {
     logout();
     onLogout();
     setIsUserDropdownOpen(false);
+  };
+
+  const formatNumberWithCommas = (value: string) => {
+    // Remove any existing commas and non-digit characters
+    const numberOnly = value.replace(/[^\d]/g, '');
+    // Convert to number and back to string with commas
+    return numberOnly === '' ? '' : parseInt(numberOnly, 10).toLocaleString();
+  };
+
+  const handleCurrencyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatNumberWithCommas(e.target.value);
+    setNewCurrency(formattedValue);
+  };
+
+  const handleCurrencySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const amount = parseInt(newCurrency.replace(/,/g, ''), 10);
+    if (!isNaN(amount) && amount >= 0) {
+      updateCurrency(amount);
+      setIsCurrencyModalOpen(false);
+    }
   };
 
   return (
@@ -645,7 +808,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
             </NavItem>
           </NavMenu>
           
-          <CurrencyDisplay>
+          <CurrencyDisplay onClick={() => setIsCurrencyModalOpen(true)} style={{ cursor: 'pointer' }}>
             {currency.toLocaleString()}
           </CurrencyDisplay>
           
@@ -735,7 +898,13 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
               </MobileNavList>
 
               <MobileUserSection>
-                <CurrencyDisplay style={{ marginBottom: '1rem' }}>
+                <CurrencyDisplay 
+                  onClick={() => {
+                    setIsCurrencyModalOpen(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
                   {currency.toLocaleString()}
                 </CurrencyDisplay>
                 <UserPanel>
@@ -753,6 +922,63 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                 </MobileLogoutButton>
               </MobileUserSection>
             </MobileMenu>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isCurrencyModalOpen && (
+            <ModalOverlay
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCurrencyModalOpen(false)}
+            >
+              <ModalContent
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                style={{ maxWidth: '400px' }}
+              >
+                <ModalHeader>
+                  <ModalTitle>Update Currency</ModalTitle>
+                  <CloseButton onClick={() => setIsCurrencyModalOpen(false)}>×</CloseButton>
+                </ModalHeader>
+
+                <form onSubmit={handleCurrencySubmit}>
+                  <FormGroup>
+                    <Label htmlFor="currency">Amount (¥)</Label>
+                    <Input
+                      type="text"
+                      id="currency"
+                      value={newCurrency}
+                      onChange={handleCurrencyChange}
+                      placeholder="Enter amount"
+                      required
+                    />
+                  </FormGroup>
+
+                  <ButtonGroup>
+                    <Button
+                      className="cancel"
+                      type="button"
+                      onClick={() => setIsCurrencyModalOpen(false)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      CANCEL
+                    </Button>
+                    <Button
+                      type="submit"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      UPDATE
+                    </Button>
+                  </ButtonGroup>
+                </form>
+              </ModalContent>
+            </ModalOverlay>
           )}
         </AnimatePresence>
       </HeaderContent>

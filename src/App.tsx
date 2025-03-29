@@ -83,9 +83,17 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentView, setCurrentView] = useState<ViewType>('daily');
-  const [currency, setCurrency] = useState<number>(0);
   const { user } = useUser();
+  const [currency, setCurrency] = useState<number>(user?.currency || 0);
   const [bootComplete, setBootComplete] = useState(false);
+
+  // Update currency whenever user's currency changes
+  useEffect(() => {
+    if (user) {
+      setCurrency(user.currency);
+    }
+  }, [user?.currency]);
+
   const [tasks, setTasks] = useState<Task[]>([
     {
       id: '1',
