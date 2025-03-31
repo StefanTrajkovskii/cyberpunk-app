@@ -40,19 +40,31 @@ const Header = styled.div`
 const TitleSection = styled.div`
   position: relative;
   margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
   &::before {
     content: 'NIGHT CITY';
     position: absolute;
-    top: -2rem;
+    top: -2.5rem;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     letter-spacing: 8px;
     color: #00f6ff;
     font-family: 'Share Tech Mono', monospace;
     opacity: 0.8;
     text-shadow: 0 0 10px rgba(0, 246, 255, 0.7);
+    white-space: nowrap;
+    text-align: center;
+    width: 100%;
+    
+    @media (max-width: 768px) {
+      font-size: 1rem;
+      letter-spacing: 3px;
+      top: -1.8rem;
+    }
   }
 
   &::after {
