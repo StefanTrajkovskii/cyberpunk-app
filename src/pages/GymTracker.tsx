@@ -8,7 +8,7 @@ interface Exercise {
   sets: number;
   muscleGroup: string;
   image?: string;
-  completed?: boolean;
+  completed: boolean;
 }
 
 // Animations
@@ -187,19 +187,19 @@ const WorkoutSchedule = styled.div`
   position: relative;
 `;
 
-const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFailed?: boolean }>`
+const DaySchedule = styled.div<{ $isRest?: boolean; $isCompleted?: boolean; $isFailed?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem;
   background: ${props => {
-    if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
-    if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
-    return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(0, 0, 0, 0.3)';
+    if (props.$isFailed) return 'rgba(255, 0, 0, 0.1)';
+    if (props.$isCompleted) return 'rgba(0, 255, 0, 0.05)';
+    return props.$isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(0, 0, 0, 0.3)';
   }};
   border: 1px solid ${props => {
-    if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
-    if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
+    if (props.$isFailed) return 'rgba(255, 0, 0, 0.5)';
+    if (props.$isCompleted) return 'rgba(0, 255, 0, 0.5)';
     return 'rgba(255, 62, 62, 0.3)';
   }};
   margin-bottom: 1rem;
@@ -208,7 +208,7 @@ const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFail
   overflow: hidden;
   cursor: pointer;
 
-  ${props => props.isCompleted && !props.isRest && css`
+  ${props => props.$isCompleted && !props.$isRest && css`
     animation: ${glitchComplete} 0.3s linear;
     
     &::after {
@@ -224,7 +224,7 @@ const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFail
     }
   `}
 
-  ${props => props.isFailed && !props.isRest && css`
+  ${props => props.$isFailed && !props.$isRest && css`
     animation: ${glitchFail} 0.5s linear;
     
     &::after {
@@ -242,13 +242,13 @@ const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFail
 
   &:hover {
     background: ${props => {
-      if (props.isFailed) return 'rgba(255, 0, 0, 0.15)';
-      if (props.isCompleted) return 'rgba(0, 255, 0, 0.1)';
-      return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.2)';
+      if (props.$isFailed) return 'rgba(255, 0, 0, 0.15)';
+      if (props.$isCompleted) return 'rgba(0, 255, 0, 0.1)';
+      return props.$isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(255, 62, 62, 0.2)';
     }};
     border-color: ${props => {
-      if (props.isFailed) return 'rgba(255, 0, 0, 0.6)';
-      if (props.isCompleted) return 'rgba(0, 255, 0, 0.6)';
+      if (props.$isFailed) return 'rgba(255, 0, 0, 0.6)';
+      if (props.$isCompleted) return 'rgba(0, 255, 0, 0.6)';
       return 'rgba(255, 62, 62, 0.5)';
     }};
   }
@@ -259,13 +259,13 @@ const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFail
     gap: 0.25rem;
     padding: 1rem;
     background: ${props => {
-      if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
-      if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
-      return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
+      if (props.$isFailed) return 'rgba(255, 0, 0, 0.1)';
+      if (props.$isCompleted) return 'rgba(0, 255, 0, 0.05)';
+      return props.$isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
     }};
     border: 1px solid ${props => {
-      if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
-      if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
+      if (props.$isFailed) return 'rgba(255, 0, 0, 0.5)';
+      if (props.$isCompleted) return 'rgba(0, 255, 0, 0.5)';
       return 'rgba(255, 62, 62, 0.3)';
     }};
     margin-bottom: 0.75rem;
@@ -274,14 +274,14 @@ const DaySchedule = styled.div<{ isCompleted?: boolean; isRest?: boolean; isFail
       transform: none;
       box-shadow: none;
       border-color: ${props => {
-        if (props.isFailed) return 'rgba(255, 0, 0, 0.5)';
-        if (props.isCompleted) return 'rgba(0, 255, 0, 0.5)';
+        if (props.$isFailed) return 'rgba(255, 0, 0, 0.5)';
+        if (props.$isCompleted) return 'rgba(0, 255, 0, 0.5)';
         return 'rgba(255, 62, 62, 0.3)';
       }};
       background: ${props => {
-        if (props.isFailed) return 'rgba(255, 0, 0, 0.1)';
-        if (props.isCompleted) return 'rgba(0, 255, 0, 0.05)';
-        return props.isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
+        if (props.$isFailed) return 'rgba(255, 0, 0, 0.1)';
+        if (props.$isCompleted) return 'rgba(0, 255, 0, 0.05)';
+        return props.$isRest ? 'rgba(255, 62, 62, 0.05)' : 'rgba(20, 0, 0, 0.95)';
       }};
     }
   }
@@ -373,9 +373,9 @@ const ExerciseList = styled.div`
   margin-top: 1.5rem;
 `;
 
-const ExerciseRow = styled.div<{ completed: boolean }>`
-  background: ${props => props.completed ? 'rgba(255, 62, 62, 0.1)' : 'rgba(0, 0, 0, 0.3)'};
-  border: 1px solid ${props => props.completed ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.2)'};
+const ExerciseRow = styled.div<{ $completed?: boolean }>`
+  background: ${props => props.$completed ? 'rgba(255, 62, 62, 0.1)' : 'rgba(0, 0, 0, 0.3)'};
+  border: 1px solid ${props => props.$completed ? 'rgba(255, 62, 62, 0.5)' : 'rgba(255, 62, 62, 0.2)'};
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -394,7 +394,7 @@ const ExerciseRow = styled.div<{ completed: boolean }>`
       rgba(255, 62, 62, 0.1) 50%,
       transparent 100%
     );
-    opacity: ${props => props.completed ? '1' : '0'};
+    opacity: ${props => props.$completed ? '1' : '0'};
     transition: opacity 0.3s ease;
   }
 
@@ -479,12 +479,12 @@ const ExerciseHeader = styled.div`
   }
 `;
 
-const ExerciseName = styled.div<{ completed: boolean }>`
-  color: ${props => props.completed ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
+const ExerciseName = styled.div<{ $completed?: boolean }>`
+  color: ${props => props.$completed ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
   font-family: 'Share Tech Mono', monospace;
   font-size: 1.2rem;
-  text-decoration: ${props => props.completed ? 'line-through' : 'none'};
-  opacity: ${props => props.completed ? 0.7 : 1};
+  text-decoration: ${props => props.$completed ? 'line-through' : 'none'};
+  opacity: ${props => props.$completed ? 0.7 : 1};
   transition: all 0.3s ease;
 
   @media (max-width: 768px) {
@@ -550,11 +550,11 @@ const CompleteButtonContainer = styled.div`
   }
 `;
 
-const CompleteButton = styled.button<{ completed: boolean }>`
+const CompleteButton = styled.button<{ $isCompleted?: boolean }>`
   width: 100%;
-  background: ${props => props.completed ? 'rgba(255, 62, 62, 0.2)' : 'transparent'};
-  border: 1px solid ${props => props.completed ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)'};
-  color: ${props => props.completed ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
+  background: ${props => props.$isCompleted ? 'rgba(255, 62, 62, 0.2)' : 'transparent'};
+  border: 1px solid ${props => props.$isCompleted ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)'};
+  color: ${props => props.$isCompleted ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e'};
   padding: 0.8rem;
   font-family: 'Share Tech Mono', monospace;
   font-size: 1rem;
@@ -567,12 +567,6 @@ const CompleteButton = styled.button<{ completed: boolean }>`
   &:hover {
     background: rgba(255, 62, 62, 0.1);
     border-color: rgba(255, 62, 62, 0.5);
-  }
-
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-    padding: 0.6rem;
-    letter-spacing: 0.5px;
   }
 `;
 
@@ -672,46 +666,168 @@ const workoutSchedule: WorkoutDay[] = [
         name: 'Reverse Fly (Cable)', 
         sets: 2, 
         muscleGroup: 'shoulders',
-        image: '/assets/exercises/cable-reverse-fly.jpg'
+        image: '/assets/exercises/cable-reverse-fly.jpg',
+        completed: false
       },
       { 
         name: 'Incline Bench Press (Smith)', 
         sets: 2, 
         muscleGroup: 'chest',
-        image: '/assets/exercises/incline-bench-press.png'
+        image: '/assets/exercises/incline-bench-press.png',
+        completed: false
       },
-      { name: 'Incline Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/incline-chest-press-machine.png' },
-      { name: 'Chest Fly', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-fly.png' },
-      { name: 'Lateral Raise (Dumbbell)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/dumbbell-lateral-raise.png' },
-      { name: 'Biceps Curl (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/cable-bicep-curl.png' },
-      { name: 'Hammer Curl (Dumbbell)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/Hammer-Curl-dumbbell.png' },
-      { name: 'Forearm', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/forearm-curl.png' }
+      { 
+        name: 'Incline Chest Press (Machine)', 
+        sets: 2, 
+        muscleGroup: 'chest', 
+        image: '/assets/exercises/incline-chest-press-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Chest Fly', 
+        sets: 2, 
+        muscleGroup: 'chest', 
+        image: '/assets/exercises/chest-fly.png',
+        completed: false
+      },
+      { 
+        name: 'Lateral Raise (Dumbbell)', 
+        sets: 3, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/dumbbell-lateral-raise.png',
+        completed: false
+      },
+      { 
+        name: 'Biceps Curl (Cable)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/cable-bicep-curl.png',
+        completed: false
+      },
+      { 
+        name: 'Hammer Curl (Dumbbell)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/Hammer-Curl-dumbbell.png',
+        completed: false
+      },
+      { 
+        name: 'Forearm', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/forearm-curl.png',
+        completed: false
+      }
     ]
   },
   {
     day: 'DAY 2',
     focus: 'LEGS 1',
     exercises: [
-      { name: 'Calf Press on Seated Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png' },
-      { name: 'Squat (Smith Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/smith-machine-squat.png' },
-      { name: 'Seated Leg Curl (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/seated-leg-curl-machine.png' },
-      { name: 'Single Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/single-leg-press.png' },
-      { name: 'Leg Extension (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/leg-extension-machine.png' },
-      { name: 'Hanging Raises', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Hanging_Leg_Raises.png' }
+      { 
+        name: 'Calf Press on Seated Leg Press', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png',
+        completed: false
+      },
+      { 
+        name: 'Squat (Smith Machine)', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/smith-machine-squat.png',
+        completed: false
+      },
+      { 
+        name: 'Seated Leg Curl (Machine)', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/seated-leg-curl-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Single Leg Press', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/single-leg-press.png',
+        completed: false
+      },
+      { 
+        name: 'Leg Extension (Machine)', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/leg-extension-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Hanging Raises', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/Hanging_Leg_Raises.png',
+        completed: false
+      }
     ]
   },
   {
     day: 'DAY 3',
     focus: 'BACK/TRICEPS/SHOULDERS',
     exercises: [
-      { name: 'Lateral Raise (Machine)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/machine-lateral-raise.png' },
-      { name: 'Iso-Lateral Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/iso-lateral-row-machine.png' },
-      { name: 'Lat Pulldown (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/lat-pulldown-machine.png' },
-      { name: 'Seated Row (Cable)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/seated-row-cable.png' },
-      { name: 'Reverse Fly (Machine)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/machine-reverse-fly.png' },
-      { name: 'Triceps Pushdown (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/straight-bar-tricep-pushdown.png' },
-      { name: 'Triceps Extension (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/triceps-extension-cable.png' },
-      { name: 'Forearm', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/forearm-curl.png' }
+      { 
+        name: 'Lateral Raise (Machine)', 
+        sets: 2, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/machine-lateral-raise.png',
+        completed: false
+      },
+      { 
+        name: 'Iso-Lateral Row (Machine)', 
+        sets: 2, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/iso-lateral-row-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Lat Pulldown (Machine)', 
+        sets: 2, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/lat-pulldown-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Seated Row (Cable)', 
+        sets: 2, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/seated-row-cable.png',
+        completed: false
+      },
+      { 
+        name: 'Reverse Fly (Machine)', 
+        sets: 3, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/machine-reverse-fly.png',
+        completed: false
+      },
+      { 
+        name: 'Triceps Pushdown (Cable)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/straight-bar-tricep-pushdown.png',
+        completed: false
+      },
+      { 
+        name: 'Triceps Extension (Cable)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/triceps-extension-cable.png',
+        completed: false
+      },
+      { 
+        name: 'Forearm', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/forearm-curl.png',
+        completed: false
+      }
     ]
   },
   {
@@ -724,40 +840,172 @@ const workoutSchedule: WorkoutDay[] = [
     day: 'DAY 5',
     focus: 'SHOULDER/ARMS',
     exercises: [
-      { name: 'Overhead Press (Dumbbell)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/overhead-press-dumbbell.png' },
-      { name: 'Lateral Raise (Cable)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/cable-lateral-raise.png' },
-      { name: 'Lateral Raise (Machine)', sets: 2, muscleGroup: 'shoulders', image: '/assets/exercises/machine-lateral-raise.png' },
-      { name: 'Reverse Fly (Machine)', sets: 3, muscleGroup: 'shoulders', image: '/assets/exercises/machine-reverse-fly.png' },
-      { name: 'Biceps Curl (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/cable-bicep-curl.png' },
-      { name: 'Incline Curl (Dumbbell)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/incline-curl-dumbbell.png' },
-      { name: 'Triceps Pushdown (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/straight-bar-tricep-pushdown.png' },
-      { name: 'Triceps Extension (Cable)', sets: 2, muscleGroup: 'arms', image: '/assets/exercises/triceps-extension-cable.png' }
+      { 
+        name: 'Overhead Press (Dumbbell)', 
+        sets: 2, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/overhead-press-dumbbell.png',
+        completed: false
+      },
+      { 
+        name: 'Lateral Raise (Cable)', 
+        sets: 2, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/cable-lateral-raise.png',
+        completed: false
+      },
+      { 
+        name: 'Lateral Raise (Machine)', 
+        sets: 2, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/machine-lateral-raise.png',
+        completed: false
+      },
+      { 
+        name: 'Reverse Fly (Machine)', 
+        sets: 3, 
+        muscleGroup: 'shoulders', 
+        image: '/assets/exercises/machine-reverse-fly.png',
+        completed: false
+      },
+      { 
+        name: 'Biceps Curl (Cable)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/cable-bicep-curl.png',
+        completed: false
+      },
+      { 
+        name: 'Incline Curl (Dumbbell)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/incline-curl-dumbbell.png',
+        completed: false
+      },
+      { 
+        name: 'Triceps Pushdown (Cable)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/straight-bar-tricep-pushdown.png',
+        completed: false
+      },
+      { 
+        name: 'Triceps Extension (Cable)', 
+        sets: 2, 
+        muscleGroup: 'arms', 
+        image: '/assets/exercises/triceps-extension-cable.png',
+        completed: false
+      }
     ]
   },
   {
     day: 'DAY 6',
     focus: 'LEGS 2',
     exercises: [
-      { name: 'Calf Press on Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png' },
-      { name: 'Hack Squat', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/smith-machine-squat.png' },
-      { name: 'Seated Leg Curl (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/seated-leg-curl-machine.png' },
-      { name: 'Single Leg Press', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/single-leg-press.png' },
-      { name: 'Leg Extensions (Machine)', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/leg-extension-machine.png' },
-      { name: 'Hanging Raises', sets: 3, muscleGroup: 'legs', image: '/assets/exercises/Hanging_Leg_Raises.png' }
+      { 
+        name: 'Calf Press on Leg Press', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/Calf-Press-on-Seated-Leg-Press.png',
+        completed: false
+      },
+      { 
+        name: 'Hack Squat', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/smith-machine-squat.png',
+        completed: false
+      },
+      { 
+        name: 'Seated Leg Curl (Machine)', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/seated-leg-curl-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Single Leg Press', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/single-leg-press.png',
+        completed: false
+      },
+      { 
+        name: 'Leg Extensions (Machine)', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/leg-extension-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Hanging Raises', 
+        sets: 3, 
+        muscleGroup: 'legs', 
+        image: '/assets/exercises/Hanging_Leg_Raises.png',
+        completed: false
+      }
     ]
   },
   {
     day: 'DAY 7',
     focus: 'CHEST/BACK',
     exercises: [
-      { name: 'Iso-Lateral Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/iso-lateral-row-machine.png' },
-      { name: 'Incline Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/incline-chest-press-machine.png' },
-      { name: 'Lat Pulldown (Cable)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/lat-pulldown-machine.png' },
-      { name: 'Chest Press (Machine)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-press-machine.png' },
-      { name: 'Seated Row (Machine)', sets: 2, muscleGroup: 'back', image: '/assets/exercises/seated-row-cable.png' },
-      { name: 'Chest Fly (Cable)', sets: 2, muscleGroup: 'chest', image: '/assets/exercises/chest-fly.png' },
-      { name: 'Pull Up', sets: 1, muscleGroup: 'back', image: '/assets/exercises/pull-up.png' },
-      { name: 'Push Up', sets: 1, muscleGroup: 'chest', image: '/assets/exercises/push-up.png' }
+      { 
+        name: 'Iso-Lateral Row (Machine)', 
+        sets: 2, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/iso-lateral-row-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Incline Chest Press (Machine)', 
+        sets: 2, 
+        muscleGroup: 'chest', 
+        image: '/assets/exercises/incline-chest-press-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Lat Pulldown (Cable)', 
+        sets: 2, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/lat-pulldown-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Chest Press (Machine)', 
+        sets: 2, 
+        muscleGroup: 'chest', 
+        image: '/assets/exercises/chest-press-machine.png',
+        completed: false
+      },
+      { 
+        name: 'Seated Row (Machine)', 
+        sets: 2, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/seated-row-cable.png',
+        completed: false
+      },
+      { 
+        name: 'Chest Fly (Cable)', 
+        sets: 2, 
+        muscleGroup: 'chest', 
+        image: '/assets/exercises/chest-fly.png',
+        completed: false
+      },
+      { 
+        name: 'Pull Up', 
+        sets: 1, 
+        muscleGroup: 'back', 
+        image: '/assets/exercises/pull-up.png',
+        completed: false
+      },
+      { 
+        name: 'Push Up', 
+        sets: 1, 
+        muscleGroup: 'chest', 
+        image: '/assets/exercises/push-up.png',
+        completed: false
+      }
     ]
   },
   {
@@ -780,18 +1028,18 @@ const ButtonGroup = styled.div`
   align-items: center;
 `;
 
-const CompletionButton = styled.button<{ isCompleted: boolean; isFailed?: boolean }>`
+const CompletionButton = styled.button<{ $isCompleted?: boolean; $isFailed?: boolean }>`
   background: ${props => {
-    if (props.isFailed) return 'rgba(255, 0, 0, 0.2)';
-    return props.isCompleted ? 'rgba(255, 62, 62, 0.2)' : 'transparent';
+    if (props.$isFailed) return 'rgba(255, 0, 0, 0.2)';
+    return props.$isCompleted ? 'rgba(255, 62, 62, 0.2)' : 'transparent';
   }};
   border: 1px solid ${props => {
-    if (props.isFailed) return 'rgba(255, 0, 0, 0.6)';
-    return props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)';
+    if (props.$isFailed) return 'rgba(255, 0, 0, 0.6)';
+    return props.$isCompleted ? 'rgba(255, 62, 62, 0.6)' : 'rgba(255, 62, 62, 0.3)';
   }};
   color: ${props => {
-    if (props.isFailed) return 'rgba(255, 0, 0, 0.8)';
-    return props.isCompleted ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e';
+    if (props.$isFailed) return 'rgba(255, 0, 0, 0.8)';
+    return props.$isCompleted ? 'rgba(255, 62, 62, 0.6)' : '#ff3e3e';
   }};
   padding: 0.4rem;
   width: 30px;
@@ -806,17 +1054,17 @@ const CompletionButton = styled.button<{ isCompleted: boolean; isFailed?: boolea
   overflow: hidden;
   font-weight: bold;
 
-  ${props => props.isCompleted && css`
+  ${props => props.$isCompleted && css`
     animation: ${glitchComplete} 0.3s linear;
   `}
 
-  ${props => props.isFailed && css`
+  ${props => props.$isFailed && css`
     animation: ${glitchFail} 0.5s linear;
   `}
 
   &:hover {
-    background: ${props => props.isFailed ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 62, 62, 0.1)'};
-    border-color: ${props => props.isFailed ? 'rgba(255, 0, 0, 0.5)' : 'rgba(255, 62, 62, 0.5)'};
+    background: ${props => props.$isFailed ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 62, 62, 0.1)'};
+    border-color: ${props => props.$isFailed ? 'rgba(255, 0, 0, 0.5)' : 'rgba(255, 62, 62, 0.5)'};
   }
 
   @media (max-width: 768px) {
@@ -918,9 +1166,9 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
         {schedule.map((day: WorkoutDay, index: number) => (
           <DaySchedule
             key={day.day}
-            isRest={!!day.isRest}
-            isCompleted={day.isCompleted}
-            isFailed={day.isFailed}
+            $isRest={!!day.isRest}
+            $isCompleted={!!day.isCompleted}
+            $isFailed={!!day.isFailed}
             onClick={() => !day.isRest && setSelectedDay(schedule[index])}
           >
             <DayHeader>
@@ -928,14 +1176,14 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
               {!day.isRest && (
                 <ButtonGroup>
                   <CompletionButton
-                    isCompleted={!!day.isCompleted}
+                    $isCompleted={!!day.isCompleted}
                     onClick={(e) => handleDayCompletion(index, e, 'complete')}
                   >
                     ✓
                   </CompletionButton>
                   <CompletionButton
-                    isCompleted={false}
-                    isFailed={!!day.isFailed}
+                    $isCompleted={false}
+                    $isFailed={!!day.isFailed}
                     onClick={(e) => handleDayCompletion(index, e, 'fail')}
                   >
                     ✕
@@ -973,11 +1221,11 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
               </ModalHeader>
               <ExerciseList>
                 {selectedDay.exercises.map((exercise, index) => (
-                  <ExerciseRow key={index} completed={exercise.completed || false}>
+                  <ExerciseRow key={index} $completed={!!exercise.completed}>
                     <ExerciseContent>
                       <ExerciseDetails>
                         <ExerciseHeader>
-                          <ExerciseName completed={exercise.completed || false}>
+                          <ExerciseName $completed={!!exercise.completed}>
                             {exercise.name}
                           </ExerciseName>
                         </ExerciseHeader>
@@ -988,7 +1236,7 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                         {!isMobile && (
                           <CompleteButtonContainer>
                             <CompleteButton
-                              completed={exercise.completed || false}
+                              $isCompleted={!!exercise.completed}
                               onClick={() => {
                                 const dayIndex = schedule.findIndex(day => day.day === selectedDay.day);
                                 handleExerciseCompletion(dayIndex, index);
@@ -1011,7 +1259,7 @@ const GymTracker: React.FC<GymTrackerProps> = ({ onBack }) => {
                       {isMobile && (
                         <CompleteButtonContainer>
                           <CompleteButton
-                            completed={exercise.completed || false}
+                            $isCompleted={!!exercise.completed}
                             onClick={() => {
                               const dayIndex = schedule.findIndex(day => day.day === selectedDay.day);
                               handleExerciseCompletion(dayIndex, index);
