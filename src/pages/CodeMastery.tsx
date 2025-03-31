@@ -225,11 +225,29 @@ interface CodeMasteryProps {
   onBack: () => void;
 }
 
-const BadgeCard = styled(motion.div)<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
-  background: ${props => props.unlocked ? 'rgba(0, 162, 255, 0.1)' : 'rgba(50, 50, 50, 0.1)'};
+interface StyledBadgeCardProps {
+  $unlocked: boolean;
+  $tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+}
+
+interface StyledBadgeIconProps {
+  $unlocked: boolean;
+  $tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+}
+
+interface StyledBadgeNameProps {
+  $unlocked: boolean;
+}
+
+interface StyledBadgeTierProps {
+  $tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM';
+}
+
+const BadgeCard = styled(motion.div)<StyledBadgeCardProps>`
+  background: ${props => props.$unlocked ? 'rgba(0, 162, 255, 0.1)' : 'rgba(50, 50, 50, 0.1)'};
   border: 2px solid ${props => {
-    if (!props.unlocked) return 'rgba(50, 50, 50, 0.3)';
-    switch (props.tier) {
+    if (!props.$unlocked) return 'rgba(50, 50, 50, 0.3)';
+    switch (props.$tier) {
       case 'BRONZE': return '#cd7f32';
       case 'SILVER': return '#c0c0c0';
       case 'GOLD': return '#ffd700';
@@ -245,7 +263,7 @@ const BadgeCard = styled(motion.div)<{ unlocked: boolean; tier: 'BRONZE' | 'SILV
   cursor: pointer;
   transition: all 0.3s ease;
 
-  ${props => props.unlocked && css<{ tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
+  ${props => props.$unlocked && css<{ $tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
     &::before {
       content: '';
       position: absolute;
@@ -257,7 +275,7 @@ const BadgeCard = styled(motion.div)<{ unlocked: boolean; tier: 'BRONZE' | 'SILV
         90deg,
         transparent,
         ${props => {
-          switch (props.tier) {
+          switch (props.$tier) {
             case 'BRONZE': return 'rgba(205, 127, 50, 0.2)';
             case 'SILVER': return 'rgba(192, 192, 192, 0.2)';
             case 'GOLD': return 'rgba(255, 215, 0, 0.2)';
@@ -274,32 +292,32 @@ const BadgeCard = styled(motion.div)<{ unlocked: boolean; tier: 'BRONZE' | 'SILV
   `}
 
   &:hover {
-    transform: ${props => props.unlocked ? 'scale(1.05)' : 'none'};
-    box-shadow: ${props => props.unlocked ? '0 0 20px rgba(0, 162, 255, 0.2)' : 'none'};
+    transform: ${props => props.$unlocked ? 'scale(1.05)' : 'none'};
+    box-shadow: ${props => props.$unlocked ? '0 0 20px rgba(0, 162, 255, 0.2)' : 'none'};
   }
 
   @media (max-width: 768px) {
     padding: 0.75rem;
     
     &:hover {
-      transform: ${props => props.unlocked ? 'scale(1.02)' : 'none'};
+      transform: ${props => props.$unlocked ? 'scale(1.02)' : 'none'};
     }
   }
 `;
 
-const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
+const BadgeIcon = styled.div<StyledBadgeIconProps>`
   width: 60px;
   height: 60px;
   margin: 0 auto 1rem;
-  background: ${props => props.unlocked ? 'rgba(0, 162, 255, 0.2)' : 'rgba(50, 50, 50, 0.2)'};
+  background: ${props => props.$unlocked ? 'rgba(0, 162, 255, 0.2)' : 'rgba(50, 50, 50, 0.2)'};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   border: 2px solid ${props => {
-    if (!props.unlocked) return '#666';
-    switch (props.tier) {
+    if (!props.$unlocked) return '#666';
+    switch (props.$tier) {
       case 'BRONZE': return '#cd7f32';
       case 'SILVER': return '#c0c0c0';
       case 'GOLD': return '#ffd700';
@@ -312,8 +330,8 @@ const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'G
     width: 30px;
     height: 30px;
     color: ${props => {
-      if (!props.unlocked) return '#666';
-      switch (props.tier) {
+      if (!props.$unlocked) return '#666';
+      switch (props.$tier) {
         case 'BRONZE': return '#cd7f32';
         case 'SILVER': return '#c0c0c0';
         case 'GOLD': return '#ffd700';
@@ -335,8 +353,8 @@ const BadgeIcon = styled.div<{ unlocked: boolean; tier: 'BRONZE' | 'SILVER' | 'G
   }
 `;
 
-const BadgeName = styled.h4<{ unlocked: boolean }>`
-  color: ${props => props.unlocked ? '#00a2ff' : '#666'};
+const BadgeName = styled.h4<StyledBadgeNameProps>`
+  color: ${props => props.$unlocked ? '#00a2ff' : '#666'};
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
   text-transform: uppercase;
@@ -348,9 +366,9 @@ const BadgeName = styled.h4<{ unlocked: boolean }>`
   }
 `;
 
-const BadgeTier = styled.div<{ tier: 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' }>`
+const BadgeTier = styled.div<StyledBadgeTierProps>`
   color: ${props => {
-    switch (props.tier) {
+    switch (props.$tier) {
       case 'BRONZE': return '#cd7f32';
       case 'SILVER': return '#c0c0c0';
       case 'GOLD': return '#ffd700';
@@ -516,9 +534,11 @@ const ProjectDate = styled.div`
 `;
 
 const BadgeDetails = styled.div`
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 162, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 `;
 
 const BadgeDescription = styled.p`
@@ -598,7 +618,7 @@ const TechnologyCard = styled(motion.div)<{ selected: boolean }>`
   }
 `;
 
-const TechnologyIcon = styled.div<{ techId: string }>`
+const TechnologyIcon = styled.div<{ $techId: string }>`
   font-size: 2rem;
   margin-bottom: 0.5rem;
   display: flex;
@@ -608,7 +628,7 @@ const TechnologyIcon = styled.div<{ techId: string }>`
     width: 40px;
     height: 40px;
     color: ${props => {
-      switch (props.techId) {
+      switch (props.$techId) {
         case 'html': return '#E34F26'; // HTML5 orange
         case 'css': return '#264DE4'; // CSS3 blue
         case 'tailwind': return '#38B2AC'; // Tailwind teal
@@ -980,23 +1000,23 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
               {track.badges.map(badge => (
                 <BadgeCard
                   key={badge.id}
-                  unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE}
-                  tier={badge.currentTier}
+                  $unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE}
+                  $tier={badge.currentTier}
                   onClick={() => setSelectedBadge(badge)}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                 >
                   <BadgeIcon 
-                    unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE} 
-                    tier={badge.currentTier}
+                    $unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE} 
+                    $tier={badge.currentTier}
                   >
                     {React.createElement(badge.icon as React.ComponentType<IconBaseProps>, { size: 30 })}
                   </BadgeIcon>
-                  <BadgeName unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE}>
+                  <BadgeName $unlocked={badge.projectsCompleted >= badge.tierRequirements.BRONZE}>
                     {badge.name}
                   </BadgeName>
-                  <BadgeTier tier={badge.currentTier}>
+                  <BadgeTier $tier={badge.currentTier}>
                     {badge.currentTier}
                   </BadgeTier>
                   <Progress>
@@ -1045,7 +1065,7 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
                             {newProject.technologies.indexOf(badge.id) + 1}
                           </SelectedCount>
                         )}
-                        <TechnologyIcon techId={badge.id}>
+                        <TechnologyIcon $techId={badge.id}>
                           {React.createElement(badge.icon as React.ComponentType<IconBaseProps>, { size: 40 })}
                         </TechnologyIcon>
                         <TechnologyName>{badge.name}</TechnologyName>
@@ -1091,17 +1111,18 @@ const CodeMastery: React.FC<CodeMasteryProps> = ({ onBack }) => {
         >
           <ModalContent>
             <CloseButton onClick={() => setSelectedBadge(null)}>×</CloseButton>
+            <h3 style={{ color: '#00a2ff', marginBottom: '1rem' }}>Badge Details</h3>
             <BadgeDetails>
               <BadgeIcon 
-                unlocked={selectedBadge.projectsCompleted >= selectedBadge.tierRequirements.BRONZE} 
-                tier={selectedBadge.currentTier}
+                $unlocked={selectedBadge.projectsCompleted >= selectedBadge.tierRequirements.BRONZE} 
+                $tier={selectedBadge.currentTier}
               >
                 {React.createElement(selectedBadge.icon as React.ComponentType<IconBaseProps>, { size: 30 })}
               </BadgeIcon>
-              <BadgeName unlocked={selectedBadge.projectsCompleted >= selectedBadge.tierRequirements.BRONZE}>
+              <BadgeName $unlocked={selectedBadge.projectsCompleted >= selectedBadge.tierRequirements.BRONZE}>
                 {selectedBadge.name}
               </BadgeName>
-              <BadgeTier tier={selectedBadge.currentTier}>
+              <BadgeTier $tier={selectedBadge.currentTier}>
                 {selectedBadge.currentTier}
               </BadgeTier>
               <BadgeDescription>
