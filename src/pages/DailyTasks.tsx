@@ -179,10 +179,10 @@ const TaskTypeFilter = styled.div`
   }
 `;
 
-const FilterButton = styled.button<{ active: boolean; taskType: string }>`
+const FilterButton = styled.button<{ $active: boolean; $taskType: string }>`
   background: transparent;
-  border: 1px solid ${({ taskType }) => {
-    switch (taskType) {
+  border: 1px solid ${({ $taskType }) => {
+    switch ($taskType) {
       case 'FOOD': return '#00ff9d';
       case 'COMBAT': return '#ff3e3e';
       case 'STEALTH': return '#9d00ff';
@@ -190,8 +190,8 @@ const FilterButton = styled.button<{ active: boolean; taskType: string }>`
       default: return '#ffffff';
     }
   }};
-  color: ${({ taskType }) => {
-    switch (taskType) {
+  color: ${({ $taskType }) => {
+    switch ($taskType) {
       case 'FOOD': return '#00ff9d';
       case 'COMBAT': return '#ff3e3e';
       case 'STEALTH': return '#9d00ff';
@@ -217,7 +217,7 @@ const FilterButton = styled.button<{ active: boolean; taskType: string }>`
     min-width: 60px;
   }
 
-  ${({ active }) => active && css`
+  ${({ $active }) => $active && css`
     animation: ${pulse} 2s infinite;
     box-shadow: 0 0 20px currentColor;
     text-shadow: 0 0 10px currentColor;
@@ -246,7 +246,7 @@ const FilterButton = styled.button<{ active: boolean; taskType: string }>`
     }
   }
 
-  ${({ active }) => active && css`
+  ${({ $active }) => $active && css`
     &::after {
       content: '';
       position: absolute;
@@ -291,16 +291,16 @@ const getTypeColor = (type: string) => {
   }
 };
 
-const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
+const TaskCard = styled(motion.div)<{ $type: string; $riskLevel: string }>`
   background: rgba(0, 0, 0, 0.85);
-  border: 1px solid ${({ type }) => getTypeColor(type)};
+  border: 1px solid ${({ $type }) => getTypeColor($type)};
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(5px);
-  cursor: ${({ type }) => (type === 'FOOD' || type === 'COMBAT') ? 'pointer' : 'default'};
-  box-shadow: 0 0 20px rgba(${({ type }) => {
-    switch (type) {
+  cursor: ${({ $type }) => ($type === 'FOOD' || $type === 'COMBAT') ? 'pointer' : 'default'};
+  box-shadow: 0 0 20px rgba(${({ $type }) => {
+    switch ($type) {
       case 'FOOD': return '0, 255, 157';
       case 'COMBAT': return '255, 62, 62';
       case 'STEALTH': return '157, 0, 255';
@@ -324,8 +324,8 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
       linear-gradient(
         90deg,
         transparent 50%,
-        rgba(${({ type }) => {
-          switch (type) {
+        rgba(${({ $type }) => {
+          switch ($type) {
             case 'FOOD': return '0, 255, 157';
             case 'COMBAT': return '255, 62, 62';
             case 'STEALTH': return '157, 0, 255';
@@ -343,8 +343,8 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
     background: linear-gradient(
       0deg,
       transparent 0%,
-      rgba(${({ type }) => {
-        switch (type) {
+      rgba(${({ $type }) => {
+        switch ($type) {
           case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
@@ -357,15 +357,15 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
     animation: ${matrixRain} 2s linear infinite;
   }
 
-  ${({ riskLevel }) => riskLevel === 'CRITICAL' && css`
+  ${({ $riskLevel }) => $riskLevel === 'CRITICAL' && css`
     animation: ${dataCorruption} 5s infinite;
   `}
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 
-      0 5px 30px rgba(${({ type }) => {
-        switch (type) {
+      0 5px 30px rgba(${({ $type }) => {
+        switch ($type) {
           case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
@@ -373,8 +373,8 @@ const TaskCard = styled(motion.div)<{ type: string; riskLevel: string }>`
           default: return '255, 255, 255';
         }
       }}, 0.3),
-      inset 0 0 20px rgba(${({ type }) => {
-        switch (type) {
+      inset 0 0 20px rgba(${({ $type }) => {
+        switch ($type) {
           case 'FOOD': return '0, 255, 157';
           case 'COMBAT': return '255, 62, 62';
           case 'STEALTH': return '157, 0, 255';
@@ -392,8 +392,8 @@ const TaskHeader = styled.div`
   margin-bottom: 1rem;
 `;
 
-const TaskTitle = styled.h3<{ type: string }>`
-  color: ${({ type }) => getTypeColor(type)};
+const TaskTitle = styled.h3<{ $type: string }>`
+  color: ${({ $type }) => getTypeColor($type)};
   font-size: 1.3rem;
   margin: 0;
   font-family: 'Share Tech Mono', monospace;
@@ -431,8 +431,8 @@ const TaskTitle = styled.h3<{ type: string }>`
   }
 `;
 
-const RiskBadge = styled.div<{ risk: string }>`
-  color: ${({ risk }) => getRiskColor(risk)};
+const RiskBadge = styled.div<{ $risk: string }>`
+  color: ${({ $risk }) => getRiskColor($risk)};
   border: 1px solid currentColor;
   padding: 0.3rem 0.6rem;
   font-size: 0.8rem;
@@ -441,7 +441,7 @@ const RiskBadge = styled.div<{ risk: string }>`
   overflow: hidden;
   text-shadow: 0 0 5px currentColor;
 
-  ${({ risk }) => risk === 'CRITICAL' && css`
+  ${({ $risk }) => $risk === 'CRITICAL' && css`
     animation: ${glitch} 3s infinite;
     &::before {
       content: 'DANGER';
@@ -477,10 +477,10 @@ const DifficultyMeter = styled.div`
   overflow: hidden;
 `;
 
-const DifficultyFill = styled.div<{ difficulty: number; type: string }>`
-  width: ${({ difficulty }) => (difficulty * 10)}%;
+const DifficultyFill = styled.div<{ $difficulty: number; $type: string }>`
+  width: ${({ $difficulty }) => ($difficulty * 10)}%;
   height: 100%;
-  background: ${({ type }) => getTypeColor(type)};
+  background: ${({ $type }) => getTypeColor($type)};
   position: relative;
 
   &::after {
@@ -502,9 +502,9 @@ const TaskDescription = styled.p`
   line-height: 1.6;
 `;
 
-const TaskFooter = styled.div<{ type: string }>`
+const TaskFooter = styled.div<{ $type: string }>`
   display: flex;
-  justify-content: ${props => props.type === 'FOOD' || props.type === 'COMBAT' || props.type === 'TECH' ? 'flex-start' : 'space-between'};
+  justify-content: ${props => props.$type === 'FOOD' || props.$type === 'COMBAT' || props.$type === 'TECH' ? 'flex-start' : 'space-between'};
   align-items: center;
   margin-top: 1.5rem;
   padding-top: 1rem;
@@ -513,8 +513,8 @@ const TaskFooter = styled.div<{ type: string }>`
 
 const RewardSection = styled.div``;
 
-const BaseReward = styled.div<{ type: string }>`
-  color: ${({ type }) => getTypeColor(type)};
+const BaseReward = styled.div<{ $type: string }>`
+  color: ${({ $type }) => getTypeColor($type)};
   font-size: 1.2rem;
   font-family: 'Share Tech Mono', monospace;
   
@@ -531,10 +531,10 @@ const StreakMultiplier = styled.div`
   margin-top: 0.3rem;
 `;
 
-const ExecuteButton = styled(motion.button)<{ type: string }>`
+const ExecuteButton = styled(motion.button)<{ $type: string }>`
   background: transparent;
-  border: 2px solid ${({ type }) => getTypeColor(type)};
-  color: ${({ type }) => getTypeColor(type)};
+  border: 2px solid ${({ $type }) => getTypeColor($type)};
+  color: ${({ $type }) => getTypeColor($type)};
   padding: 0.7rem 1.5rem;
   font-family: 'Share Tech Mono', monospace;
   cursor: pointer;
@@ -552,14 +552,14 @@ const ExecuteButton = styled(motion.button)<{ type: string }>`
     left: -100%;
     width: 100%;
     height: 100%;
-    background: ${({ type }) => getTypeColor(type)};
+    background: ${({ $type }) => getTypeColor($type)};
     opacity: 0.2;
     transition: all 0.3s ease;
     z-index: -1;
   }
 
   &:hover:not(:disabled) {
-    background: ${({ type }) => getTypeColor(type)};
+    background: ${({ $type }) => getTypeColor($type)};
     color: #000000;
     text-shadow: none;
     
@@ -593,7 +593,7 @@ const TaskStats = styled.div`
   border-radius: 4px;
 `;
 
-const StatItem = styled.div<{ type: string }>`
+const StatItem = styled.div<{ $type: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -607,12 +607,12 @@ const StatItem = styled.div<{ type: string }>`
   
   span:last-child {
     font-size: 1rem;
-    color: ${({ type }) => getTypeColor(type)};
+    color: ${({ $type }) => getTypeColor($type)};
     font-family: 'Share Tech Mono', monospace;
   }
 `;
 
-const ProgressBar = styled.div<{ progress: number; type: string }>`
+const ProgressBar = styled.div<{ $progress: number; $type: string }>`
   width: 100%;
   height: 4px;
   background: rgba(255, 255, 255, 0.1);
@@ -626,9 +626,9 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
     top: 0;
     left: 0;
     height: 100%;
-    width: ${props => props.progress}%;
-    background: ${props => getTypeColor(props.type)};
-    box-shadow: 0 0 10px ${props => getTypeColor(props.type)};
+    width: ${props => props.$progress}%;
+    background: ${props => getTypeColor(props.$type)};
+    box-shadow: 0 0 10px ${props => getTypeColor(props.$type)};
     transition: width 0.3s ease;
   }
 
@@ -636,7 +636,7 @@ const ProgressBar = styled.div<{ progress: number; type: string }>`
     content: '';
     position: absolute;
     top: 0;
-    left: ${props => props.progress}%;
+    left: ${props => props.$progress}%;
     height: 100%;
     width: 4px;
     background: white;
@@ -744,34 +744,16 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
   return (
     <Container>
       <TaskTypeFilter>
-        <FilterButton
-          taskType="FOOD"
-          active={selectedType === 'FOOD'}
-          onClick={() => setSelectedType(selectedType === 'FOOD' ? null : 'FOOD')}
-        >
-          Food
-        </FilterButton>
-        <FilterButton
-          taskType="COMBAT"
-          active={selectedType === 'COMBAT'}
-          onClick={() => setSelectedType(selectedType === 'COMBAT' ? null : 'COMBAT')}
-        >
-          Combat
-        </FilterButton>
-        <FilterButton
-          taskType="STEALTH"
-          active={selectedType === 'STEALTH'}
-          onClick={() => setSelectedType(selectedType === 'STEALTH' ? null : 'STEALTH')}
-        >
-          Stealth
-        </FilterButton>
-        <FilterButton
-          taskType="TECH"
-          active={selectedType === 'TECH'}
-          onClick={() => setSelectedType(selectedType === 'TECH' ? null : 'TECH')}
-        >
-          Tech
-        </FilterButton>
+        {['FOOD', 'COMBAT', 'STEALTH', 'TECH'].map(type => (
+          <FilterButton
+            key={type}
+            $taskType={type}
+            $active={selectedType === type}
+            onClick={() => setSelectedType(selectedType === type ? null : type)}
+          >
+            {type === 'COMBAT' ? 'Combat' : type.charAt(0) + type.slice(1).toLowerCase()}
+          </FilterButton>
+        ))}
       </TaskTypeFilter>
 
       <TaskGrid>
@@ -779,8 +761,8 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
           {filteredTasks.map(task => (
             <TaskCard
               key={task.id}
-              type={task.type}
-              riskLevel={task.riskLevel}
+              $type={task.type}
+              $riskLevel={task.riskLevel}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -788,47 +770,47 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
               onClick={() => handleCardClick(task)}
             >
               <TaskHeader>
-                <TaskTitle type={task.type}>
+                <TaskTitle $type={task.type}>
                   {task.title}
                 </TaskTitle>
-                <RiskBadge risk={task.riskLevel}>{task.riskLevel}</RiskBadge>
+                <RiskBadge $risk={task.riskLevel}>{task.riskLevel}</RiskBadge>
               </TaskHeader>
 
               <DifficultyMeter>
-                <DifficultyFill difficulty={task.difficulty} type={task.type} />
+                <DifficultyFill $difficulty={task.difficulty} $type={task.type} />
               </DifficultyMeter>
 
               <TaskStats>
-                <StatItem type={task.type}>
+                <StatItem $type={task.type}>
                   <span>DIFFICULTY</span>
                   <span>{task.difficulty}/10</span>
                 </StatItem>
                 {task.type === 'COMBAT' && (
-                  <StatItem type={task.type}>
+                  <StatItem $type={task.type}>
                     <span>NEXT</span>
                     <span>{nextWorkout || 'LOADING...'}</span>
                   </StatItem>
                 )}
                 {task.type !== 'COMBAT' && task.type !== 'TECH' && (
-                  <StatItem type={task.type}>
+                  <StatItem $type={task.type}>
                     <span>STREAK</span>
                     <span>{task.consecutiveCompletions}x</span>
                   </StatItem>
                 )}
                 {task.type === 'FOOD' && (
                   <>
-                    <StatItem type={task.type}>
+                    <StatItem $type={task.type}>
                       <span>CALORIES</span>
                       <span>{todaysCalories}</span>
                     </StatItem>
-                    <StatItem type={task.type}>
+                    <StatItem $type={task.type}>
                       <span>PROTEIN</span>
                       <span>{todaysProtein}g</span>
                     </StatItem>
                   </>
                 )}
                 {task.type !== 'FOOD' && task.type !== 'COMBAT' && task.type !== 'TECH' && (
-                  <StatItem type={task.type}>
+                  <StatItem $type={task.type}>
                     <span>REWARD</span>
                     <span>¥{task.baseReward}</span>
                   </StatItem>
@@ -837,12 +819,12 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
 
               <TaskDescription>{task.description}</TaskDescription>
 
-              <ProgressBar progress={task.completed ? 100 : 0} type={task.type} />
+              <ProgressBar $progress={task.completed ? 100 : 0} $type={task.type} />
 
-              <TaskFooter type={task.type}>
+              <TaskFooter $type={task.type}>
                 {task.type !== 'FOOD' && task.type !== 'COMBAT' && task.type !== 'TECH' && (
                   <RewardSection>
-                    <BaseReward type={task.type}>
+                    <BaseReward $type={task.type}>
                       {Math.floor(task.baseReward * (1 + task.consecutiveCompletions * 0.1)).toLocaleString()}
                     </BaseReward>
                     {task.consecutiveCompletions > 0 && (
@@ -854,7 +836,7 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
                 )}
 
                 <ExecuteButton
-                  type={task.type}
+                  $type={task.type}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCompleteTask(task.id);

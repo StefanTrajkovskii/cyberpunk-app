@@ -265,8 +265,8 @@ const NavItemIndicator = styled.span`
   box-shadow: 0 0 8px rgba(255, 62, 136, 0.7);
 `;
 
-const NavItem = styled(motion.a)<{ active?: boolean }>`
-  color: ${({ active }) => active ? '#00f6ff' : '#e4f3ff'};
+const NavItem = styled(motion.a)<{ $active?: boolean }>`
+  color: ${({ $active }) => $active ? '#00f6ff' : '#e4f3ff'};
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 600;
@@ -470,11 +470,11 @@ const MobileNavList = styled.div`
   gap: 0.5rem;
 `;
 
-const MobileNavItem = styled.button<{ active?: boolean }>`
+const MobileNavItem = styled.button<{ $active?: boolean }>`
   width: 100%;
-  background: ${({ active }) => active ? 'rgba(0, 246, 255, 0.1)' : 'transparent'};
-  border: 1px solid ${({ active }) => active ? '#00f6ff' : 'rgba(0, 246, 255, 0.3)'};
-  color: ${({ active }) => active ? '#00f6ff' : '#e4f3ff'};
+  background: ${({ $active }) => $active ? 'rgba(0, 246, 255, 0.1)' : 'transparent'};
+  border: 1px solid ${({ $active }) => $active ? '#00f6ff' : 'rgba(0, 246, 255, 0.3)'};
+  color: ${({ $active }) => $active ? '#00f6ff' : '#e4f3ff'};
   padding: 0.8rem;
   text-align: left;
   font-size: 0.9rem;
@@ -775,7 +775,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
         <NavContainer>
           <NavMenu>
             <NavItem 
-              active={currentView === 'daily'} 
+              $active={currentView === 'daily'} 
               onClick={() => onViewChange('daily')}
               whileHover={{ y: -2 }} 
               whileTap={{ y: 0 }}
@@ -783,7 +783,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
               <NavItemIndicator />DAILY TASKS
             </NavItem>
             <NavItem 
-              active={currentView === 'missions'} 
+              $active={currentView === 'missions'} 
               onClick={() => onViewChange('missions')}
               whileHover={{ y: -2 }} 
               whileTap={{ y: 0 }}
@@ -791,7 +791,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
               <NavItemIndicator />MISSIONS
             </NavItem>
             <NavItem 
-              active={currentView === 'market'} 
+              $active={currentView === 'market'} 
               onClick={() => onViewChange('market')}
               whileHover={{ y: -2 }} 
               whileTap={{ y: 0 }}
@@ -799,7 +799,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
               <NavItemIndicator />MARKET
             </NavItem>
             <NavItem 
-              active={currentView === 'messages'} 
+              $active={currentView === 'messages'} 
               onClick={() => onViewChange('messages')}
               whileHover={{ y: -2 }} 
               whileTap={{ y: 0 }}
@@ -856,7 +856,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
             >
               <MobileNavList>
                 <MobileNavItem 
-                  active={currentView === 'daily'}
+                  $active={currentView === 'daily'}
                   onClick={() => {
                     onViewChange('daily');
                     setIsMobileMenuOpen(false);
@@ -866,7 +866,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   DAILY TASKS
                 </MobileNavItem>
                 <MobileNavItem 
-                  active={currentView === 'missions'}
+                  $active={currentView === 'missions'}
                   onClick={() => {
                     onViewChange('missions');
                     setIsMobileMenuOpen(false);
@@ -876,7 +876,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   MISSIONS
                 </MobileNavItem>
                 <MobileNavItem 
-                  active={currentView === 'market'}
+                  $active={currentView === 'market'}
                   onClick={() => {
                     onViewChange('market');
                     setIsMobileMenuOpen(false);
@@ -886,7 +886,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   MARKET
                 </MobileNavItem>
                 <MobileNavItem 
-                  active={currentView === 'messages'}
+                  $active={currentView === 'messages'}
                   onClick={() => {
                     onViewChange('messages');
                     setIsMobileMenuOpen(false);
