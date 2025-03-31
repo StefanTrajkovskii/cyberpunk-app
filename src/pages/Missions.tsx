@@ -15,6 +15,18 @@ interface Event {
   completed: boolean;
 }
 
+interface StyledEventCardProps {
+  $category: 'social' | 'appointment' | 'task' | 'other';
+}
+
+interface StyledEventTitleProps {
+  $category: 'social' | 'appointment' | 'task' | 'other';
+}
+
+interface StyledCategoryBadgeProps {
+  $category: 'social' | 'appointment' | 'task' | 'other';
+}
+
 const Missions: React.FC = () => {
   const { user } = useUser();
   const [events, setEvents] = useState<Event[]>(() => {
@@ -171,15 +183,15 @@ const Missions: React.FC = () => {
             {events.map(event => (
               <EventCard
                 key={event.id}
-                category={event.category}
+                $category={event.category}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
                 <EventHeader>
-                  <EventTitle category={event.category}>{event.title}</EventTitle>
-                  <CategoryBadge category={event.category}>{event.category}</CategoryBadge>
+                  <EventTitle $category={event.category}>{event.title}</EventTitle>
+                  <CategoryBadge $category={event.category}>{event.category}</CategoryBadge>
                 </EventHeader>
 
                 <EventDetails>
@@ -212,7 +224,7 @@ const Missions: React.FC = () => {
                     <ActionButton
                       onClick={() => handleCompleteEvent(event.id)}
                       disabled={event.completed}
-                      completed={event.completed}
+                      $completed={event.completed}
                     >
                       {event.completed ? 'COMPLETED' : 'COMPLETE'}
                     </ActionButton>
@@ -496,10 +508,10 @@ const EventGrid = styled.div`
   }
 `;
 
-const EventCard = styled(motion.div)<{ category: string }>`
+const EventCard = styled(motion.div)<StyledEventCardProps>`
   background: rgba(0, 10, 20, 0.6);
-  border: 1px solid ${props => {
-    switch (props.category) {
+  border: 1px solid ${({ $category }) => {
+    switch ($category) {
       case 'social': return '#23d18b';
       case 'appointment': return '#00f6ff';
       case 'task': return '#ff3e88';
@@ -523,8 +535,8 @@ const EventCard = styled(motion.div)<{ category: string }>`
     height: 2px;
     background: linear-gradient(90deg, 
       transparent, 
-      ${props => {
-        switch (props.category) {
+      ${({ $category }) => {
+        switch ($category) {
           case 'social': return '#23d18b';
           case 'appointment': return '#00f6ff';
           case 'task': return '#ff3e88';
@@ -543,10 +555,10 @@ const EventHeader = styled.div`
   margin-bottom: 1rem;
 `;
 
-const EventTitle = styled.h3<{ category: string }>`
+const EventTitle = styled.h3<StyledEventTitleProps>`
   margin: 0;
-  color: ${props => {
-    switch (props.category) {
+  color: ${({ $category }) => {
+    switch ($category) {
       case 'social': return '#23d18b';
       case 'appointment': return '#00f6ff';
       case 'task': return '#ff3e88';
@@ -558,18 +570,18 @@ const EventTitle = styled.h3<{ category: string }>`
   letter-spacing: 1px;
 `;
 
-const CategoryBadge = styled.span<{ category: string }>`
+const CategoryBadge = styled.span<StyledCategoryBadgeProps>`
   padding: 0.25rem 0.75rem;
-  background: ${props => {
-    switch (props.category) {
+  background: ${({ $category }) => {
+    switch ($category) {
       case 'social': return 'rgba(35, 209, 139, 0.2)';
       case 'appointment': return 'rgba(0, 246, 255, 0.2)';
       case 'task': return 'rgba(255, 62, 136, 0.2)';
       default: return 'rgba(128, 128, 128, 0.2)';
     }
   }};
-  color: ${props => {
-    switch (props.category) {
+  color: ${({ $category }) => {
+    switch ($category) {
       case 'social': return '#23d18b';
       case 'appointment': return '#00f6ff';
       case 'task': return '#ff3e88';
@@ -646,21 +658,21 @@ const ButtonGroup = styled.div`
   }
 `;
 
-const ActionButton = styled(motion.button)<{ completed?: boolean }>`
+const ActionButton = styled(motion.button)<{ $completed?: boolean }>`
   padding: 0.5rem 1rem;
-  background: ${props => props.completed ? 'rgba(35, 209, 139, 0.2)' : 'transparent'};
-  border: 2px solid ${props => props.completed ? '#23d18b' : '#00f6ff'};
-  color: ${props => props.completed ? '#23d18b' : '#00f6ff'};
+  background: ${props => props.$completed ? 'rgba(35, 209, 139, 0.2)' : 'transparent'};
+  border: 2px solid ${props => props.$completed ? '#23d18b' : '#00f6ff'};
+  color: ${props => props.$completed ? '#23d18b' : '#00f6ff'};
   font-family: 'Share Tech Mono', monospace;
-  cursor: ${props => props.completed ? 'default' : 'pointer'};
+  cursor: ${props => props.$completed ? 'default' : 'pointer'};
   text-transform: uppercase;
   letter-spacing: 1px;
   transition: all 0.3s ease;
   min-width: 100px;
   
   &:hover {
-    background: ${props => props.completed ? 'rgba(35, 209, 139, 0.2)' : 'rgba(0, 246, 255, 0.1)'};
-    box-shadow: ${props => props.completed ? 'none' : '0 0 20px rgba(0, 246, 255, 0.3)'};
+    background: ${props => props.$completed ? 'rgba(35, 209, 139, 0.2)' : 'rgba(0, 246, 255, 0.1)'};
+    box-shadow: ${props => props.$completed ? 'none' : '0 0 20px rgba(0, 246, 255, 0.3)'};
   }
   
   &:disabled {
