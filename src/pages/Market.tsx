@@ -17,6 +17,10 @@ const Container = styled.div`
     padding: 1.5rem;
     text-align: center;
   }
+  
+  @media (max-width: 480px) {
+    padding: 1rem 0.5rem;
+  }
 `;
 
 const Header = styled.div`
@@ -104,9 +108,10 @@ const ProductGrid = styled.div`
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    max-width: 400px;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+    gap: 1.5rem;
   }
 `;
 
@@ -122,6 +127,15 @@ const ProductCard = styled(motion.div)`
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
+  
+  @media (max-width: 768px) {
+    padding: 1.2rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 1rem;
+  }
   
   &::before {
     content: '';
@@ -190,6 +204,11 @@ const ProductName = styled.h3`
   overflow: hidden;
   text-overflow: ellipsis;
   
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+  
   &::after {
     content: '';
     position: absolute;
@@ -213,6 +232,11 @@ const ProductPrice = styled.div`
   text-shadow: 0 0 10px rgba(35, 209, 139, 0.5);
   white-space: nowrap;
   
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
   &::before {
     content: "¥";
     margin-right: 0.2rem;
@@ -228,6 +252,12 @@ const ProductDescription = styled.p`
   padding-left: 0.5rem;
   min-height: 4.5rem;
   flex-grow: 1;
+  
+  @media (max-width: 480px) {
+    font-size: 0.85rem;
+    min-height: 3.5rem;
+    margin: 0.5rem 0 1rem;
+  }
   
   &::before {
     content: '';
@@ -252,6 +282,10 @@ const ImageContainer = styled.div`
   background: rgba(0, 0, 0, 0.2);
   cursor: ${props => props.onClick ? 'pointer' : 'default'};
   transition: transform 0.2s ease;
+  
+  @media (max-width: 480px) {
+    height: 150px;
+  }
   
   &:hover {
     ${props => props.onClick && `
@@ -343,6 +377,23 @@ const ProgressText = styled.div`
   
   > span:last-child {
     color: #23d18b;
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    font-size: 0.75rem;
+    
+    > span:first-child {
+      margin-bottom: 0.3rem;
+    }
+    
+    > span:last-child {
+      margin-left: auto;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    font-size: 0.7rem;
   }
 `;
 
