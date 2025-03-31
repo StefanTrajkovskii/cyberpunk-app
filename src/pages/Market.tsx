@@ -8,14 +8,6 @@ interface MarketProps {
   onBack: () => void;
 }
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  imageUrl?: string; // This will now contain a base64 string of the uploaded image
-}
-
 const Container = styled.div`
   padding: 2rem;
   max-width: 1200px;
@@ -311,7 +303,7 @@ const ProgressText = styled.div`
   display: flex;
   justify-content: space-between;
   color: #b8c0c2;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   margin-top: 0.5rem;
   font-family: 'Share Tech Mono', monospace;
   
@@ -542,11 +534,19 @@ const ImagePreview = styled.div`
 `;
 
 const Market: React.FC<MarketProps> = ({ onBack }) => {
-  const { user, updateCurrency } = useUser();
-  const [products, setProducts] = useState<Product[]>([]);
+  const { user, updateCurrency, updateUserData } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newProduct, setNewProduct] = useState<Partial<Product>>({});
+  const [newProduct, setNewProduct] = useState<Partial<{
+    id: string;
+    name: string;
+    price: number;
+    description: string;
+    imageUrl?: string;
+  }>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  
+  // Get products from user data with a fallback to empty array
+  const products = user?.marketProducts || [];
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -579,15 +579,21 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
   };
 
   const handleAddProduct = () => {
+    if (!user) return;
     if (newProduct.name && newProduct.price && newProduct.description) {
-      const product: Product = {
+      const product = {
         id: Date.now().toString(),
         name: newProduct.name,
         price: Number(newProduct.price),
         description: newProduct.description,
         imageUrl: newProduct.imageUrl
       };
-      setProducts([...products, product]);
+      
+      // Update user's market products
+      const updatedProducts = [...products, product];
+      updateUserData({ marketProducts: updatedProducts });
+      
+      // Clear form and close modal
       setNewProduct({});
       setImagePreview(null);
       setIsModalOpen(false);
@@ -598,13 +604,26 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
     return Math.min((user?.currency || 0) / price * 100, 100);
   };
 
-  const handlePurchase = (product: Product) => {
+  const handlePurchase = (product: {
+    id: string;
+    name: string;
+    price: number;
+    description: string;
+    imageUrl?: string;
+  }) => {
+    if (!user) return;
+    
     console.log("Purchase button clicked for:", product.name);
     
-    if (user?.currency && user.currency >= product.price) {
+    if (user.currency && user.currency >= product.price) {
       console.log("Processing purchase");
+      
+      // Update currency
       updateCurrency(user.currency - product.price);
-      setProducts(products.filter(p => p.id !== product.id));
+      
+      // Remove product from the list
+      const updatedProducts = products.filter((p: any) => p.id !== product.id);
+      updateUserData({ marketProducts: updatedProducts });
     } else {
       console.log("Not enough funds");
       alert("Not enough funds to purchase this item");
@@ -624,48 +643,54 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
       </Header>
 
       <ProductGrid>
-        {products.map(product => (
-          <ProductCard
-            key={product.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            whileHover={{ y: -5 }}
-          >
-            <ProductHeader>
-              <ProductName>{product.name}</ProductName>
-              <ProductPrice>{product.price.toLocaleString()}</ProductPrice>
-            </ProductHeader>
-            
-            {product.imageUrl ? (
-              <ImageContainer>
-                <ProductImage src={product.imageUrl} alt={product.name} />
-              </ImageContainer>
-            ) : (
-              <ImageContainer>
-                <NoImage>NO IMAGE AVAILABLE</NoImage>
-              </ImageContainer>
-            )}
-            
-            <ProductDescription>{product.description}</ProductDescription>
-            
-            <ProgressContainer>
-              <ProgressBar $progress={calculateProgress(product.price)} />
-              <ProgressText>
-                <span>Progress: {calculateProgress(product.price).toFixed(1)}%</span>
-                <span>¥{(user?.currency || 0).toLocaleString()} / ¥{product.price.toLocaleString()}</span>
-              </ProgressText>
-            </ProgressContainer>
-
-            <Button
-              onClick={() => handlePurchase(product)}
-              $disabled={!user?.currency || user.currency < product.price}
-              type="button"
+        {products.length > 0 ? (
+          products.map(product => (
+            <ProductCard
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              whileHover={{ y: -5 }}
             >
-              {user?.currency && user.currency >= product.price ? 'Purchase' : 'Not Enough Funds'}
-            </Button>
-          </ProductCard>
-        ))}
+              <ProductHeader>
+                <ProductName>{product.name}</ProductName>
+                <ProductPrice>{product.price.toLocaleString()}</ProductPrice>
+              </ProductHeader>
+              
+              {product.imageUrl ? (
+                <ImageContainer>
+                  <ProductImage src={product.imageUrl} alt={product.name} />
+                </ImageContainer>
+              ) : (
+                <ImageContainer>
+                  <NoImage>NO IMAGE AVAILABLE</NoImage>
+                </ImageContainer>
+              )}
+              
+              <ProductDescription>{product.description}</ProductDescription>
+              
+              <ProgressContainer>
+                <ProgressBar $progress={calculateProgress(product.price)} />
+                <ProgressText>
+                  <span>Progress: {calculateProgress(product.price).toFixed(1)}%</span>
+                  <span>¥{(user?.currency || 0).toLocaleString()} / ¥{product.price.toLocaleString()}</span>
+                </ProgressText>
+              </ProgressContainer>
+
+              <Button
+                onClick={() => handlePurchase(product)}
+                $disabled={!user?.currency || user.currency < product.price}
+                type="button"
+              >
+                {user?.currency && user.currency >= product.price ? 'Purchase' : 'Not Enough Funds'}
+              </Button>
+            </ProductCard>
+          ))
+        ) : (
+          <div style={{ textAlign: 'center', width: '100%', gridColumn: '1 / -1', color: '#b8c0c2', margin: '3rem 0' }}>
+            No products available. Add some products to get started.
+          </div>
+        )}
       </ProductGrid>
 
       <AnimatePresence>

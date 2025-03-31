@@ -1,9 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  imageUrl?: string;
+}
+
 interface User {
   username: string;
   isLoggedIn: boolean;
   currency: number;
+  marketProducts?: Product[];
 }
 
 interface StoredUser {
@@ -12,6 +21,7 @@ interface StoredUser {
   password: string;
   createdAt?: string;
   currency: number;
+  marketProducts?: Product[];
 }
 
 interface UserContextType {
@@ -20,6 +30,7 @@ interface UserContextType {
   register: (username: string, password: string) => Promise<void>;
   logout: () => void;
   updateCurrency: (newAmount: number) => void;
+  updateUserData: (data: Partial<User>) => void;
 }
 
 // Define project-specific storage keys
@@ -66,7 +77,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         username,
         password,
         createdAt: new Date().toISOString(),
-        currency: 0
+        currency: 0,
+        marketProducts: [] // Initialize empty products array
       };
       
       // Add to users array
@@ -86,7 +98,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Log the user in after successful registration
-      setUser({ username, isLoggedIn: true, currency: 0 });
+      setUser({ username, isLoggedIn: true, currency: 0, marketProducts: [] });
       console.log('Registration successful and user logged in');
     } catch (error) {
       console.error('Registration error:', error);
@@ -121,8 +133,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log('Login successful for user:', username);
-      // Set the current user with their currency
-      setUser({ username, isLoggedIn: true, currency: foundUser.currency });
+      // Set the current user with their currency and market products
+      setUser({ 
+        username, 
+        isLoggedIn: true, 
+        currency: foundUser.currency,
+        marketProducts: foundUser.marketProducts || []
+      });
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -154,8 +171,26 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserData = (data: Partial<User>) => {
+    if (!user) return;
+
+    // Update the current user's data
+    const updatedUser = { ...user, ...data };
+    setUser(updatedUser);
+
+    // Update the stored user's data in the users array
+    const usersStr = localStorage.getItem(STORAGE_KEYS.USERS);
+    if (usersStr) {
+      const users: StoredUser[] = JSON.parse(usersStr);
+      const updatedUsers = users.map(u => 
+        u.username === user.username ? { ...u, ...data } : u
+      );
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updatedUsers));
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, login, register, logout, updateCurrency }}>
+    <UserContext.Provider value={{ user, login, register, logout, updateCurrency, updateUserData }}>
       {children}
     </UserContext.Provider>
   );
