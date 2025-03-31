@@ -722,6 +722,13 @@ const ModalContent = styled(motion.div)`
   padding: 2rem;
   position: relative;
   box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
+
+  @media (max-width: 768px) {
+    width: 95%;
+    padding: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 `;
 
 const ModalHeader = styled.div`
@@ -729,6 +736,10 @@ const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
 `;
 
 const ModalTitle = styled.h2`
@@ -737,6 +748,11 @@ const ModalTitle = styled.h2`
   font-size: 1.5rem;
   text-transform: uppercase;
   letter-spacing: 2px;
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -763,6 +779,12 @@ const FormGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
 `;
 
 const FormGroup = styled.div`
@@ -773,6 +795,10 @@ const FormGroup = styled.div`
   
   &.full-width {
     grid-column: 1 / -1;
+  }
+
+  @media (max-width: 768px) {
+    gap: 0.25rem;
   }
 `;
 
@@ -789,6 +815,11 @@ const Label = styled.label`
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+  }
 `;
 
 const Input = styled.input`
@@ -804,6 +835,11 @@ const Input = styled.input`
     border-color: #00f6ff;
     box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
   }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
 `;
 
 const Select = styled.select`
@@ -818,6 +854,11 @@ const Select = styled.select`
   &:focus {
     border-color: #00f6ff;
     box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    font-size: 0.9rem;
   }
 `;
 
@@ -835,6 +876,12 @@ const TextArea = styled.textarea`
   &:focus {
     border-color: #00f6ff;
     box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.5rem;
+    min-height: 80px;
+    font-size: 0.9rem;
   }
 `;
 
