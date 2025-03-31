@@ -231,10 +231,32 @@ const ProductDescription = styled.p`
 
 const ImageContainer = styled.div`
   margin: 1rem 0;
-  height: 160px;
+  height: 180px;
   overflow: hidden;
   border-radius: 4px;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  cursor: ${props => props.onClick ? 'pointer' : 'default'};
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    ${props => props.onClick && `
+      transform: scale(1.02);
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 246, 255, 0.1);
+        z-index: 1;
+      }
+    `}
+  }
   
   &::before {
     content: '';
@@ -533,6 +555,67 @@ const ImagePreview = styled.div`
   }
 `;
 
+const FullImageModal = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 1rem;
+  backdrop-filter: blur(5px);
+`;
+
+const FullImageContainer = styled(motion.div)`
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(10, 10, 18, 0.8);
+  padding: 0.5rem;
+  border: 1px solid #00f6ff;
+  box-shadow: 0 0 30px rgba(0, 246, 255, 0.2);
+`;
+
+const FullSizeImage = styled.img`
+  max-width: 100%;
+  max-height: calc(90vh - 2rem);
+  object-fit: contain;
+  border-radius: 2px;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  z-index: 2001;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(255, 60, 60, 0.8);
+    transform: scale(1.1);
+  }
+`;
+
 const Market: React.FC<MarketProps> = ({ onBack }) => {
   const { user, updateCurrency, updateUserData } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -544,6 +627,7 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
     imageUrl?: string;
   }>>({});
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
   
   // Get products from user data with a fallback to empty array
   const products = user?.marketProducts || [];
@@ -630,6 +714,14 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
     }
   };
 
+  const handleImageClick = (imageUrl: string) => {
+    setFullImageUrl(imageUrl);
+  };
+
+  const closeFullImage = () => {
+    setFullImageUrl(null);
+  };
+
   return (
     <Container>
       <Header>
@@ -658,7 +750,7 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
               </ProductHeader>
               
               {product.imageUrl ? (
-                <ImageContainer>
+                <ImageContainer onClick={() => handleImageClick(product.imageUrl!)}>
                   <ProductImage src={product.imageUrl} alt={product.name} />
                 </ImageContainer>
               ) : (
@@ -759,6 +851,27 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
               </ButtonGroup>
             </ModalContent>
           </Modal>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {fullImageUrl && (
+          <FullImageModal
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeFullImage}
+          >
+            <FullImageContainer
+              onClick={e => e.stopPropagation()}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <CloseButton onClick={closeFullImage}>×</CloseButton>
+              <FullSizeImage src={fullImageUrl} alt="Full size" />
+            </FullImageContainer>
+          </FullImageModal>
         )}
       </AnimatePresence>
     </Container>
