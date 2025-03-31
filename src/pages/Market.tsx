@@ -13,13 +13,18 @@ interface Product {
   name: string;
   price: number;
   description: string;
-  imageUrl?: string;
+  imageUrl?: string; // This will now contain a base64 string of the uploaded image
 }
 
 const Container = styled.div`
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+    text-align: center;
+  }
 `;
 
 const Header = styled.div`
@@ -92,6 +97,13 @@ const ProductGrid = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
   margin-top: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 `;
 
 const ProductCard = styled(motion.div)`
@@ -100,7 +112,7 @@ const ProductCard = styled(motion.div)`
   border-radius: 4px;
   padding: 1.5rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 0 15px rgba(0, 246, 255, 0.1);
   transition: all 0.3s ease;
   
@@ -114,6 +126,7 @@ const ProductCard = styled(motion.div)`
     background: linear-gradient(90deg, #ff003c, #00f6ff, #ff003c);
     background-size: 200% 100%;
     animation: gradient-slide 3s linear infinite;
+    pointer-events: none;
   }
   
   &::after {
@@ -126,6 +139,7 @@ const ProductCard = styled(motion.div)`
     background: linear-gradient(135deg, rgba(0, 246, 255, 0.2) 0%, transparent 100%);
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
   }
   
   &:hover {
@@ -149,6 +163,10 @@ const ProductHeader = styled.div`
   align-items: flex-start;
   margin-bottom: 1rem;
   position: relative;
+  
+  @media (max-width: 768px) {
+    align-items: center;
+  }
 `;
 
 const ProductName = styled.h3`
@@ -290,13 +308,13 @@ const ProgressText = styled.div`
   }
 `;
 
-const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
+const Button = styled.button<{ $variant?: 'primary' | 'secondary'; $disabled?: boolean }>`
   background: ${props => props.$variant === 'secondary' ? 'transparent' : 'rgba(0, 246, 255, 0.1)'};
-  border: 1px solid #00f6ff;
-  color: #00f6ff;
+  border: 1px solid ${props => props.$disabled ? 'rgba(0, 246, 255, 0.3)' : '#00f6ff'};
+  color: ${props => props.$disabled ? 'rgba(0, 246, 255, 0.5)' : '#00f6ff'};
   padding: 0.8rem 1.5rem;
   border-radius: 3px;
-  cursor: pointer;
+  cursor: pointer !important;
   font-family: 'Share Tech Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -304,7 +322,11 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   width: 100%;
   margin-top: 1rem;
   position: relative;
-  overflow: hidden;
+  z-index: 5;
+  overflow: visible;
+  opacity: ${props => props.$disabled ? '0.7' : '1'};
+  pointer-events: auto !important;
+  user-select: none;
 
   &::before {
     content: '';
@@ -319,38 +341,19 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
     animation: border-rotate 3s linear infinite;
     opacity: 0;
     transition: opacity 0.3s ease;
+    pointer-events: none;
   }
 
   &:hover {
-    background: rgba(0, 246, 255, 0.2);
-    box-shadow: 0 0 15px rgba(0, 246, 255, 0.3);
-    transform: translateY(-2px);
+    background: ${props => props.$disabled ? 'rgba(100, 100, 100, 0.1)' : 'rgba(0, 246, 255, 0.2)'};
+    box-shadow: ${props => props.$disabled ? 'none' : '0 0 15px rgba(0, 246, 255, 0.3)'};
+    transform: ${props => props.$disabled ? 'none' : 'translateY(-2px)'};
     
     &::before {
-      opacity: 1;
+      opacity: ${props => props.$disabled ? '0' : '1'};
     }
   }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: rgba(100, 100, 100, 0.1);
-    border-color: rgba(0, 246, 255, 0.3);
-    color: rgba(0, 246, 255, 0.5);
-    box-shadow: none;
-    transform: none;
-    
-    &:hover {
-      background: rgba(100, 100, 100, 0.1);
-      box-shadow: none;
-      transform: none;
-      
-      &::before {
-        opacity: 0;
-      }
-    }
-  }
-  
   @keyframes border-rotate {
     0% { background-position: 0% 0%; }
     100% { background-position: 300% 0%; }
@@ -437,11 +440,131 @@ const StyledGlitchButton = styled(GlitchButton)`
   }
 `;
 
+const FileUploadContainer = styled.div`
+  width: 100%;
+  margin-bottom: 1rem;
+  position: relative;
+`;
+
+const FileUploadLabel = styled.label`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 120px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed rgba(0, 246, 255, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: #00f6ff;
+    background: rgba(0, 246, 255, 0.05);
+  }
+`;
+
+const FileInput = styled.input`
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+`;
+
+const UploadIcon = styled.div`
+  color: #00f6ff;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  
+  &::before {
+    content: '↑';
+  }
+`;
+
+const UploadText = styled.div`
+  color: #b8c0c2;
+  font-size: 0.9rem;
+  text-align: center;
+`;
+
+const ImagePreview = styled.div`
+  width: 100%;
+  height: 120px;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  
+  button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: rgba(255, 60, 60, 0.8);
+    }
+  }
+`;
+
 const Market: React.FC<MarketProps> = ({ onBack }) => {
   const { user, updateCurrency } = useUser();
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState<Partial<Product>>({});
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.match('image.*')) {
+      alert('Please select an image file');
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size should be less than 5MB');
+      return;
+    }
+    
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      const base64String = event.target?.result as string;
+      setImagePreview(base64String);
+      setNewProduct({ ...newProduct, imageUrl: base64String });
+    };
+    
+    reader.readAsDataURL(file);
+  };
+  
+  const removeImage = () => {
+    setImagePreview(null);
+    setNewProduct({ ...newProduct, imageUrl: undefined });
+  };
 
   const handleAddProduct = () => {
     if (newProduct.name && newProduct.price && newProduct.description) {
@@ -454,6 +577,7 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
       };
       setProducts([...products, product]);
       setNewProduct({});
+      setImagePreview(null);
       setIsModalOpen(false);
     }
   };
@@ -463,9 +587,15 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
   };
 
   const handlePurchase = (product: Product) => {
+    console.log("Purchase button clicked for:", product.name);
+    
     if (user?.currency && user.currency >= product.price) {
+      console.log("Processing purchase");
       updateCurrency(user.currency - product.price);
       setProducts(products.filter(p => p.id !== product.id));
+    } else {
+      console.log("Not enough funds");
+      alert("Not enough funds to purchase this item");
     }
   };
 
@@ -517,7 +647,8 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
 
             <Button
               onClick={() => handlePurchase(product)}
-              disabled={!user?.currency || user.currency < product.price}
+              $disabled={!user?.currency || user.currency < product.price}
+              type="button"
             >
               {user?.currency && user.currency >= product.price ? 'Purchase' : 'Not Enough Funds'}
             </Button>
@@ -560,11 +691,26 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
                 onChange={e => setNewProduct({ ...newProduct, description: e.target.value })}
               />
               
-              <Input
-                placeholder="Image URL (optional)"
-                value={newProduct.imageUrl || ''}
-                onChange={e => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
-              />
+              {imagePreview ? (
+                <ImagePreview>
+                  <img src={imagePreview} alt="Preview" />
+                  <button onClick={removeImage}>×</button>
+                </ImagePreview>
+              ) : (
+                <FileUploadContainer>
+                  <FileUploadLabel htmlFor="image-upload">
+                    <UploadIcon />
+                    <UploadText>Upload product image</UploadText>
+                    <UploadText>(Max. 5MB)</UploadText>
+                  </FileUploadLabel>
+                  <FileInput
+                    id="image-upload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileUpload}
+                  />
+                </FileUploadContainer>
+              )}
 
               <ButtonGroup>
                 <Button $variant="secondary" onClick={() => setIsModalOpen(false)}>
