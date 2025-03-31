@@ -381,7 +381,7 @@ const UserStatus = styled.div`
   }
 `;
 
-const MenuIconWrapper = styled.div<{ isOpen: boolean }>`
+const MenuIconWrapper = styled.div<{ $isOpen: boolean }>`
   width: 20px;
   height: 20px;
   position: relative;
@@ -403,19 +403,19 @@ const MenuIconWrapper = styled.div<{ isOpen: boolean }>`
     box-shadow: 0 0 5px rgba(0, 246, 255, 0.5);
 
     &:nth-child(1) {
-      top: ${({ isOpen }) => isOpen ? '9px' : '0px'};
-      transform: ${({ isOpen }) => isOpen ? 'rotate(135deg)' : 'rotate(0)'};
+      top: ${({ $isOpen }) => $isOpen ? '9px' : '0px'};
+      transform: ${({ $isOpen }) => $isOpen ? 'rotate(135deg)' : 'rotate(0)'};
     }
 
     &:nth-child(2) {
       top: 9px;
-      opacity: ${({ isOpen }) => isOpen ? '0' : '1'};
-      transform: ${({ isOpen }) => isOpen ? 'translateX(20px)' : 'translateX(0)'};
+      opacity: ${({ $isOpen }) => $isOpen ? '0' : '1'};
+      transform: ${({ $isOpen }) => $isOpen ? 'translateX(20px)' : 'translateX(0)'};
     }
 
     &:nth-child(3) {
-      top: ${({ isOpen }) => isOpen ? '9px' : '18px'};
-      transform: ${({ isOpen }) => isOpen ? 'rotate(-135deg)' : 'rotate(0)'};
+      top: ${({ $isOpen }) => $isOpen ? '9px' : '18px'};
+      transform: ${({ $isOpen }) => $isOpen ? 'rotate(-135deg)' : 'rotate(0)'};
     }
   }
 `;
@@ -839,7 +839,7 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
         </NavContainer>
 
         <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          <MenuIconWrapper isOpen={isMobileMenuOpen}>
+          <MenuIconWrapper $isOpen={isMobileMenuOpen}>
             <span></span>
             <span></span>
             <span></span>

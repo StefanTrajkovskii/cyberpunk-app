@@ -744,16 +744,34 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
   return (
     <Container>
       <TaskTypeFilter>
-        {['FOOD', 'COMBAT', 'STEALTH', 'TECH'].map(type => (
-          <FilterButton
-            key={type}
-            taskType={type}
-            active={selectedType === type}
-            onClick={() => setSelectedType(selectedType === type ? null : type)}
-          >
-            {type === 'COMBAT' ? 'GYM' : type}
-          </FilterButton>
-        ))}
+        <FilterButton
+          taskType="FOOD"
+          active={selectedType === 'FOOD'}
+          onClick={() => setSelectedType(selectedType === 'FOOD' ? null : 'FOOD')}
+        >
+          Food
+        </FilterButton>
+        <FilterButton
+          taskType="COMBAT"
+          active={selectedType === 'COMBAT'}
+          onClick={() => setSelectedType(selectedType === 'COMBAT' ? null : 'COMBAT')}
+        >
+          Combat
+        </FilterButton>
+        <FilterButton
+          taskType="STEALTH"
+          active={selectedType === 'STEALTH'}
+          onClick={() => setSelectedType(selectedType === 'STEALTH' ? null : 'STEALTH')}
+        >
+          Stealth
+        </FilterButton>
+        <FilterButton
+          taskType="TECH"
+          active={selectedType === 'TECH'}
+          onClick={() => setSelectedType(selectedType === 'TECH' ? null : 'TECH')}
+        >
+          Tech
+        </FilterButton>
       </TaskTypeFilter>
 
       <TaskGrid>
