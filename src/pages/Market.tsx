@@ -119,6 +119,9 @@ const ProductCard = styled(motion.div)`
   overflow: visible;
   box-shadow: 0 0 15px rgba(0, 246, 255, 0.1);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   
   &::before {
     content: '';
@@ -167,6 +170,7 @@ const ProductHeader = styled.div`
   align-items: flex-start;
   margin-bottom: 1rem;
   position: relative;
+  width: 100%;
   
   @media (max-width: 768px) {
     align-items: center;
@@ -176,11 +180,15 @@ const ProductHeader = styled.div`
 const ProductName = styled.h3`
   color: #00f6ff;
   margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   letter-spacing: 1px;
   position: relative;
   display: inline-block;
   font-family: 'Share Tech Mono', monospace;
+  max-width: 65%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   
   &::after {
     content: '';
@@ -196,13 +204,14 @@ const ProductName = styled.h3`
 
 const ProductPrice = styled.div`
   color: #23d18b;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin-left: auto;
   background: rgba(35, 209, 139, 0.1);
   padding: 0.3rem 0.7rem;
   border-radius: 3px;
   text-shadow: 0 0 10px rgba(35, 209, 139, 0.5);
+  white-space: nowrap;
   
   &::before {
     content: "¥";
@@ -217,6 +226,8 @@ const ProductDescription = styled.p`
   line-height: 1.5;
   position: relative;
   padding-left: 0.5rem;
+  min-height: 4.5rem;
+  flex-grow: 1;
   
   &::before {
     content: '';
@@ -297,6 +308,7 @@ const NoImage = styled.div`
 
 const ProgressContainer = styled.div`
   margin: 1.5rem 0 1rem;
+  margin-top: auto;
 `;
 
 const ProgressBar = styled.div<{ $progress: number }>`
@@ -616,6 +628,51 @@ const CloseButton = styled.button`
   }
 `;
 
+// Add a utility function to compress images
+const compressImage = (base64: string, maxWidth: number = 800, quality: number = 0.7): Promise<string> => {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = base64;
+    
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+      
+      // Calculate new dimensions
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(img, 0, 0, width, height);
+      
+      // Get compressed image
+      const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+      resolve(compressedBase64);
+    };
+  });
+};
+
+// Add a function to check localStorage size
+const checkStorageQuota = (): boolean => {
+  try {
+    const testKey = '_test_quota_';
+    const testValue = 'x'.repeat(1024 * 1024); // 1MB
+    
+    localStorage.setItem(testKey, testValue);
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    console.warn('localStorage quota exceeded, attempting to clear space');
+    return false;
+  }
+};
+
 const Market: React.FC<MarketProps> = ({ onBack }) => {
   const { user, updateCurrency, updateUserData } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -632,7 +689,8 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
   // Get products from user data with a fallback to empty array
   const products = user?.marketProducts || [];
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Update the handleFileUpload function
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     
@@ -646,15 +704,43 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
       return;
     }
     
-    const reader = new FileReader();
-    
-    reader.onload = (event) => {
-      const base64String = event.target?.result as string;
-      setImagePreview(base64String);
-      setNewProduct({ ...newProduct, imageUrl: base64String });
-    };
-    
-    reader.readAsDataURL(file);
+    try {
+      const reader = new FileReader();
+      
+      reader.onload = async (event) => {
+        const base64String = event.target?.result as string;
+        
+        // Check if we can store this image without compression
+        if (!checkStorageQuota()) {
+          // Compress the image
+          try {
+            const compressedImage = await compressImage(base64String, 600, 0.6);
+            console.log('Image compressed to save space');
+            setImagePreview(compressedImage);
+            setNewProduct({ ...newProduct, imageUrl: compressedImage });
+          } catch (error) {
+            alert('Unable to process image. Please try a smaller image.');
+            console.error('Image compression error:', error);
+          }
+        } else {
+          // If storage is available, compress lightly for better performance
+          try {
+            const compressedImage = await compressImage(base64String, 800, 0.8);
+            setImagePreview(compressedImage);
+            setNewProduct({ ...newProduct, imageUrl: compressedImage });
+          } catch (error) {
+            // If compression fails for any reason, use the original
+            setImagePreview(base64String);
+            setNewProduct({ ...newProduct, imageUrl: base64String });
+          }
+        }
+      };
+      
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Error processing image:', error);
+      alert('There was an error processing your image. Please try again.');
+    }
   };
   
   const removeImage = () => {
@@ -662,25 +748,37 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
     setNewProduct({ ...newProduct, imageUrl: undefined });
   };
 
+  // Update the handleAddProduct function
   const handleAddProduct = () => {
     if (!user) return;
     if (newProduct.name && newProduct.price && newProduct.description) {
-      const product = {
-        id: Date.now().toString(),
-        name: newProduct.name,
-        price: Number(newProduct.price),
-        description: newProduct.description,
-        imageUrl: newProduct.imageUrl
-      };
-      
-      // Update user's market products
-      const updatedProducts = [...products, product];
-      updateUserData({ marketProducts: updatedProducts });
-      
-      // Clear form and close modal
-      setNewProduct({});
-      setImagePreview(null);
-      setIsModalOpen(false);
+      try {
+        const product = {
+          id: Date.now().toString(),
+          name: newProduct.name,
+          price: Number(newProduct.price),
+          description: newProduct.description,
+          imageUrl: newProduct.imageUrl
+        };
+        
+        // Update user's market products
+        const updatedProducts = [...products, product];
+        
+        try {
+          updateUserData({ marketProducts: updatedProducts });
+          
+          // Clear form and close modal
+          setNewProduct({});
+          setImagePreview(null);
+          setIsModalOpen(false);
+        } catch (storageError) {
+          console.error('Storage error:', storageError);
+          alert('Unable to save product due to storage limitations. Try using smaller images or removing some existing products.');
+        }
+      } catch (error) {
+        console.error('Error adding product:', error);
+        alert('There was an error adding your product. Please try again.');
+      }
     }
   };
 
@@ -745,7 +843,7 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
               whileHover={{ y: -5 }}
             >
               <ProductHeader>
-                <ProductName>{product.name}</ProductName>
+                <ProductName title={product.name}>{product.name}</ProductName>
                 <ProductPrice>{product.price.toLocaleString()}</ProductPrice>
               </ProductHeader>
               
