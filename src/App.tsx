@@ -13,6 +13,7 @@ import Register from './pages/Register';
 import Missions from './pages/Missions';
 import { UserProvider, useUser } from './contexts/UserContext';
 import BootSequence from './pages/BootSequence';
+import Market from './pages/Market';
 
 
 
@@ -200,6 +201,8 @@ function AppContent() {
               navigate('/missions');
             } else if (view === 'daily') {
               navigate('/');
+            } else if (view === 'market') {
+              navigate('/market');
             }
           }}
           userName={user.username}
@@ -224,6 +227,7 @@ function AppContent() {
             <Route path="/gym-tracker" element={<GymTracker onBack={() => navigate('/')} />} />
             <Route path="/code-mastery" element={<CodeMastery onBack={() => navigate('/')} />} />
             <Route path="/missions" element={<Missions />} />
+            <Route path="/market" element={<Market onBack={() => navigate('/')} />} />
           </Routes>
         </MainContent>
 
