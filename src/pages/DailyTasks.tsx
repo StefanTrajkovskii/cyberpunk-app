@@ -298,7 +298,7 @@ const TaskCard = styled(motion.div)<{ $type: string; $riskLevel: string }>`
   position: relative;
   overflow: hidden;
   backdrop-filter: blur(5px);
-  cursor: ${({ $type }) => ($type === 'FOOD' || $type === 'COMBAT') ? 'pointer' : 'default'};
+  cursor: ${({ $type }) => ($type === 'FOOD' || $type === 'COMBAT' || $type === 'TECH') ? 'pointer' : 'default'};
   box-shadow: 0 0 20px rgba(${({ $type }) => {
     switch ($type) {
       case 'FOOD': return '0, 255, 157';
