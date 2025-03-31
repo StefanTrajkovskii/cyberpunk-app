@@ -97,10 +97,12 @@ const ProductGrid = styled.div`
 const ProductCard = styled(motion.div)`
   background: rgba(10, 10, 18, 0.8);
   border: 1px solid #00f6ff;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 246, 255, 0.1);
+  transition: all 0.3s ease;
   
   &::before {
     content: '';
@@ -109,21 +111,76 @@ const ProductCard = styled(motion.div)`
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, #00f6ff, transparent);
+    background: linear-gradient(90deg, #ff003c, #00f6ff, #ff003c);
+    background-size: 200% 100%;
+    animation: gradient-slide 3s linear infinite;
   }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 246, 255, 0.2) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 25px rgba(0, 246, 255, 0.2);
+    
+    &::after {
+      opacity: 0.05;
+    }
+  }
+  
+  @keyframes gradient-slide {
+    0% { background-position: 0% 0; }
+    100% { background-position: 200% 0; }
+  }
+`;
+
+const ProductHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  position: relative;
 `;
 
 const ProductName = styled.h3`
   color: #00f6ff;
-  margin: 0 0 1rem 0;
+  margin: 0 0 0.5rem 0;
   font-size: 1.5rem;
+  letter-spacing: 1px;
+  position: relative;
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 40px;
+    height: 1px;
+    background: #00f6ff;
+    box-shadow: 0 0 8px rgba(0, 246, 255, 0.7);
+  }
 `;
 
 const ProductPrice = styled.div`
   color: #23d18b;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-left: auto;
+  background: rgba(35, 209, 139, 0.1);
+  padding: 0.3rem 0.7rem;
+  border-radius: 3px;
+  text-shadow: 0 0 10px rgba(35, 209, 139, 0.5);
   
   &::before {
     content: "¥";
@@ -133,20 +190,79 @@ const ProductPrice = styled.div`
 
 const ProductDescription = styled.p`
   color: #b8c0c2;
-  margin-bottom: 1.5rem;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  position: relative;
+  padding-left: 0.5rem;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: rgba(0, 246, 255, 0.3);
+  }
+`;
+
+const ImageContainer = styled.div`
+  margin: 1rem 0;
+  height: 160px;
+  overflow: hidden;
+  border-radius: 4px;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 1px solid rgba(0, 246, 255, 0.3);
+    z-index: 1;
+    pointer-events: none;
+  }
+`;
+
+const ProductImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  
+  ${ProductCard}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const NoImage = styled.div`
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(0, 246, 255, 0.3);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  border: 1px dashed rgba(0, 246, 255, 0.3);
 `;
 
 const ProgressContainer = styled.div`
-  margin: 1rem 0;
+  margin: 1.5rem 0 1rem;
 `;
 
 const ProgressBar = styled.div<{ $progress: number }>`
   width: 100%;
-  height: 8px;
-  background: rgba(0, 246, 255, 0.1);
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
   overflow: hidden;
   position: relative;
+  border: 1px solid rgba(0, 246, 255, 0.2);
 
   &::after {
     content: '';
@@ -155,9 +271,9 @@ const ProgressBar = styled.div<{ $progress: number }>`
     left: 0;
     height: 100%;
     width: ${props => props.$progress}%;
-    background: #00f6ff;
+    background: linear-gradient(90deg, #00f6ff, #00f6ff 70%, #23d18b);
     box-shadow: 0 0 10px rgba(0, 246, 255, 0.7);
-    transition: width 0.3s ease;
+    transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 `;
 
@@ -165,8 +281,13 @@ const ProgressText = styled.div`
   display: flex;
   justify-content: space-between;
   color: #b8c0c2;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   margin-top: 0.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  
+  > span:last-child {
+    color: #23d18b;
+  }
 `;
 
 const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
@@ -174,7 +295,7 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   border: 1px solid #00f6ff;
   color: #00f6ff;
   padding: 0.8rem 1.5rem;
-  border-radius: 4px;
+  border-radius: 3px;
   cursor: pointer;
   font-family: 'Share Tech Mono', monospace;
   text-transform: uppercase;
@@ -182,33 +303,58 @@ const Button = styled.button<{ $variant?: 'primary' | 'secondary' }>`
   transition: all 0.3s ease;
   width: 100%;
   margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    height: calc(100% + 4px);
+    width: calc(100% + 4px);
+    background: linear-gradient(45deg, #00f6ff, transparent, #00f6ff);
+    border-radius: 3px;
+    z-index: -1;
+    animation: border-rotate 3s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
 
   &:hover {
     background: rgba(0, 246, 255, 0.2);
     box-shadow: 0 0 15px rgba(0, 246, 255, 0.3);
+    transform: translateY(-2px);
+    
+    &::before {
+      opacity: 1;
+    }
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    background: rgba(100, 100, 100, 0.1);
+    border-color: rgba(0, 246, 255, 0.3);
+    color: rgba(0, 246, 255, 0.5);
+    box-shadow: none;
+    transform: none;
+    
     &:hover {
-      background: rgba(0, 246, 255, 0.1);
+      background: rgba(100, 100, 100, 0.1);
       box-shadow: none;
+      transform: none;
+      
+      &::before {
+        opacity: 0;
+      }
     }
   }
-`;
-
-const HeaderDecoration = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    rgba(0, 246, 255, 0) 0%,
-    rgba(0, 246, 255, 0.5) 50%,
-    #00f6ff 100%
-  );
+  
+  @keyframes border-rotate {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 300% 0%; }
+  }
 `;
 
 const Modal = styled(motion.div)`
@@ -342,9 +488,23 @@ const Market: React.FC<MarketProps> = ({ onBack }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
+            whileHover={{ y: -5 }}
           >
-            <ProductName>{product.name}</ProductName>
-            <ProductPrice>{product.price.toLocaleString()}</ProductPrice>
+            <ProductHeader>
+              <ProductName>{product.name}</ProductName>
+              <ProductPrice>{product.price.toLocaleString()}</ProductPrice>
+            </ProductHeader>
+            
+            {product.imageUrl ? (
+              <ImageContainer>
+                <ProductImage src={product.imageUrl} alt={product.name} />
+              </ImageContainer>
+            ) : (
+              <ImageContainer>
+                <NoImage>NO IMAGE AVAILABLE</NoImage>
+              </ImageContainer>
+            )}
+            
             <ProductDescription>{product.description}</ProductDescription>
             
             <ProgressContainer>
