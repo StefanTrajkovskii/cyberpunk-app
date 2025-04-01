@@ -818,10 +818,18 @@ const Transactions: React.FC<TransactionsProps> = ({ onBack }) => {
                   <Tooltip 
                     formatter={(value: number) => [`¥${value.toLocaleString()}`, 'Amount']}
                     contentStyle={{ 
-                      background: 'rgba(10, 10, 18, 0.9)', 
+                      background: 'rgba(10, 10, 18, 0.95)', 
                       border: '1px solid #00f6ff',
                       borderRadius: '4px',
-                      fontFamily: 'Share Tech Mono, monospace'
+                      fontFamily: 'Share Tech Mono, monospace',
+                      color: '#00f6ff',
+                      boxShadow: '0 0 10px rgba(0, 246, 255, 0.3)'
+                    }}
+                    itemStyle={{
+                      color: '#ffffff'
+                    }}
+                    labelStyle={{
+                      color: '#00f6ff'
                     }}
                   />
                   <Legend />
