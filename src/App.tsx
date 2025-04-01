@@ -14,6 +14,7 @@ import Missions from './pages/Missions';
 import { UserProvider, useUser } from './contexts/UserContext';
 import BootSequence from './pages/BootSequence';
 import Market from './pages/Market';
+import Transactions from './pages/Transactions';
 
 
 
@@ -36,7 +37,7 @@ interface Task {
 
 
 // Add a type for our different views
-type ViewType = 'daily' | 'missions' | 'market' | 'messages';
+type ViewType = 'daily' | 'missions' | 'market' | 'transactions';
 
 // Add back the core styled components
 const AppContainer = styled.div`
@@ -203,6 +204,8 @@ function AppContent() {
               navigate('/');
             } else if (view === 'market') {
               navigate('/market');
+            } else if (view === 'transactions') {
+              navigate('/transactions');
             }
           }}
           userName={user.username}
@@ -228,6 +231,7 @@ function AppContent() {
             <Route path="/code-mastery" element={<CodeMastery onBack={() => navigate('/')} />} />
             <Route path="/missions" element={<Missions />} />
             <Route path="/market" element={<Market onBack={() => navigate('/')} />} />
+            <Route path="/transactions" element={<Transactions onBack={() => navigate('/')} />} />
           </Routes>
         </MainContent>
 

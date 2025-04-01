@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
+import StatusBar from '../components/StatusBar';
 
 interface DailyTask {
   id: string;
@@ -743,6 +744,8 @@ const DailyTasks: React.FC<DailyTasksProps> = ({ onComplete, onNavigateToFood, o
 
   return (
     <Container>
+      <StatusBar hideEvents={true} />
+      
       <TaskTypeFilter>
         {['FOOD', 'COMBAT', 'STEALTH', 'TECH'].map(type => (
           <FilterButton

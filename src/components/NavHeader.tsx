@@ -6,8 +6,8 @@ import { useUser } from '../contexts/UserContext';
 interface NavHeaderProps {
   missionCount: number;
   currency: number;
-  currentView: 'daily' | 'missions' | 'market' | 'messages';
-  onViewChange: (view: 'daily' | 'missions' | 'market' | 'messages') => void;
+  currentView: 'daily' | 'missions' | 'market' | 'transactions';
+  onViewChange: (view: 'daily' | 'missions' | 'market' | 'transactions') => void;
   userName: string;
   onLogout: () => void;
 }
@@ -799,12 +799,12 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
               <NavItemIndicator />MARKET
             </NavItem>
             <NavItem 
-              $active={currentView === 'messages'} 
-              onClick={() => onViewChange('messages')}
+              $active={currentView === 'transactions'} 
+              onClick={() => onViewChange('transactions')}
               whileHover={{ y: -2 }} 
               whileTap={{ y: 0 }}
             >
-              <NavItemIndicator />MESSAGES
+              <NavItemIndicator />TRANSACTIONS
             </NavItem>
           </NavMenu>
           
@@ -886,14 +886,14 @@ const NavHeader: React.FC<NavHeaderProps> = ({ missionCount, currency, currentVi
                   MARKET
                 </MobileNavItem>
                 <MobileNavItem 
-                  $active={currentView === 'messages'}
+                  $active={currentView === 'transactions'}
                   onClick={() => {
-                    onViewChange('messages');
+                    onViewChange('transactions');
                     setIsMobileMenuOpen(false);
                   }}
                 >
                   <NavItemIndicator />
-                  MESSAGES
+                  TRANSACTIONS
                 </MobileNavItem>
               </MobileNavList>
 
