@@ -18,11 +18,6 @@ interface Transaction {
   type: 'income' | 'expense';
 }
 
-interface CategoryTotal {
-  name: string;
-  value: number;
-  color: string;
-}
 
 // Predefined colors for categories
 const CATEGORY_COLORS = [
@@ -554,18 +549,27 @@ const Transactions: React.FC<TransactionsProps> = ({ onBack }) => {
     }
   }, [user]);
   
+  // Use ref to avoid dependency issues
+  const userRef = React.useRef(user);
+  const updateUserDataRef = React.useRef(updateUserData);
+  
+  // Keep refs updated
   useEffect(() => {
-    // Create a debounced save function to avoid too many localStorage writes
+    userRef.current = user;
+    updateUserDataRef.current = updateUserData;
+  }, [user, updateUserData]);
+  
+  // This effect now depends only on transactions and categories
+  useEffect(() => {
     const timer = setTimeout(() => {
-      if (user) {
-        updateUserData({ 
-          transactions: transactions,
-          categories: categories
+      if (userRef.current) {
+        updateUserDataRef.current({ 
+          transactions,
+          categories
         });
       }
-    }, 300); // 300ms debounce
+    }, 300);
     
-    // Cleanup timeout on component unmount or before next effect run
     return () => clearTimeout(timer);
   }, [transactions, categories]);
   
@@ -622,8 +626,9 @@ const Transactions: React.FC<TransactionsProps> = ({ onBack }) => {
     }
   };
   
-  // Prepare data for pie chart - Optimized with useMemo
-  const getExpensesByCategory = (): CategoryTotal[] => {
+  // Use memoization to prevent unnecessary chart recalculations
+  const expenseData = React.useMemo(() => {
+    // Inline implementation of getExpensesByCategory
     const expenseTransactions = transactions.filter(t => t.type === 'expense');
     const categoryTotals: { [key: string]: number } = {};
     
@@ -640,16 +645,13 @@ const Transactions: React.FC<TransactionsProps> = ({ onBack }) => {
       value: categoryTotals[category],
       color: CATEGORY_COLORS[index % CATEGORY_COLORS.length]
     }));
-  };
+  }, [transactions]);
   
   // Get the color for a specific category
   const getCategoryColor = (category: string): string => {
     const index = categories.indexOf(category);
     return CATEGORY_COLORS[index % CATEGORY_COLORS.length];
   };
-  
-  // Use memoization to prevent unnecessary chart recalculations
-  const expenseData = React.useMemo(() => getExpensesByCategory(), [transactions, categories]);
   
   // Memoize the total calculations to avoid recalculating on every render
   const { totalIncome, totalExpense, balance } = React.useMemo(() => {
