@@ -380,20 +380,19 @@ const ProgressText = styled.div`
   }
   
   @media (max-width: 768px) {
-    flex-direction: column;
-    font-size: 0.75rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
     
     > span:first-child {
-      margin-bottom: 0.3rem;
+      margin-bottom: 0;
     }
     
     > span:last-child {
-      margin-left: auto;
+      margin-left: 0.5rem;
+      text-align: right;
     }
-  }
-  
-  @media (max-width: 480px) {
-    font-size: 0.7rem;
   }
 `;
 
