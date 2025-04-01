@@ -203,17 +203,55 @@ const Input = styled.input`
 `;
 
 const Select = styled.select`
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(0, 246, 255, 0.3);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 246, 255, 0.5);
   padding: 0.8rem;
-  color: #fff;
+  color: #00f6ff;
   font-family: 'Share Tech Mono', monospace;
   border-radius: 4px;
+  appearance: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0, 246, 255, 0.2);
   
   &:focus {
     outline: none;
     border-color: #00f6ff;
-    box-shadow: 0 0 10px rgba(0, 246, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 246, 255, 0.4);
+  }
+  
+  &:hover {
+    border-color: #00f6ff;
+    box-shadow: 0 0 10px rgba(0, 246, 255, 0.3);
+  }
+  
+  /* Custom dropdown arrow with cyberpunk style */
+  background-image: linear-gradient(45deg, transparent 50%, #00f6ff 50%),
+                    linear-gradient(135deg, #00f6ff 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(1em + 2px),
+                       calc(100% - 15px) calc(1em + 2px);
+  background-size: 5px 5px,
+                   5px 5px;
+  background-repeat: no-repeat;
+  
+  /* Style the options */
+  & option {
+    background-color: #0a0a12;
+    color: #00f6ff;
+    padding: 10px;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  
+  & option:checked,
+  & option:hover {
+    background: linear-gradient(90deg, #0a0a12, rgba(0, 246, 255, 0.2));
+    color: #ffffff;
+  }
+  
+  & option:first-child {
+    font-weight: bold;
+    border-bottom: 1px solid rgba(0, 246, 255, 0.3);
   }
 `;
 
