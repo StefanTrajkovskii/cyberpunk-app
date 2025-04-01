@@ -8,11 +8,22 @@ interface Product {
   imageUrl?: string;
 }
 
+interface Transaction {
+  id: string;
+  amount: number;
+  category: string;
+  description: string;
+  date: string;
+  type: 'income' | 'expense';
+}
+
 interface User {
   username: string;
   isLoggedIn: boolean;
   currency: number;
   marketProducts?: Product[];
+  transactions?: Transaction[];
+  categories?: string[];
 }
 
 interface StoredUser {
@@ -22,6 +33,8 @@ interface StoredUser {
   createdAt?: string;
   currency: number;
   marketProducts?: Product[];
+  transactions?: Transaction[];
+  categories?: string[];
 }
 
 interface UserContextType {
@@ -72,13 +85,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error('Username already exists');
       }
 
+      // Default categories for new users
+      const defaultCategories = [
+        'Food', 'Transportation', 'Housing', 'Entertainment', 'Utilities', 
+        'Shopping', 'Healthcare', 'Education', 'Salary', 'Investment'
+      ];
+
       // Create new user with initial currency of 0
       const newUser: StoredUser = {
         username,
         password,
         createdAt: new Date().toISOString(),
         currency: 0,
-        marketProducts: [] // Initialize empty products array
+        marketProducts: [], // Initialize empty products array
+        transactions: [], // Initialize empty transactions array
+        categories: defaultCategories // Initialize with default categories
       };
       
       // Add to users array
@@ -98,7 +119,14 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       // Log the user in after successful registration
-      setUser({ username, isLoggedIn: true, currency: 0, marketProducts: [] });
+      setUser({ 
+        username, 
+        isLoggedIn: true, 
+        currency: 0, 
+        marketProducts: [],
+        transactions: [],
+        categories: defaultCategories
+      });
       console.log('Registration successful and user logged in');
     } catch (error) {
       console.error('Registration error:', error);
@@ -138,7 +166,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         username, 
         isLoggedIn: true, 
         currency: foundUser.currency,
-        marketProducts: foundUser.marketProducts || []
+        marketProducts: foundUser.marketProducts || [],
+        transactions: foundUser.transactions || [],
+        categories: foundUser.categories || []
       });
     } catch (error) {
       console.error('Login error:', error);
